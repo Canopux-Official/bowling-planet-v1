@@ -1,0 +1,53 @@
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 56px;
+}
+
+.thumb {
+  aspect-ratio: 16 / 10;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5FC1D1;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0;
+  color: #86868B;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+@media (max-width: 900px) {
+  .header {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

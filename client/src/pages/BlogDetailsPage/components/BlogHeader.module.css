@@ -1,0 +1,27 @@
+.header {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 120px 28px 28px;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F7;
+  line-height: 1.12;
+}
+
+.meta {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #86868B;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

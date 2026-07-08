@@ -1,0 +1,30 @@
+.wrap {
+  margin: 40px 0 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  border-radius: 4px;
+  border: none;
+  background: #5FC1D1;
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+.hint {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #48484A;
+}

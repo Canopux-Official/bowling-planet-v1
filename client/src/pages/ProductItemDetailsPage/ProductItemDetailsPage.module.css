@@ -1,0 +1,11 @@
+.page {
+  background: #000;
+  color: #F5F5F7;
+  min-height: 60vh;
+  padding: 120px 28px 80px;
+}
+
+.inner {
+  max-width: 960px;
+  margin: 0 auto;
+}

@@ -1,0 +1,35 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heading {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #48484A;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

@@ -1,0 +1,34 @@
+.section {
+  margin-bottom: 48px;
+}
+
+.heading {
+  margin: 0 0 20px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.group {
+  margin-bottom: 24px;
+}
+
+.groupTitle {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5FC1D1;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: #86868B;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.list li + li {
+  margin-top: 6px;
+}

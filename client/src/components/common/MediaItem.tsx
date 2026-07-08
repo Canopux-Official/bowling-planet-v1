@@ -1,9 +1,15 @@
 import type { FC } from 'react'
-import type { IMedia } from '../../pages/ProjectsPage/services/projectsApi'
 import styles from './MediaItem.module.css'
 
+// Shared media shape used by Projects and Products modules.
+export interface CommonMedia {
+  type: 'image' | 'video'
+  url: string
+  publicId?: string
+}
+
 interface MediaItemProps {
-  media: IMedia
+  media: CommonMedia
   alt?: string
   className?: string
   controls?: boolean

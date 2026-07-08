@@ -1,0 +1,27 @@
+.header {
+  margin-bottom: 36px;
+}
+
+.title {
+  margin: 0 0 14px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0 0 16px;
+  max-width: 640px;
+  color: #86868B;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.price {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #5FC1D1;
+}

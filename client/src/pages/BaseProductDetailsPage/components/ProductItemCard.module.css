@@ -1,0 +1,65 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(95, 193, 209, 0.4);
+}
+
+.thumb {
+  aspect-ratio: 16 / 10;
+  background: #111118;
+  overflow: hidden;
+}
+
+.body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.title {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #86868B;
+  flex: 1;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  margin-top: 8px;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #5FC1D1;
+}
+
+.purchased {
+  font-size: 12px;
+  color: #48484A;
+}

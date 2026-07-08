@@ -1,10 +1,9 @@
 import { type FC, useEffect, useState } from 'react'
-import type { IMedia } from '../../pages/ProjectsPage/services/projectsApi'
-import MediaItem from './MediaItem'
+import MediaItem, { type CommonMedia } from './MediaItem'
 import styles from './Lightbox.module.css'
 
 interface LightboxProps {
-  media: IMedia[]
+  media: CommonMedia[]
   initialIndex: number
   isOpen: boolean
   onClose: () => void

@@ -1,0 +1,18 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #F5F5F7;
+}
+
+.pdf { background: rgba(95, 193, 209, 0.15); color: #5FC1D1; }
+.video { background: rgba(109, 189, 78, 0.15); color: #6DBD4E; }
+.tool { background: rgba(255, 170, 51, 0.15); color: #FFAA33; }
+.link { background: rgba(192, 132, 252, 0.15); color: #C084FC; }
+.guide { background: rgba(255, 255, 255, 0.08); color: #86868B; }

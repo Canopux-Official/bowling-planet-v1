@@ -1,0 +1,16 @@
+.article {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 8px 28px 48px;
+  color: #86868B;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.article :global(p) {
+  margin: 0 0 16px;
+}
+
+.article :global(p:last-child) {
+  margin-bottom: 0;
+}

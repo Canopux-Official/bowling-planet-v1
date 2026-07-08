@@ -11,14 +11,22 @@ import Layout from './components/Layout'
 import { theme } from './theme'
 
 const LandingPage = lazy(() => import('./pages/Landing/LandingPage'))
-const AboutPage = lazy(() => import('./pages/About/AboutPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage/AboutPage'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage/ProjectsPage'))
 const ProjectDetailsPage = lazy(() => import('./pages/ProjectDetailsPage/ProjectDetailsPage'))
+const ProductsPage = lazy(() => import('./pages/ProductsPage/ProductsPage'))
+const BaseProductDetailsPage = lazy(
+  () => import('./pages/BaseProductDetailsPage/BaseProductDetailsPage'),
+)
+const ProductItemDetailsPage = lazy(
+  () => import('./pages/ProductItemDetailsPage/ProductItemDetailsPage'),
+)
 const FranchisePage = lazy(() => import('./pages/Franchise/FranchisePage'))
 const JobsPage = lazy(() => import('./pages/JobsPage/JobsPage'))
 const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage/JobDetailsPage'))
 const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
-const BlogPage = lazy(() => import('./pages/Blog/BlogPage'))
+const InsightsPage = lazy(() => import('./pages/InsightsPage/InsightsPage'))
+const BlogDetailsPage = lazy(() => import('./pages/BlogDetailsPage/BlogDetailsPage'))
 const LoginPage = lazy(() => import('./pages/Login/LoginPage'))
 const SignupPage = lazy(() => import('./pages/Signup/SignupPage'))
 
@@ -52,11 +60,18 @@ export default function App() {
               <Route path="about" element={<AboutPage />} />
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="projects/:slug" element={<ProjectDetailsPage />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route
+                path="products/:baseSlug/:itemSlug"
+                element={<ProductItemDetailsPage />}
+              />
+              <Route path="products/:slug" element={<BaseProductDetailsPage />} />
               <Route path="franchise" element={<FranchisePage />} />
               <Route path="careers" element={<JobsPage />} />
               <Route path="careers/:slug" element={<JobDetailsPage />} />
               <Route path="contact" element={<ContactPage />} />
-              <Route path="blog" element={<BlogPage />} />
+              <Route path="blog" element={<InsightsPage />} />
+              <Route path="blog/:slug" element={<BlogDetailsPage />} />
             </Route>
 
             <Route path="login" element={<LoginPage />} />

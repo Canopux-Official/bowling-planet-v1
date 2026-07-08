@@ -1,0 +1,43 @@
+.section {
+  margin-bottom: 48px;
+}
+
+.heading {
+  margin: 0 0 20px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #86868B;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

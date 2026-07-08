@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { label: 'About',     path: '/about'     },
   { label: 'Services',  path: '/#services' },
   { label: 'Projects',  path: '/projects'  },
+  { label: 'Products',  path: '/products'  },
   { label: 'Franchise', path: '/franchise' },
   { label: 'Careers',   path: '/careers'   },
   { label: 'Blog',      path: '/blog'      },

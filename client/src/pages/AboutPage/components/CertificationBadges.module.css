@@ -1,0 +1,52 @@
+.section {
+  padding: 72px 28px;
+  background: #0A0A0F;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.heading {
+  margin: 0 0 28px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 28px 24px;
+  background: #000;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #F5F5F7;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+}
+
+.text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #86868B;
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

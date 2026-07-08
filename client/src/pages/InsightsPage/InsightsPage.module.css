@@ -1,0 +1,54 @@
+.page {
+  background: #000;
+  color: #F5F5F7;
+  min-height: 60vh;
+  padding: 120px 28px 80px;
+}
+
+.inner {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5FC1D1;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 560px;
+  color: #86868B;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

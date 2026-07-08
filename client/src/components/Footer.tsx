@@ -16,6 +16,7 @@ const NAV_COLS = [
     links: [
       { l: 'Consulting', path: '/services'  },
       { l: 'Projects',   path: '/projects'  },
+      { l: 'Products',   path: '/products'  },
       { l: 'Franchise',  path: '/franchise' },
     ],
   },
