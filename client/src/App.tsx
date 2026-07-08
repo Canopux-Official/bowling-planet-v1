@@ -7,15 +7,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Layout from './components/Layout'
-import LandingPage from './pages/LandingPage'
-import AboutPage from './pages/AboutPage'
-import ProductsPage from './pages/ProductsPage'
-import FranchisePage from './pages/FranchisePage'
-import CareersPage from './pages/CareersPage'
-import ContactPage from './pages/ContactPage'
-import BlogPage from './pages/BlogPage'
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
+import LandingPage from './pages/Landing/LandingPage'
+import AboutPage from './pages/About/AboutPage'
+import ProductsPage from './pages/Products/ProductsPage'
+import FranchisePage from './pages/Franchise/FranchisePage'
+import CareersPage from './pages/Careers/CareersPage'
+import ContactPage from './pages/Contact/ContactPage'
+import BlogPage from './pages/Blog/BlogPage'
+import LoginPage from './pages/Login/LoginPage'
+import SignupPage from './pages/Signup/SignupPage'
 
 export default function App() {
   return (
@@ -37,3 +37,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
