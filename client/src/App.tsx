@@ -1,40 +1,67 @@
 /**
  * Bowling Planet — App entry point
- * ─────────────────────────────────
- * Set up React Router and routes.
+ * Nested layout, lazy routes, Helmet for SEO.
  */
 
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 
 import Layout from './components/Layout'
-import LandingPage from './pages/Landing/LandingPage'
-import AboutPage from './pages/About/AboutPage'
-import ProductsPage from './pages/Products/ProductsPage'
-import FranchisePage from './pages/Franchise/FranchisePage'
-import CareersPage from './pages/Careers/CareersPage'
-import ContactPage from './pages/Contact/ContactPage'
-import BlogPage from './pages/Blog/BlogPage'
-import LoginPage from './pages/Login/LoginPage'
-import SignupPage from './pages/Signup/SignupPage'
+import { theme } from './theme'
 
-export default function App() {
+const LandingPage = lazy(() => import('./pages/Landing/LandingPage'))
+const AboutPage = lazy(() => import('./pages/About/AboutPage'))
+const ProductsPage = lazy(() => import('./pages/Products/ProductsPage'))
+const ProductDetailPage = lazy(() => import('./pages/ProductDetail/ProductDetailPage'))
+const FranchisePage = lazy(() => import('./pages/Franchise/FranchisePage'))
+const CareersPage = lazy(() => import('./pages/Careers/CareersPage'))
+const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
+const BlogPage = lazy(() => import('./pages/Blog/BlogPage'))
+const LoginPage = lazy(() => import('./pages/Login/LoginPage'))
+const SignupPage = lazy(() => import('./pages/Signup/SignupPage'))
+
+function RouteFallback() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<LandingPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="franchise" element={<FranchisePage />} />
-          <Route path="careers" element={<CareersPage />} />
-          <Route path="contact" element={<ContactPage />} />
-          <Route path="blog" element={<BlogPage />} />
-        </Route>
-
-        <Route path="login" element={<LoginPage />} />
-        <Route path="signup" element={<SignupPage />} />
-      </Routes>
-    </BrowserRouter>
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        minHeight: '40vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: theme.colors.text2,
+        padding: 48,
+      }}
+    >
+      Loading…
+    </div>
   )
 }
 
+export default function App() {
+  return (
+    <HelmetProvider>
+      <BrowserRouter>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<LandingPage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="products/:slug" element={<ProductDetailPage />} />
+              <Route path="franchise" element={<FranchisePage />} />
+              <Route path="careers" element={<CareersPage />} />
+              <Route path="contact" element={<ContactPage />} />
+              <Route path="blog" element={<BlogPage />} />
+            </Route>
+
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignupPage />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </HelmetProvider>
+  )
+}

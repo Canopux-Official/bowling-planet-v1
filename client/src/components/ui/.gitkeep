@@ -1,0 +1,2 @@
+/** Reserved for shared UI primitives used across product pages. */
+export {}

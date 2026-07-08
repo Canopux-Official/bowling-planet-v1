@@ -1,4 +1,5 @@
 import { type FC } from 'react'
+import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 
 const CATEGORIES = [
@@ -154,14 +155,13 @@ const ProductsSection: FC = () => {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          {/* TODO: connect to /products catalog route */}
-          <button
+          <Link
+            to="/products"
             className="btn btn-primary"
-            onClick={() => console.log('TODO: connect to Browse Full Catalog page')}
             aria-label="Browse the full product catalog"
           >
             Browse Full Catalog
-          </button>
+          </Link>
         </div>
       </div>
     </section>

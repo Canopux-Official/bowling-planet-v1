@@ -105,10 +105,9 @@ const Hero: FC = () => {
           <span className="text-metallic" style={{ display: 'block' }}>India's Best</span>
           {/* Fixed-height line so the layout never shifts when word length changes */}
           <span style={{
-            display: 'block',
+            display: 'flex',
             height: 'clamp(3rem, 6.6vw, 6.6rem)',
             overflow: 'hidden',
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}>

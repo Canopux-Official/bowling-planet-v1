@@ -1,0 +1,2 @@
+/** Router utilities — primary route table remains in App.tsx. */
+export {}

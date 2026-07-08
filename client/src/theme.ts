@@ -19,6 +19,7 @@ export const theme = {
     tealMid: '#4AAFBF',
     green: '#6DBD4E',
     greenMid: '#58A83E',
+    purple: '#C084FC',
     
     // Text (Apple-inspired palette)
     text1: '#F5F5F7', // Primary white
@@ -35,7 +36,7 @@ export const theme = {
   },
   
   typography: {
-    fontDisplay: '"Sora", "SF Pro Display", -apple-system, sans-serif',
+    fontDisplay: '"Plus Jakarta Sans", "Sora", "SF Pro Display", -apple-system, sans-serif',
     fontBody: '"Inter", -apple-system, "SF Pro Text", sans-serif',
   },
   

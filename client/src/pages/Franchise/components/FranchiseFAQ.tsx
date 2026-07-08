@@ -91,6 +91,9 @@ const FranchiseFAQ: FC = () => {
               >
                 <button
                   className="faq-btn"
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
                   style={{
                     width: '100%',
                     background: 'none',

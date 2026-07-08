@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
 /* ═══════════════════════════════════════════════════════════
    BOWLING PLANET · Apple-Dark × Gaming-Neon Design System
@@ -64,7 +63,7 @@ body {
    TYPOGRAPHY
    ═══════════════════════════════════════════ */
 
-.font-display { font-family: "Sora", "SF Pro Display", -apple-system, sans-serif; }
+.font-display { font-family: "Plus Jakarta Sans", "Sora", "SF Pro Display", -apple-system, sans-serif; }
 
 /* Metallic headline gradient — Apple's signature look on dark */
 .text-metallic {
