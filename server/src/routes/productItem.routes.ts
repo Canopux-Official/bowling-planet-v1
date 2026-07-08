@@ -9,14 +9,20 @@ import {
   incrementPurchaseCount,
   deleteProductItem,
 } from '../controllers/productItem.controller';
+import { upload } from '../middleware/multer';
 
 const router = Router();
 
+const productItemUpload = upload.fields([
+  { name: 'thumbnail', maxCount: 1 },
+  { name: 'gallery', maxCount: 10 }
+]);
+
 // admin
-router.post('/', createProductItem);
-router.patch('/:id', updateProductItem);
-router.patch('/:id/purchase', incrementPurchaseCount);
-router.delete('/:id', deleteProductItem);
+router.post('/admin', productItemUpload,createProductItem);
+router.patch('/admin/:id', productItemUpload,updateProductItem);
+router.patch('/admin/:id/purchase', incrementPurchaseCount);
+router.delete('/admin/:id', deleteProductItem);
 
 // public
 router.get('/', getAllProductItems);

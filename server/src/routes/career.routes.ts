@@ -15,10 +15,10 @@ router.get('/', getAllJobs);
 router.get('/:slug', getJobBySlug);
 
 // Admin 
-router.post('/', createJob);
-router.get('/id/:id', getJobById);
-router.put('/:id', updateJob);
-router.delete('/:id', deleteJob);
+router.post('/admin', createJob);
+router.get('/admin/id/:id', getJobById);
+router.put('/admin/:id', updateJob);
+router.delete('/admin/:id', deleteJob);
 
 
 

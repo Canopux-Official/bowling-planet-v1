@@ -3,6 +3,8 @@
  * // Assumption: types colocated with list API to avoid an extra types folder.
  */
 
+import { MOCK_PROJECTS } from "./mockdata"
+
 export interface IMedia {
   type: 'image' | 'video'
   url: string
@@ -75,14 +77,18 @@ export interface GetAllProjectsResponse {
   pagination: IPaginationMeta
 }
 
-export async function getAllProjects(
-  params: GetAllProjectsParams,
-): Promise<GetAllProjectsResponse> {
-  // TODO: implement API call
-  const page = params.page ?? 1
-  const limit = params.limit ?? 9
+export const getAllProjects = async (params: any): Promise<GetAllProjectsResponse> => {
+  // Simulate network latency
+  await new Promise(resolve => setTimeout(resolve, 600));
+
+  // Simply return your mock payload directly matching the expected API schema
   return {
-    projects: [],
-    pagination: { total: 0, page, limit, totalPages: 0 },
-  }
-}
+    projects: MOCK_PROJECTS as unknown as IProject[],
+    pagination: {
+      total: MOCK_PROJECTS.length,
+      page: params.page || 1,
+      limit: params.limit || 9,
+      totalPages: 1
+    }
+  };
+};

@@ -4,9 +4,9 @@ const router = express.Router()
 
 
 // admin
-router.post('/', createTeamMember);
-router.patch('/:id', updateTeamMember);
-router.delete('/:id', deleteTeamMember);
+router.post('/admin', createTeamMember);
+router.patch('/admin/:id', updateTeamMember);
+router.delete('/admin/:id', deleteTeamMember);
 
 
 // public

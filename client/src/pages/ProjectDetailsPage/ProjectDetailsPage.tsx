@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
 import type { IProject } from '../ProjectsPage/services/projectsApi'
-import { getProjectBySlug } from './services/projectDetailsApi'
+// 1. Import your mock project data array
+
 import ProjectHero from './components/ProjectHero'
 import ProjectGallery from './components/ProjectGallery'
 import FeaturePointsList from './components/FeaturePointsList'
@@ -11,6 +12,7 @@ import BulletListSection from './components/BulletListSection'
 import SetupStepsTimeline from './components/SetupStepsTimeline'
 import TestimonialsCarousel from './components/TestimonialsCarousel'
 import styles from './ProjectDetailsPage.module.css'
+import { MOCK_PROJECTS } from '../ProjectsPage/services/mockdata'
 
 const ProjectDetailsPage: FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -28,13 +30,18 @@ const ProjectDetailsPage: FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await getProjectBySlug(slug)
-      // Placeholder stub returns empty title until API is wired.
-      if (!data.title) {
+      // 2. Simulate network delay (e.g., 400ms) to witness your loader
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      // 3. Find the specific project matching the URL slug parameter
+      const matchedProject = MOCK_PROJECTS.find((p) => p.slug === slug);
+
+      if (!matchedProject) {
         setProject(null)
         setError('Project not found.')
       } else {
-        setProject(data)
+        // Cast as IProject safely for template integration
+        setProject(matchedProject as unknown as IProject)
       }
     } catch {
       setError('Unable to load this project.')

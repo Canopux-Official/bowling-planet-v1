@@ -7,14 +7,19 @@ import {
   updateBaseProduct,
   deleteBaseProduct,
 } from '../controllers/baseProduct.controller';
+import { upload } from '../middleware/multer';
 
 const router = Router();
 
+const baseProductUpload = upload.fields([
+  { name: 'thumbnail', maxCount: 1 }
+]);
+
 
 // admin
-router.post('/', createBaseProduct);
-router.patch('/:id', updateBaseProduct);
-router.delete('/:id', deleteBaseProduct);
+router.post('/admin',baseProductUpload, createBaseProduct);
+router.patch('/admin/:id',baseProductUpload, updateBaseProduct);
+router.delete('/admin/:id', deleteBaseProduct);
 
 // public
 router.get('/', getAllBaseProducts);
