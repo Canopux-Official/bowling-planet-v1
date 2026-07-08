@@ -21,6 +21,8 @@ import baseProductRoutes from './routes/baseProduct.routes';
 import productItemRoutes from './routes/productItem.routes';
 import careerRoutes from './routes/career.routes';
 import teamRoutes from './routes/team.routes';
+import blogRoutes from './routes/blog.routes';
+import resourceRoutes from './routes/resources.routes';
 
 const app = express();
 
@@ -131,6 +133,8 @@ app.use('/base-products',baseProductRoutes);
 app.use('/product-items',productItemRoutes);
 app.use('/career',careerRoutes);
 app.use('/team',teamRoutes);
+app.use('/blog',blogRoutes);
+app.use('/resource',resourceRoutes);
 
 // ------------------------------------------------------------------
 // 8. 404 HANDLER — catches any request that didn't match a route.
