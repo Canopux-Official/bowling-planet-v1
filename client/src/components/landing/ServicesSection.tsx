@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 interface Service {
   id: string; num: string; eyebrow: string; title: string
@@ -181,3 +181,4 @@ const ServicesSection: FC = () => {
 }
 
 export default ServicesSection
+

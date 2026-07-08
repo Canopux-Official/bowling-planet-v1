@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 const STATS = [
   { num: '17+',  label: 'Years of Experience' },
@@ -47,3 +47,4 @@ const StatsBar: FC = () => {
 }
 
 export default StatsBar
+

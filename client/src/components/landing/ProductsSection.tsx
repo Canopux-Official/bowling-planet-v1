@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 const CATEGORIES = [
   {
@@ -169,3 +169,4 @@ const ProductsSection: FC = () => {
 }
 
 export default ProductsSection
+

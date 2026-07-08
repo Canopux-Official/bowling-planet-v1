@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 const BRANDS = [
   'Roongta Cinema',
@@ -122,3 +122,4 @@ const TrustedBrands: FC = () => {
 }
 
 export default TrustedBrands
+

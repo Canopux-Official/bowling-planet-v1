@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
-import { theme } from '../theme'
-import { useReveal } from '../hooks/useReveal'
+import { theme } from '../../theme'
+import { useReveal } from '../../hooks/useReveal'
 
 const HIGHLIGHTS = [
   {
@@ -188,3 +188,4 @@ const FranchiseSection: FC = () => {
 }
 
 export default FranchiseSection
+

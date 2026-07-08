@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 const CONTACTS = [
   { label: 'Email',    value: 'pr@bowlingplanet.co.in', href: 'mailto:pr@bowlingplanet.co.in' },
@@ -92,3 +92,4 @@ const ContactSection: FC = () => {
 }
 
 export default ContactSection
+

@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 const AboutSection: FC = () => {
   const titleRef = useReveal()
@@ -221,3 +221,4 @@ const AboutSection: FC = () => {
 }
 
 export default AboutSection
+

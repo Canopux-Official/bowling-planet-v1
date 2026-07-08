@@ -3,7 +3,7 @@
  */
 
 import { type FC, Suspense, useState, useEffect } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 import Hero3DScene from './Hero3DScene'
 
 const ACTIVITIES = [
@@ -187,3 +187,4 @@ const Hero: FC = () => {
 }
 
 export default Hero
+

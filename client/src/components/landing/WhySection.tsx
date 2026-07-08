@@ -1,6 +1,6 @@
 import { type FC } from 'react'
-import { theme } from '../theme'
-import { useReveal } from '../hooks/useReveal'
+import { theme } from '../../theme'
+import { useReveal } from '../../hooks/useReveal'
 
 const PROPS = [
   { id: 'w1', num: '01', icon: '🎯', title: 'Industry Expertise',            desc: 'Deep operational knowledge across FEC, cinema, and entertainment — not just consulting theory.' },
@@ -149,3 +149,4 @@ const WhySection: FC = () => {
 }
 
 export default WhySection
+

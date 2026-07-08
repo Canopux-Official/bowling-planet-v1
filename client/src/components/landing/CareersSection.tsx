@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { useReveal } from '../hooks/useReveal'
+import { useReveal } from '../../hooks/useReveal'
 
 
 const CareersSection: FC = () => {
@@ -46,3 +46,4 @@ const CareersSection: FC = () => {
 }
 
 export default CareersSection
+
