@@ -1,0 +1,361 @@
+// TEMPORARY: Replace with real API integration later.
+/**
+ * Shared job types — mirrors backend Mongoose schema exactly.
+ * // Assumption: types colocated with list API to avoid an extra types folder.
+ */
+
+export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Freelance'
+export type ExperienceLevel = 'Fresher' | '0-1 years' | '1-3 years' | '3-5 years' | '5+ years'
+export type WorkMode = 'On-site' | 'Remote' | 'Hybrid'
+export type JobStatus = 'open' | 'closed' | 'draft'
+
+export interface IJob {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  location: string
+  workMode: WorkMode
+  jobType: JobType
+  experience: ExperienceLevel
+  eligibilityCriteria: string[]
+  requirements: string[]
+  keyResponsibilities: string[]
+  skills: string[]
+  tags: string[]
+  department?: string
+  openings: number
+  applicationEmail: string
+  applicationDeadline?: string
+  status: JobStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface IPaginationMeta {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export type JobSort = 'newest' | 'oldest' | 'title'
+
+export interface GetAllJobsParams {
+  status?: JobStatus
+  jobType?: JobType
+  workMode?: WorkMode
+  experience?: ExperienceLevel
+  department?: string
+  tags?: string[]
+  search?: string
+  page?: number
+  limit?: number
+  sort?: JobSort
+}
+
+export interface GetAllJobsResponse {
+  jobs: IJob[]
+  pagination: IPaginationMeta
+}
+
+export const mockJobs: IJob[] = [
+  {
+    _id: 'job-1',
+    title: 'Senior Frontend Developer',
+    slug: 'senior-frontend-developer',
+    description:
+      'Lead the development of Bowling Planet’s public web experiences. You will own React architecture, accessibility, and performance for marketing and product-facing pages.',
+    location: 'Bangalore',
+    workMode: 'Hybrid',
+    jobType: 'Full-time',
+    experience: '3-5 years',
+    eligibilityCriteria: [
+      'Bachelor’s degree in Computer Science or equivalent experience',
+      'Legal eligibility to work in India',
+      'Willingness to visit client sites occasionally',
+      'Strong communication skills in English',
+    ],
+    requirements: [
+      '3+ years of production React/TypeScript experience',
+      'Solid understanding of responsive CSS and design systems',
+      'Experience with accessibility (WCAG AA)',
+      'Familiarity with Vite or similar modern tooling',
+    ],
+    keyResponsibilities: [
+      'Build and maintain public-facing web features',
+      'Collaborate with design and backend teams',
+      'Own code quality, reviews, and documentation',
+      'Improve Core Web Vitals and SEO foundations',
+    ],
+    skills: ['React', 'TypeScript', 'CSS Modules', 'Accessibility', 'Git'],
+    tags: ['Engineering', 'Frontend', 'React'],
+    department: 'Engineering',
+    openings: 2,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-12-31',
+    status: 'open',
+    createdAt: '2026-06-01T10:00:00.000Z',
+    updatedAt: '2026-06-15T10:00:00.000Z',
+  },
+  {
+    _id: 'job-2',
+    title: 'Marketing Associate',
+    slug: 'marketing-associate',
+    description:
+      'Support brand campaigns, franchisee outreach, and digital content for Bowling Planet across India.',
+    location: 'Remote',
+    workMode: 'Remote',
+    jobType: 'Full-time',
+    experience: '0-1 years',
+    eligibilityCriteria: [
+      'Graduate in Marketing, Communications, or related field',
+      'Comfortable with remote collaboration tools',
+      'Portfolio of written or social content preferred',
+    ],
+    requirements: [
+      'Working knowledge of social platforms and analytics basics',
+      'Strong written English',
+      'Ability to manage multiple campaign timelines',
+    ],
+    keyResponsibilities: [
+      'Draft campaign copy and social calendars',
+      'Coordinate with franchise and sales teams',
+      'Track campaign metrics and prepare reports',
+      'Support event and trade-show content',
+    ],
+    skills: ['Content Writing', 'Social Media', 'Canva', 'Excel', 'SEO Basics'],
+    tags: ['Marketing', 'Remote', 'Entry Level'],
+    department: 'Marketing',
+    openings: 1,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-09-30',
+    status: 'open',
+    createdAt: '2026-05-20T10:00:00.000Z',
+    updatedAt: '2026-06-01T10:00:00.000Z',
+  },
+  {
+    _id: 'job-3',
+    title: 'UI/UX Designer',
+    slug: 'ui-ux-designer',
+    description:
+      'Design polished interfaces for entertainment destinations, franchise tools, and the public Bowling Planet website.',
+    location: 'Mumbai',
+    workMode: 'Hybrid',
+    jobType: 'Full-time',
+    experience: '1-3 years',
+    eligibilityCriteria: [
+      'Design degree or equivalent portfolio',
+      'Based in or willing to relocate to Mumbai',
+      'Experience shipping digital products end to end',
+    ],
+    requirements: [
+      'Proficiency in Figma',
+      'Strong visual and interaction design craft',
+      'Understanding of design systems and handoff',
+    ],
+    keyResponsibilities: [
+      'Create wireframes, prototypes, and high-fidelity UI',
+      'Maintain component library with engineering',
+      'Run lightweight user feedback sessions',
+      'Ensure visual consistency across pages',
+    ],
+    skills: ['Figma', 'Prototyping', 'Design Systems', 'Typography', 'User Research'],
+    tags: ['Design', 'UI', 'UX'],
+    department: 'Design',
+    openings: 1,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-10-15',
+    status: 'open',
+    createdAt: '2026-05-10T10:00:00.000Z',
+    updatedAt: '2026-05-28T10:00:00.000Z',
+  },
+  {
+    _id: 'job-4',
+    title: 'Project Coordinator Intern',
+    slug: 'project-coordinator-intern',
+    description:
+      'Assist project managers with timelines, vendor coordination, and documentation for FEC installation programmes.',
+    location: 'Surat',
+    workMode: 'On-site',
+    jobType: 'Internship',
+    experience: 'Fresher',
+    eligibilityCriteria: [
+      'Currently pursuing or recently completed a degree',
+      'Available for a 6-month internship',
+      'Willingness to travel within Gujarat occasionally',
+    ],
+    requirements: [
+      'Excellent organisational skills',
+      'Working knowledge of Google Workspace or MS Office',
+      'Clear written and verbal communication',
+    ],
+    keyResponsibilities: [
+      'Track project milestones and follow-ups',
+      'Prepare meeting notes and status packs',
+      'Coordinate vendor and site scheduling',
+      'Maintain shared project documentation',
+    ],
+    skills: ['Coordination', 'MS Office', 'Communication', 'Documentation'],
+    tags: ['Internship', 'Operations', 'On-site'],
+    department: 'Operations',
+    openings: 3,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-08-31',
+    status: 'open',
+    createdAt: '2026-06-10T10:00:00.000Z',
+    updatedAt: '2026-06-18T10:00:00.000Z',
+  },
+  {
+    _id: 'job-5',
+    title: 'Backend Engineer',
+    slug: 'backend-engineer',
+    description:
+      'Build reliable APIs for projects, jobs, and content systems powering Bowling Planet’s digital platforms.',
+    location: 'Bangalore',
+    workMode: 'On-site',
+    jobType: 'Full-time',
+    experience: '3-5 years',
+    eligibilityCriteria: [
+      'Bachelor’s in Engineering or equivalent experience',
+      'Production experience with Node.js and MongoDB',
+      'Comfortable owning API design and data modelling',
+    ],
+    requirements: [
+      'Strong Node.js/TypeScript skills',
+      'Experience with Express or similar frameworks',
+      'Understanding of authentication and authorisation patterns',
+      'Familiarity with cloud deployments',
+    ],
+    keyResponsibilities: [
+      'Design and implement REST APIs',
+      'Maintain data integrity and performance',
+      'Collaborate with frontend engineers on contracts',
+      'Improve monitoring and error handling',
+    ],
+    skills: ['Node.js', 'TypeScript', 'MongoDB', 'Express', 'REST'],
+    tags: ['Engineering', 'Backend', 'API'],
+    department: 'Engineering',
+    openings: 2,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-11-30',
+    status: 'open',
+    createdAt: '2026-04-12T10:00:00.000Z',
+    updatedAt: '2026-06-02T10:00:00.000Z',
+  },
+  {
+    _id: 'job-6',
+    title: 'Business Development Manager',
+    slug: 'business-development-manager',
+    description:
+      'Drive FEC consulting and franchise conversations with malls, hotels, and investors across key Indian markets.',
+    location: 'Delhi NCR',
+    workMode: 'Hybrid',
+    jobType: 'Full-time',
+    experience: '5+ years',
+    eligibilityCriteria: [
+      'Proven B2B sales or consulting experience',
+      'Willingness to travel extensively',
+      'Existing network in real estate or hospitality preferred',
+    ],
+    requirements: [
+      '5+ years in enterprise or project sales',
+      'Excellent presentation and negotiation skills',
+      'Ability to manage complex deal cycles',
+    ],
+    keyResponsibilities: [
+      'Generate and qualify high-value leads',
+      'Lead discovery and proposal meetings',
+      'Coordinate with consulting and design teams',
+      'Maintain CRM hygiene and forecast accuracy',
+    ],
+    skills: ['B2B Sales', 'Negotiation', 'CRM', 'Presentation', 'Consulting'],
+    tags: ['Sales', 'Business Development', 'Hybrid'],
+    department: 'Sales',
+    openings: 1,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-07-01',
+    status: 'closed',
+    createdAt: '2026-03-01T10:00:00.000Z',
+    updatedAt: '2026-06-20T10:00:00.000Z',
+  },
+  {
+    _id: 'job-7',
+    title: 'Contract Technical Writer',
+    slug: 'contract-technical-writer',
+    description:
+      'Document SOPs, installation guides, and operator training materials for entertainment destination projects.',
+    location: 'Remote',
+    workMode: 'Remote',
+    jobType: 'Contract',
+    experience: '1-3 years',
+    eligibilityCriteria: [
+      'Portfolio of technical or process documentation',
+      'Ability to interview subject-matter experts remotely',
+      'Reliable availability for a 3-month engagement',
+    ],
+    requirements: [
+      'Clear structured writing in English',
+      'Experience with Markdown or docs-as-code workflows',
+      'Ability to simplify complex operational processes',
+    ],
+    keyResponsibilities: [
+      'Draft and edit operator documentation',
+      'Maintain versioned document libraries',
+      'Collaborate with operations and training leads',
+      'Produce onboarding checklists and guides',
+    ],
+    skills: ['Technical Writing', 'Markdown', 'Editing', 'Process Docs'],
+    tags: ['Contract', 'Remote', 'Documentation'],
+    department: 'Operations',
+    openings: 1,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2025-12-01',
+    status: 'open',
+    createdAt: '2026-02-15T10:00:00.000Z',
+    updatedAt: '2026-03-01T10:00:00.000Z',
+  },
+  {
+    _id: 'job-8',
+    title: 'Freelance Motion Designer',
+    slug: 'freelance-motion-designer',
+    description:
+      'Create short-form motion assets for website heroes, franchise decks, and social campaigns.',
+    location: 'Remote',
+    workMode: 'Remote',
+    jobType: 'Freelance',
+    experience: '1-3 years',
+    eligibilityCriteria: [
+      'Strong motion reel required',
+      'Able to deliver assets in After Effects / equivalent',
+      'Responsive across IST business hours',
+    ],
+    requirements: [
+      'Portfolio of marketing or product motion work',
+      'Understanding of brand-safe, premium aesthetics',
+      'Reliable file organisation and delivery timelines',
+    ],
+    keyResponsibilities: [
+      'Produce hero and section motion treatments',
+      'Adapt assets for web and social formats',
+      'Iterate based on design feedback',
+      'Deliver export-ready packages',
+    ],
+    skills: ['After Effects', 'Motion Graphics', 'Storyboarding', 'Exporting'],
+    tags: ['Freelance', 'Design', 'Motion'],
+    department: 'Design',
+    openings: 1,
+    applicationEmail: 'careers@bowlingplanet.co.in',
+    applicationDeadline: '2026-08-15',
+    status: 'open',
+    createdAt: '2026-06-05T10:00:00.000Z',
+    updatedAt: '2026-06-12T10:00:00.000Z',
+  },
+]
+
+export const mockPagination: IPaginationMeta = {
+  total: mockJobs.length,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
+}

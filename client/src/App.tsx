@@ -15,7 +15,8 @@ const AboutPage = lazy(() => import('./pages/About/AboutPage'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage/ProjectsPage'))
 const ProjectDetailsPage = lazy(() => import('./pages/ProjectDetailsPage/ProjectDetailsPage'))
 const FranchisePage = lazy(() => import('./pages/Franchise/FranchisePage'))
-const CareersPage = lazy(() => import('./pages/Careers/CareersPage'))
+const JobsPage = lazy(() => import('./pages/JobsPage/JobsPage'))
+const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage/JobDetailsPage'))
 const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
 const BlogPage = lazy(() => import('./pages/Blog/BlogPage'))
 const LoginPage = lazy(() => import('./pages/Login/LoginPage'))
@@ -52,7 +53,8 @@ export default function App() {
               <Route path="projects" element={<ProjectsPage />} />
               <Route path="projects/:slug" element={<ProjectDetailsPage />} />
               <Route path="franchise" element={<FranchisePage />} />
-              <Route path="careers" element={<CareersPage />} />
+              <Route path="careers" element={<JobsPage />} />
+              <Route path="careers/:slug" element={<JobDetailsPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="blog" element={<BlogPage />} />
             </Route>

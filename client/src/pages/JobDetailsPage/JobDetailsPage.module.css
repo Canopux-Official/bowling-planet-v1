@@ -1,0 +1,14 @@
+.page {
+  background: #000;
+  min-height: 60vh;
+  color: #F5F5F7;
+}
+
+.missing {
+  padding: 140px 28px;
+  text-align: center;
+}
+
+.missing a {
+  color: #5FC1D1;
+}

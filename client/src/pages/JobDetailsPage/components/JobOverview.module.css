@@ -1,0 +1,21 @@
+.section {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 40px 28px 16px;
+}
+
+.heading {
+  margin: 0 0 14px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #86868B;
+  white-space: pre-wrap;
+}

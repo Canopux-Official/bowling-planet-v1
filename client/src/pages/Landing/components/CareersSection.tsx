@@ -1,4 +1,5 @@
 import { type FC } from 'react'
+import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 
 
@@ -30,14 +31,14 @@ const CareersSection: FC = () => {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <button
+            <Link
+              to="/careers"
               className="btn btn-primary"
-              onClick={() => console.log('TODO: connect to full careers page')}
               aria-label="Visit Career Page"
               style={{ padding: '14px 32px', fontSize: 16 }}
             >
               Visit Career Page
-            </button>
+            </Link>
           </div>
         </div>
       </div>

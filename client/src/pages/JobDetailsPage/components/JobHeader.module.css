@@ -1,0 +1,39 @@
+.header {
+  padding: 120px 28px 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #000;
+}
+
+.inner {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.department {
+  margin: 0 0 12px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5FC1D1;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0 0 20px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F7;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: #86868B;
+}
