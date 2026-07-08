@@ -1,0 +1,17 @@
+.section {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 48px 28px;
+}
+
+.heading {
+  margin: 0 0 12px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.list {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}

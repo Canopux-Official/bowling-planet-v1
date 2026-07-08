@@ -1,0 +1,70 @@
+.section {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 48px 28px 80px;
+}
+
+.heading {
+  margin: 0 0 28px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+
+.card {
+  flex: 0 0 min(340px, 85vw);
+  scroll-snap-align: start;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: #0A0A0F;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1A1A24;
+  flex-shrink: 0;
+}
+
+.client {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #86868B;
+}
+
+.message {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #86868B;
+}
+
+.rating {
+  margin-top: 12px;
+}

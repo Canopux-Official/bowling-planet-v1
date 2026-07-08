@@ -1,0 +1,30 @@
+.gallery {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 48px 28px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.item {
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0A0A0F;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: zoom-in;
+  aspect-ratio: 16 / 10;
+}
+
+@media (max-width: 860px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+}

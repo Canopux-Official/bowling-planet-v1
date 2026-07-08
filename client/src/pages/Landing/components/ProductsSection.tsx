@@ -156,11 +156,11 @@ const ProductsSection: FC = () => {
 
         <div style={{ textAlign: 'center' }}>
           <Link
-            to="/products"
+            to="/projects"
             className="btn btn-primary"
-            aria-label="Browse the full product catalog"
+            aria-label="Browse projects"
           >
-            Browse Full Catalog
+            View Projects
           </Link>
         </div>
       </div>

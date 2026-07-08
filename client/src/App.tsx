@@ -12,8 +12,8 @@ import { theme } from './theme'
 
 const LandingPage = lazy(() => import('./pages/Landing/LandingPage'))
 const AboutPage = lazy(() => import('./pages/About/AboutPage'))
-const ProductsPage = lazy(() => import('./pages/Products/ProductsPage'))
-const ProductDetailPage = lazy(() => import('./pages/ProductDetail/ProductDetailPage'))
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage/ProjectsPage'))
+const ProjectDetailsPage = lazy(() => import('./pages/ProjectDetailsPage/ProjectDetailsPage'))
 const FranchisePage = lazy(() => import('./pages/Franchise/FranchisePage'))
 const CareersPage = lazy(() => import('./pages/Careers/CareersPage'))
 const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
@@ -49,8 +49,8 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<LandingPage />} />
               <Route path="about" element={<AboutPage />} />
-              <Route path="products" element={<ProductsPage />} />
-              <Route path="products/:slug" element={<ProductDetailPage />} />
+              <Route path="projects" element={<ProjectsPage />} />
+              <Route path="projects/:slug" element={<ProjectDetailsPage />} />
               <Route path="franchise" element={<FranchisePage />} />
               <Route path="careers" element={<CareersPage />} />
               <Route path="contact" element={<ContactPage />} />

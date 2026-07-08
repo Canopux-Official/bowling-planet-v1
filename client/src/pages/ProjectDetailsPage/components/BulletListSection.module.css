@@ -1,0 +1,33 @@
+.section {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 28px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.block {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+}
+
+.heading {
+  margin: 0 0 14px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.list {
+  margin: 0;
+  padding-left: 20px;
+  color: #86868B;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.list li + li {
+  margin-top: 8px;
+}

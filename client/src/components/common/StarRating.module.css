@@ -1,0 +1,11 @@
+.rating {
+  display: inline-flex;
+  gap: 2px;
+  color: #5FC1D1;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.empty {
+  color: #48484A;
+}

@@ -1,0 +1,34 @@
+.hero {
+  padding: 120px 28px 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #000;
+}
+
+.inner {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.75;
+  color: #86868B;
+  max-width: 680px;
+}

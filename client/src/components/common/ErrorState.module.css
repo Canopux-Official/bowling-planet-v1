@@ -1,0 +1,26 @@
+.error {
+  text-align: center;
+  padding: 48px 24px;
+  color: #86868B;
+}
+
+.message {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.retry {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: #5FC1D1;
+  padding: 10px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.retry:hover {
+  border-color: rgba(95, 193, 209, 0.45);
+}

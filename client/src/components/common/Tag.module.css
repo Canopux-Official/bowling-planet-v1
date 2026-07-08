@@ -1,0 +1,23 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #86868B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  background: transparent;
+  cursor: default;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover,
+.active {
+  color: #5FC1D1;
+  border-color: rgba(95, 193, 209, 0.45);
+}

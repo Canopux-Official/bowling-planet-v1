@@ -1,0 +1,53 @@
+.card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.number {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #5FC1D1;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.description {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #86868B;
+}
+
+.points {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  color: #86868B;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.image {
+  max-width: 360px;
+  aspect-ratio: 16 / 10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #0A0A0F;
+}
+
+@media (max-width: 640px) {
+  .card {
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+  }
+}
