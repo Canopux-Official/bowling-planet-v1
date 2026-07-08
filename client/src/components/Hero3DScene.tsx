@@ -68,7 +68,7 @@ function BowlingPin({ position, rotation, scale = 1, materialType = 'metal' }: a
         <mesh material={materialType === 'glass' ? glassMaterial : metalMaterial}>
           <latheGeometry args={[points, 64]} />
         </mesh>
-        
+
         {/* Lower Red Stripe */}
         <mesh position={[0, 1.13, 0]} rotation={[Math.PI / 2, 0, 0]} material={redMaterial}>
           <torusGeometry args={[0.096, 0.007, 16, 64]} />
@@ -85,7 +85,7 @@ function BowlingPin({ position, rotation, scale = 1, materialType = 'metal' }: a
 
 function Composition() {
   const groupRef = useRef<THREE.Group>(null)
-  
+
   // Subtle parallax
   useFrame((state) => {
     if (groupRef.current) {
@@ -100,7 +100,7 @@ function Composition() {
     <group ref={groupRef}>
       {/* Left Pin (Frosted Glass) */}
       <BowlingPin position={[-3.2, -0.6, 0]} rotation={[0.15, 0, 0.15]} scale={1.2} materialType="glass" />
-      
+
       {/* Right Pin (Dark Metallic) */}
       <BowlingPin position={[3.2, -0.6, 0]} rotation={[0.08, 0, -0.15]} scale={1.2} materialType="metal" />
     </group>
@@ -110,9 +110,9 @@ function Composition() {
 export default function Hero3DScene() {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-      <Canvas 
+      <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        dpr={[1, 2]} 
+        dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
       >
         <ambientLight intensity={0.2} />

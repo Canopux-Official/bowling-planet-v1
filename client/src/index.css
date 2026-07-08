@@ -381,3 +381,150 @@ body {
   }
   html { scroll-behavior: auto; }
 }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — NAV UTILITY CLASSES
+   (replaces Tailwind hidden/md:flex classes)
+   ═══════════════════════════════════════════ */
+.nav-desktop-links { display: flex !important; }
+.nav-desktop-cta   { display: inline-flex !important; }
+.nav-hamburger     { display: none !important; }
+
+@media (max-width: 768px) {
+  .nav-desktop-links { display: none !important; }
+  .nav-desktop-cta   { display: none !important; }
+  .nav-hamburger     { display: flex !important; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE  ≤ 768px
+   ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Prevent horizontal overflow ───────── */
+  body, #root { overflow-x: hidden; }
+  section      { overflow-x: hidden !important; }
+
+  /* ── Hero ──────────────────────────────── */
+  #hero {
+    padding: 100px 16px 32px !important;
+    align-items: center !important;
+  }
+  /* Hide heavy 3D canvas on mobile */
+  #hero canvas { display: none !important; }
+
+  /* ── StatsBar: 4-col → 2×2 grid ───────── */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* ── Section padding ───────────────────── */
+  #about, #portfolio, #services, #products,
+  #franchise, #careers {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+  
+  /* Remove gap between Portfolio and Services on mobile */
+  #portfolio { padding-bottom: 0px !important; }
+  #services  { padding-top: 0px !important; }
+  #contact {
+    padding: 80px 16px 60px !important;
+  }
+
+  /* ── About: two-col → single col ──────── */
+  .about-two-col {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  /* Clip floating badge so it doesn't overflow on mobile */
+  .about-card-wrap { overflow: visible !important; }
+  .about-floating-badge { display: none !important; }
+
+  /* ── Portfolio grid: 2-col on mobile ─────── */
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .portfolio-img {
+    height: 140px !important;
+  }
+  .portfolio-title {
+    font-size: 13px !important;
+  }
+  .portfolio-card-details {
+    padding: 12px 14px !important;
+  }
+
+  /* ── Services cards: side-by-side → stack */
+  .services-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* ── Products grid → 1-col ─────────────── */
+  .products-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* ── Franchise: two-col → single col ───── */
+  .franchise-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  .franchise-highlights {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* ── Contact info row: wrap + center ───── */
+  .contact-info-row {
+    gap: 28px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* ── Footer top row → stack ─────────────── */
+  .footer-top {
+    flex-direction: column !important;
+    gap: 36px !important;
+    align-items: flex-start !important;
+  }
+  .footer-nav-cols { gap: 32px !important; }
+
+  /* ── CTA button groups: stack vertically ── */
+  .btn-group {
+    flex-direction: column !important;
+    width: 100%;
+  }
+  .btn-group .btn { width: 100%; justify-content: center; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE  ≤ 480px
+   ═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* Franchise highlights → single col */
+  .franchise-highlights {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stat numbers smaller */
+  .stat-num { font-size: 2rem !important; }
+
+  /* Nav logo — hide wordmark to save space */
+  .nav-wordmark { display: none !important; }
+
+  /* Footer bottom row → stack */
+  .footer-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* TrustedBrands label smaller */
+  .trusted-label { font-size: 10px !important; }
+}

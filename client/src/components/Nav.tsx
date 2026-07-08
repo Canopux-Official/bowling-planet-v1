@@ -1,12 +1,15 @@
 import { useState, useEffect, type FC } from 'react'
+import { Link } from 'react-router-dom'
 
 const NAV_LINKS = [
-  { label: 'About',     anchor: '#about'     },
-  { label: 'Services',  anchor: '#services'  },
-  { label: 'Products',  anchor: '#products'  },
-  { label: 'Franchise', anchor: '#franchise' },
-  { label: 'Portfolio', anchor: '#portfolio' },
-  { label: 'Careers',   anchor: '#careers'   },
+  { label: 'Home',      path: '/'          },
+  { label: 'About',     path: '/about'     },
+  { label: 'Services',  path: '/#services' },
+  { label: 'Products',  path: '/products'  },
+  { label: 'Franchise', path: '/franchise' },
+  { label: 'Careers',   path: '/careers'   },
+  { label: 'Blog',      path: '/blog'      },
+  { label: 'Contact',   path: '/contact'   },
 ]
 
 const Nav: FC = () => {
@@ -19,9 +22,15 @@ const Nav: FC = () => {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  const goto = (anchor: string) => {
-    setMenuOpen(false)
-    document.querySelector(anchor)?.scrollIntoView({ behavior: 'smooth' })
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (path.startsWith('/#') && window.location.pathname === '/') {
+      e.preventDefault()
+      const id = path.replace('/#', '')
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      setMenuOpen(false)
+    } else {
+      setMenuOpen(false)
+    }
   }
 
   return (
@@ -39,10 +48,10 @@ const Nav: FC = () => {
         }}>
 
           {/* Logo */}
-          <a
-            href="#"
-            onClick={e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-            aria-label="Bowling Planet — back to top"
+          <Link
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Bowling Planet — Home"
             style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
           >
             <img
@@ -54,55 +63,70 @@ const Nav: FC = () => {
                 if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = '/logo.avif' }
               }}
             />
-            <span style={{
-              fontFamily: '"Sora", sans-serif', fontWeight: 700,
-              fontSize: 22, letterSpacing: '-0.02em', color: '#F5F5F7',
-            }}>
+            <span
+              className="nav-wordmark"
+              style={{
+                fontFamily: '"Sora", sans-serif', fontWeight: 700,
+                fontSize: 22, letterSpacing: '-0.02em', color: '#F5F5F7',
+              }}
+            >
               Bowling Planet
             </span>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <ul
-            style={{ display: 'flex', gap: 32, listStyle: 'none', padding: 0, margin: 0 }}
-            className="hidden md:flex"
+            className="nav-desktop-links"
+            style={{ gap: 32, listStyle: 'none', padding: 0, margin: 0 }}
           >
-            {NAV_LINKS.map(({ label, anchor }) => (
+            {NAV_LINKS.map(({ label, path }) => (
               <li key={label}>
-                <button
-                  onClick={() => goto(anchor)}
+                <Link
+                  to={path}
+                  onClick={(e) => handleLinkClick(e, path)}
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
                     fontFamily: '"Inter", sans-serif', fontSize: 14, fontWeight: 500,
                     color: 'rgba(245,245,247,0.65)', letterSpacing: '0.01em',
-                    padding: '4px 0', transition: 'color 0.2s ease',
+                    padding: '4px 0', transition: 'color 0.2s ease', textDecoration: 'none'
                   }}
                   onMouseEnter={e => { e.currentTarget.style.color = '#F5F5F7' }}
                   onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,245,247,0.65)' }}
                 >
                   {label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {/* TODO: connect to /contact route */}
-            <button
-              className="btn btn-primary hidden md:inline-flex"
-              style={{ padding: '10px 22px', fontSize: 14 }}
-              onClick={() => {
-                console.log('TODO: connect to contact page')
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+            {/* CTA's */}
+            <Link
+              to="/login"
+              className="btn nav-desktop-cta"
+              style={{
+                padding: '10px 22px', fontSize: 14, textDecoration: 'none',
+                background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff', borderRadius: 8, transition: 'all 0.2s ease'
               }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              Login
+            </Link>
+            
+            <Link
+              to="/contact"
+              className="btn btn-primary nav-desktop-cta"
+              style={{ padding: '10px 22px', fontSize: 14, textDecoration: 'none' }}
               aria-label="Get in touch"
             >
               Get in Touch
-            </button>
+            </Link>
 
             {/* Hamburger */}
             <button
-              className="md:hidden"
+              className="nav-hamburger"
               onClick={() => setMenuOpen(o => !o)}
               aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={menuOpen}
@@ -140,31 +164,45 @@ const Nav: FC = () => {
           display: 'flex', flexDirection: 'column', gap: 4,
         }}
       >
-        {NAV_LINKS.map(({ label, anchor }) => (
-          <button
+        {NAV_LINKS.map(({ label, path }) => (
+          <Link
             key={label}
-            onClick={() => goto(anchor)}
+            to={path}
+            onClick={(e) => handleLinkClick(e, path)}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontFamily: '"Sora", sans-serif', fontWeight: 700, fontSize: 22,
               letterSpacing: '-0.02em', color: '#F5F5F7', padding: '14px 0',
               textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.05)',
-              transition: 'color 0.2s ease',
+              transition: 'color 0.2s ease', textDecoration: 'none', display: 'block'
             }}
             onMouseEnter={e => { e.currentTarget.style.color = '#5FC1D1' }}
             onMouseLeave={e => { e.currentTarget.style.color = '#F5F5F7' }}
           >
             {label}
-          </button>
+          </Link>
         ))}
-        {/* TODO: connect to /contact route */}
-        <button
+        {/* Mobile CTA */}
+        <Link
+          to="/contact"
           className="btn btn-primary"
-          style={{ marginTop: 28, justifyContent: 'center' }}
-          onClick={() => { setMenuOpen(false); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }}
+          style={{ marginTop: 28, justifyContent: 'center', textDecoration: 'none' }}
+          onClick={() => setMenuOpen(false)}
         >
           Get in Touch
-        </button>
+        </Link>
+        <Link
+          to="/login"
+          style={{
+            display: 'block', padding: '16px', marginTop: 14, background: 'rgba(255,255,255,0.05)',
+            color: '#fff', textAlign: 'center', borderRadius: 8,
+            textDecoration: 'none', fontWeight: 600, fontSize: 16,
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}
+          onClick={() => setMenuOpen(false)}
+        >
+          Login
+        </Link>
       </div>
     </>
   )

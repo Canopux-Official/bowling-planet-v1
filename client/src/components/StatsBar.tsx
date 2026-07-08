@@ -16,7 +16,7 @@ const StatsBar: FC = () => {
       <div className="divider-teal" />
       <div
         ref={ref}
-        className="stagger"
+        className="stagger stats-grid"
         style={{
           maxWidth: 1320, margin: '0 auto', padding: '0 28px',
           display: 'grid',

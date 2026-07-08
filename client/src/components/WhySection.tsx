@@ -1,15 +1,16 @@
 import { type FC } from 'react'
+import { theme } from '../theme'
 import { useReveal } from '../hooks/useReveal'
 
 const PROPS = [
-  { num: '01', icon: '🎯', title: 'Industry Expertise',            desc: 'Deep operational knowledge across FEC, cinema, and entertainment — not just consulting theory.' },
-  { num: '02', icon: '💡', title: 'Innovative Solutions',          desc: 'We stay ahead of global FEC trends to bring the freshest concepts to your specific market.' },
-  { num: '03', icon: '🏅', title: 'Certified Professionals',       desc: 'Every consultant holds formal qualifications plus years of hands-on venue management.' },
-  { num: '04', icon: '🤝', title: 'Personalized Approach',         desc: 'No cookie-cutter blueprints. Every engagement is scoped and tailored to your goals.' },
-  { num: '05', icon: '📅', title: '17+ Years Experience',          desc: 'Accumulated knowledge from managing venues serving millions of families across India.' },
-  { num: '06', icon: '📊', title: 'Data-Driven Insights',          desc: 'Every decision backed by real footfall data, spend-per-head metrics, and live KPIs.' },
-  { num: '07', icon: '💰', title: 'ROI Focus',                     desc: 'We measure our success by the profitability of every venue we help build and operate.' },
-  { num: '08', icon: '🔄', title: 'Continuous Monitoring',         desc: 'Our engagement doesn\'t end at opening — we track, report, and improve continuously.' },
+  { id: 'w1', num: '01', icon: '🎯', title: 'Industry Expertise',            desc: 'Deep operational knowledge across FEC, cinema, and entertainment — not just consulting theory.' },
+  { id: 'w2', num: '02', icon: '💡', title: 'Innovative Solutions',          desc: 'We stay ahead of global FEC trends to bring the freshest concepts to your specific market.' },
+  { id: 'w3', num: '03', icon: '🏅', title: 'Certified Professionals',       desc: 'Every consultant holds formal qualifications plus years of hands-on venue management.' },
+  { id: 'w4', num: '04', icon: '🤝', title: 'Personalized Approach',         desc: 'No cookie-cutter blueprints. Every engagement is scoped and tailored to your goals.' },
+  { id: 'w5', num: '05', icon: '⚙️',  title: 'End-to-End Execution',          desc: 'From initial design and procurement to staff training and grand opening operations.' },
+  { id: 'w6', num: '06', icon: '📊', title: 'Data-Driven Insights',          desc: 'Every decision backed by real footfall data, spend-per-head metrics, and live KPIs.' },
+  { id: 'w7', num: '07', icon: '💰', title: 'ROI Focus',                     desc: 'We measure our success by the profitability of every venue we help build and operate.' },
+  { id: 'w8', num: '08', icon: '🔄', title: 'Continuous Monitoring',         desc: 'Our engagement doesn\'t end at opening — we track, report, and improve continuously.' },
 ]
 
 const WhySection: FC = () => {
@@ -17,8 +18,11 @@ const WhySection: FC = () => {
   const gridRef  = useReveal()
 
   return (
-    <section style={{ background: '#0A0A0F', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-      <div className="orb orb-teal"  style={{ width: 600, height: 600, top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+    <section style={{ background: theme.colors.surface, padding: '120px 28px', position: 'relative', overflow: 'hidden' }}>
+      <div className="orb orb-teal"  style={{ width: 600, height: 600, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.3 }} />
+      <div className="orb orb-purple" style={{ width: 400, height: 400, top: '10%', right: '-10%', opacity: 0.2 }} />
+      
+      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
 
       <div style={{ maxWidth: 1320, margin: '0 auto', position: 'relative', zIndex: 1 }}>
 
@@ -35,57 +39,111 @@ const WhySection: FC = () => {
           </div>
         </div>
 
-        {/* Grid */}
+        {/* Premium Grid */}
         <div
           ref={gridRef}
-          className="stagger"
+          className="stagger why-premium-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: 2,
-            background: 'rgba(255,255,255,0.04)',
-            borderRadius: 20, overflow: 'hidden',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 24,
           }}
         >
           {PROPS.map((p, i) => {
-            const isTeal  = i % 2 === 0
-            const accent  = isTeal ? '#5FC1D1' : '#6DBD4E'
-            const glowBg  = isTeal ? 'rgba(95,193,209,0.06)' : 'rgba(109,189,78,0.05)'
+            const isEven = i % 2 === 0
+            const isThird = i % 3 === 0
+            
+            let color = theme.colors.teal
+            if (!isEven) color = theme.colors.green
+            if (isThird) color = theme.colors.purple
+
             return (
               <div
-                key={p.title}
-                className="feat-card"
-                style={{ borderRadius: 0, border: 'none', padding: '32px 28px', position: 'relative', overflow: 'hidden' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A1A24' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111118' }}
+                key={p.id}
+                className="glass-card"
+                style={{
+                  borderRadius: 24,
+                  padding: '40px 32px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-6px)';
+                  (e.currentTarget as HTMLElement).style.borderColor = `${color}50`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 40px ${color}15`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.05)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
               >
-                {/* Corner accent glow */}
-                <div aria-hidden="true" style={{
-                  position: 'absolute', bottom: 0, right: 0,
-                  width: 80, height: 80,
-                  background: `radial-gradient(circle at bottom right, ${glowBg}, transparent 70%)`,
+                {/* Number Watermark */}
+                <div style={{
+                  position: 'absolute',
+                  top: -15,
+                  right: -10,
+                  fontSize: 120,
+                  fontWeight: 900,
+                  fontFamily: theme.typography.fontDisplay,
+                  color: 'rgba(255,255,255,0.03)',
                   pointerEvents: 'none',
-                }} />
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                  <span style={{ fontSize: 22 }} aria-hidden="true">{p.icon}</span>
-                  <span style={{
-                    fontFamily: '"Sora", sans-serif', fontWeight: 800, fontSize: 10,
-                    color: accent, letterSpacing: '0.12em', textTransform: 'uppercase',
-                  }}>
-                    {p.num}
-                  </span>
+                  userSelect: 'none',
+                  lineHeight: 1,
+                  zIndex: 0,
+                }}>
+                  {p.num}
                 </div>
 
-                <h3 className="font-display text-metallic" style={{ fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em', lineHeight: 1.3, marginBottom: 10 }}>
-                  {p.title}
-                </h3>
-                <p style={{ fontSize: 13, lineHeight: 1.65, color: '#86868B' }}>{p.desc}</p>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  {/* Glowing Box Icon */}
+                  <div style={{
+                    width: 48, height: 48, borderRadius: 12,
+                    background: `linear-gradient(135deg, ${color}20, transparent)`,
+                    border: `1px solid ${color}40`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 24,
+                    fontSize: 22,
+                  }}>
+                    <span aria-hidden="true" style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.2))' }}>
+                      {p.icon}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display" style={{ 
+                    fontWeight: 800, 
+                    fontSize: 20, 
+                    color: theme.colors.text1,
+                    letterSpacing: '-0.01em', 
+                    lineHeight: 1.3, 
+                    marginBottom: 12 
+                  }}>
+                    {p.title}
+                  </h3>
+                  <p style={{ 
+                    fontSize: 15, 
+                    lineHeight: 1.6, 
+                    color: theme.colors.text2,
+                    fontFamily: theme.typography.fontBody
+                  }}>
+                    {p.desc}
+                  </p>
+                </div>
               </div>
             )
           })}
         </div>
       </div>
+      
+      <style>{`
+        @media (max-width: 600px) {
+          .why-premium-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   )
 }

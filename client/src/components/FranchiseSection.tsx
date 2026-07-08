@@ -1,25 +1,51 @@
 import { type FC } from 'react'
+import { Link } from 'react-router-dom'
+import { theme } from '../theme'
 import { useReveal } from '../hooks/useReveal'
 
 const HIGHLIGHTS = [
-  { num: '01', title: 'Attractive ROI',     desc: 'Transparent financial models backed by real venue data — know exactly what to expect before you invest a rupee.' },
-  { num: '02', title: 'Less Competition',   desc: 'Premium FEC franchises in high-growth tier-2 and tier-3 cities with wide-open, first-mover opportunity.' },
-  { num: '03', title: 'Long-Term Support',  desc: 'Our partnership doesn\'t end at opening. Ongoing coaching, co-branding, and growing network benefits.' },
-  { num: '04', title: 'Full-Stack Partner', desc: 'Site selection to grand opening and beyond — we are your operational backbone at every stage of growth.' },
+  {
+    id: 'feat-1',
+    num: '01',
+    title: 'Attractive ROI',
+    subtitle: 'Transparent financial models backed by real venue data — know exactly what to expect before you invest a rupee.',
+    color: '#5FC1D1', // Teal
+  },
+  {
+    id: 'feat-2',
+    num: '02',
+    title: 'Less Competition',
+    subtitle: 'Premium FEC franchises in high-growth tier-2 and tier-3 cities with wide-open, first-mover opportunity.',
+    color: '#6DBD4E', // Green
+  },
+  {
+    id: 'feat-3',
+    num: '03',
+    title: 'Long-Term Support',
+    subtitle: 'Our partnership doesn\'t end at opening. Ongoing coaching, co-branding, and growing network benefits.',
+    color: '#C084FC', // Purple
+  },
+  {
+    id: 'feat-4',
+    num: '04',
+    title: 'Full-Stack Partner',
+    subtitle: 'Site selection to grand opening and beyond — we are your operational backbone at every stage of growth.',
+    color: '#FFAA33', // Orange
+  },
 ]
 
 const FranchiseSection: FC = () => {
   const ref = useReveal()
 
   return (
-    <section id="franchise" style={{ background: '#0A0A0F', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section id="franchise" style={{ background: '#0A0A0F', padding: '120px 28px', position: 'relative', overflow: 'hidden' }}>
 
       {/* Glow orbs */}
       <div className="orb orb-green" style={{ width: 700, height: 600, top: '-20%', right: '-10%' }} />
-      <div className="orb orb-teal"  style={{ width: 500, height: 500, bottom: '-15%', left: '-8%' }} />
+      <div className="orb orb-teal" style={{ width: 500, height: 500, bottom: '-15%', left: '-8%' }} />
 
       {/* Grid pattern */}
-      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.6, pointerEvents: 'none' }} />
+      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
 
       <div className="divider-teal" style={{ marginBottom: 80 }} />
 
@@ -43,70 +69,117 @@ const FranchiseSection: FC = () => {
           </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: 80, alignItems: 'start',
-        }}>
+        <div
+          className="franchise-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gap: 80, alignItems: 'start',
+          }}>
+          
           {/* ── Left: CTAs ──────────────────────── */}
           <div>
+            <p style={{ fontSize: 16, lineHeight: 1.75, color: '#86868B', maxWidth: 460, marginBottom: 40, fontFamily: theme.typography.fontBody }}>
+              Join a growing network of family entertainment entrepreneurs. We provide
+              everything — from vision and equipment to the operational playbook that
+              makes your venue thrive from day one.
+            </p>
 
-          <p style={{ fontSize: 16, lineHeight: 1.75, color: '#86868B', maxWidth: 460, marginBottom: 40 }}>
-            Join a growing network of family entertainment entrepreneurs. We provide
-            everything — from vision and equipment to the operational playbook that
-            makes your venue thrive from day one.
-          </p>
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <Link to="/franchise" className="btn btn-primary btn-primary-green" style={{ textDecoration: 'none' }}>
+                Explore Franchise
+              </Link>
+              <Link to="/contact" className="btn btn-ghost" style={{ textDecoration: 'none' }}>
+                Apply Now →
+              </Link>
+            </div>
+          </div>
 
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-            {/* TODO: connect to /franchise-apply route */}
-            <button
-              className="btn btn-primary btn-primary-green"
-              onClick={() => console.log('TODO: connect to Apply for Franchise page')}
-              aria-label="Apply for a Bowling Planet franchise"
-            >
-              Apply for Franchise
-            </button>
-            {/* TODO: connect to /franchise-info route */}
-            <button
-              className="btn btn-ghost"
-              onClick={() => console.log('TODO: connect to franchise info page')}
-              aria-label="Download franchise info pack"
-            >
-              Info Pack →
-            </button>
+          {/* ── Right: premium highlight grid ──────────────────────── */}
+          <div
+            className="franchise-highlights"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 16,
+            }}
+          >
+            {HIGHLIGHTS.map(p => (
+              <div
+                key={p.id}
+                className="bento-card"
+                style={{
+                  background: `linear-gradient(135deg, ${p.color}10, rgba(255,255,255,0.02))`,
+                  border: `1px solid ${p.color}25`,
+                  borderRadius: 20,
+                  padding: '32px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
+                  (e.currentTarget as HTMLElement).style.borderColor = `${p.color}60`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 15px 40px ${p.color}15`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  (e.currentTarget as HTMLElement).style.borderColor = `${p.color}25`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                }}
+              >
+                {/* Giant Watermark Number */}
+                <div style={{
+                  position: 'absolute',
+                  top: -20,
+                  right: -10,
+                  fontSize: 140,
+                  fontWeight: 900,
+                  fontFamily: theme.typography.fontDisplay,
+                  color: `${p.color}10`,
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                  lineHeight: 1,
+                  zIndex: 0,
+                }}>
+                  {p.num}
+                </div>
+
+                {/* Glowing Accent Light */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, height: 3,
+                  background: `linear-gradient(90deg, ${p.color}, transparent)`,
+                  opacity: 0.8,
+                }} />
+
+                {/* Text Content */}
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <h3 className="font-display" style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: p.color,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.2,
+                    marginBottom: 12,
+                  }}>
+                    {p.title}
+                  </h3>
+                  <p style={{
+                    fontSize: 14,
+                    color: theme.colors.text1,
+                    fontFamily: theme.typography.fontBody,
+                    lineHeight: 1.6,
+                  }}>
+                    {p.subtitle}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-
-        {/* ── Right: highlight grid ──────────────────────── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 2,
-          background: 'rgba(255,255,255,0.04)',
-          borderRadius: 16, overflow: 'hidden',
-        }}>
-          {HIGHLIGHTS.map(h => (
-            <div
-              key={h.num}
-              className="feat-card"
-              style={{ borderRadius: 0, border: 'none', padding: '28px 24px' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1A1A24' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111118' }}
-            >
-              <div style={{
-                fontFamily: '"Sora", sans-serif', fontWeight: 800, fontSize: 10,
-                color: '#6DBD4E', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12,
-              }}>
-                {h.num}
-              </div>
-              <h3 className="font-display text-metallic" style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.01em', lineHeight: 1.3, marginBottom: 10 }}>
-                {h.title}
-              </h3>
-              <p style={{ fontSize: 13, color: '#86868B', lineHeight: 1.65 }}>{h.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
       </div>
 
       <div className="divider" style={{ marginTop: 80 }} />

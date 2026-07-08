@@ -29,7 +29,7 @@ const PortfolioSection: FC = () => {
   const gridRef  = useReveal()
 
   return (
-    <section id="portfolio" style={{ background: '#000000', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section id="portfolio" style={{ background: '#000000', padding: '80px 28px 0px', position: 'relative', overflow: 'hidden' }}>
       <div className="orb orb-green" style={{ width: 500, height: 500, top: '5%', right: '-5%' }} />
 
       <div style={{ maxWidth: 1080, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -54,7 +54,7 @@ const PortfolioSection: FC = () => {
         {/* ── Project grid (Symmetric 2x2) ────────────────── */}
         <div
           ref={gridRef}
-          className="stagger"
+          className="stagger portfolio-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
@@ -68,7 +68,7 @@ const PortfolioSection: FC = () => {
               style={{ overflow: 'hidden', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
             >
               {/* Image Container */}
-              <div style={{ height: 300, position: 'relative', overflow: 'hidden', background: '#0A0A0F' }}>
+              <div className="portfolio-img" style={{ height: 300, position: 'relative', overflow: 'hidden', background: '#0A0A0F' }}>
                 <img 
                   src={p.image} 
                   alt={p.name} 
@@ -79,8 +79,8 @@ const PortfolioSection: FC = () => {
               </div>
               
               {/* Details Container */}
-              <div style={{ padding: '24px 28px', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <h3 className="font-display" style={{ fontSize: 20, fontWeight: 700, color: '#F5F5F7', marginBottom: 4 }}>
+              <div className="portfolio-card-details" style={{ padding: '24px 28px', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <h3 className="font-display portfolio-title" style={{ fontSize: 20, fontWeight: 700, color: '#F5F5F7', marginBottom: 4 }}>
                   {p.name}
                 </h3>
                 <div style={{ width: 40, height: 2, background: p.color, borderRadius: 2, marginTop: 12 }} />
@@ -90,7 +90,7 @@ const PortfolioSection: FC = () => {
         </div>
 
         {/* ── View All Projects Button ────────────────────── */}
-        <div style={{ textAlign: 'center', marginBottom: 64 }} className="reveal">
+        <div style={{ textAlign: 'center', marginBottom: 0 }} className="reveal">
           <button
             className="btn btn-ghost"
             onClick={() => console.log('TODO: connect to full portfolio page')}

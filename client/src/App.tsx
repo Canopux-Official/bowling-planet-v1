@@ -1,63 +1,44 @@
 /**
  * Bowling Planet — App entry point
  * ─────────────────────────────────
- * Thin orchestrator: imports components and composes the page.
- * All logic lives in /components and /hooks.
+ * Set up React Router and routes.
  */
 
-import Nav             from './components/Nav'
-import Hero            from './components/Hero'
-import StatsBar        from './components/StatsBar'
-import TrustedBrands   from './components/TrustedBrands'
-import AboutSection    from './components/AboutSection'
-import ServicesSection from './components/ServicesSection'
-import ProductsSection from './components/ProductsSection'
-import FranchiseSection from './components/FranchiseSection'
-import PortfolioSection from './components/PortfolioSection'
-import WhySection      from './components/WhySection'
-import CareersSection  from './components/CareersSection'
-import ContactFooter   from './components/ContactFooter'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+import Layout from './components/Layout'
+import LandingPage from './pages/LandingPage'
+import AboutPage from './pages/AboutPage'
+import PortfolioPage from './pages/PortfolioPage'
+import ServicesPage from './pages/ServicesPage'
+import ProductsPage from './pages/ProductsPage'
+import FranchisePage from './pages/FranchisePage'
+import CareersPage from './pages/CareersPage'
+import ContactPage from './pages/ContactPage'
+import BlogPage from './pages/BlogPage'
+import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
 
 export default function App() {
   return (
-    <>
-      {/* ── Global sticky nav ─────────────────────────── */}
-      <Nav />
-
-      <main>
-        {/* 1. Hero — Static cinematic section */}
-        <Hero />
-
-        {/* 2. Stats bar */}
-        <StatsBar />
-
-        {/* Trusted By Brands */}
-        <TrustedBrands />
-
-        {/* 3. About / Founder */}
-        <AboutSection />
-
-        {/* 4. Portfolio / projects (Our Prestigious Projects) */}
-        <PortfolioSection />
-
-        {/* 5. Services (pre-opening + operations) */}
-        <ServicesSection />
-
-        {/* 6. Products & equipment */}
-        <ProductsSection />
-
-        {/* 7. Franchise opportunity */}
-        <FranchiseSection />
-
-        {/* 8. Why Bowling Planet */}
-        <WhySection />
-
-        {/* 9. Careers */}
-        <CareersSection />
-      </main>
-
-      {/* 10. Contact + Footer */}
-      <ContactFooter />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<LandingPage />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="products" element={<ProductsPage />} />
+          <Route path="franchise" element={<FranchisePage />} />
+          <Route path="careers" element={<CareersPage />} />
+          <Route path="contact" element={<ContactPage />} />
+          <Route path="blog" element={<BlogPage />} />
+        </Route>
+        
+        {/* Auth routes don't use the main Layout (no standard Nav/Footer) */}
+        <Route path="login" element={<LoginPage />} />
+        <Route path="signup" element={<SignupPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }

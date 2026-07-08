@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "npx nodemon --exec npx ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
