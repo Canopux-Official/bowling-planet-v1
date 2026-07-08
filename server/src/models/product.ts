@@ -1,9 +1,7 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import slugify from 'slugify';
 
-// ------------------------------------------------------------------
-// Sub-document interfaces
-// ------------------------------------------------------------------
+
 export interface IMedia {
   type: 'image' | 'video';
   url: string;
@@ -28,9 +26,7 @@ export interface IUsageLocation {
 
 export type ProductStatus = 'active' | 'draft' | 'archived';
 
-// ------------------------------------------------------------------
-// BaseProduct interface
-// ------------------------------------------------------------------
+
 export interface IBaseProduct extends Document {
   title: string;
   slug: string;
@@ -41,9 +37,7 @@ export interface IBaseProduct extends Document {
   updatedAt: Date;
 }
 
-// ------------------------------------------------------------------
-// ProductItem interface
-// ------------------------------------------------------------------
+
 export interface IProductItem extends Document {
   baseProduct: Types.ObjectId;
   title: string;
@@ -62,9 +56,6 @@ export interface IProductItem extends Document {
   updatedAt: Date;
 }
 
-// ------------------------------------------------------------------
-// Sub-schemas
-// ------------------------------------------------------------------
 const MediaSchema = new Schema<IMedia>(
   {
     type: { type: String, enum: ['image', 'video'], required: true },
@@ -74,7 +65,7 @@ const MediaSchema = new Schema<IMedia>(
   { _id: false }
 );
 
-// Feature cards (title + description) — for detailed feature explanations
+
 const FeaturePointSchema = new Schema<IFeaturePoint>(
   {
     title: { type: String, required: true },
@@ -83,7 +74,7 @@ const FeaturePointSchema = new Schema<IFeaturePoint>(
   { _id: false }
 );
 
-// Simple bullet list section — e.g. "Features": ["Waterproof", "5-year warranty", ...]
+
 const BulletListSchema = new Schema<IBulletList>(
   {
     heading: { type: String, required: true },
@@ -92,7 +83,7 @@ const BulletListSchema = new Schema<IBulletList>(
   { _id: false }
 );
 
-// Where this product has been used/deployed
+
 const UsageLocationSchema = new Schema<IUsageLocation>(
   {
     name: { type: String, required: true },
@@ -102,9 +93,8 @@ const UsageLocationSchema = new Schema<IUsageLocation>(
   { _id: false }
 );
 
-// ------------------------------------------------------------------
-// BaseProduct schema
-// ------------------------------------------------------------------
+
+
 const BaseProductSchema = new Schema<IBaseProduct>(
   {
     title: { type: String, required: true, trim: true },
@@ -126,9 +116,7 @@ const BaseProductSchema = new Schema<IBaseProduct>(
   { timestamps: true }
 );
 
-// ------------------------------------------------------------------
-// ProductItem schema
-// ------------------------------------------------------------------
+
 const ProductItemSchema = new Schema<IProductItem>(
   {
     baseProduct: {
@@ -148,14 +136,14 @@ const ProductItemSchema = new Schema<IProductItem>(
     description: { type: String },
     thumbnail: { type: MediaSchema, required: true },
 
-    gallery: [MediaSchema],              // extra images/videos for this item
-    featureList: [BulletListSchema],     // e.g. { heading: "Features", items: [...] }
-    points: [FeaturePointSchema],        // detailed feature cards (title + description)
-    usedIn: [UsageLocationSchema],       // "used in Dubai" style entries
+    gallery: [MediaSchema],              
+    featureList: [BulletListSchema],     
+    points: [FeaturePointSchema],        
+    usedIn: [UsageLocationSchema],       
 
-    price: { type: Number },             // optional, no `required`
-    purchaseCount: { type: Number, default: 0, min: 0 },  // social proof / bestseller sort
-    featuredOrder: { type: Number, default: 0 },          // optional manual override for display order
+    price: { type: Number },             
+    purchaseCount: { type: Number, default: 0, min: 0 },  
+    featuredOrder: { type: Number, default: 0 },          
 
     status: {
       type: String,
@@ -168,19 +156,7 @@ const ProductItemSchema = new Schema<IProductItem>(
 
 ProductItemSchema.index({ baseProduct: 1, purchaseCount: -1 });
 
-// ------------------------------------------------------------------
-// Shared slug generation + guaranteed uniqueness
-// ------------------------------------------------------------------
-// Strategy:
-// 1. Only auto-generate the slug when it's missing, OR when the title changed
-//    and the slug was never manually customized (adjust to your needs).
-// 2. Before saving, check the DB for collisions and append -1, -2, -3...
-//    until we find a free slug. This protects against races better than
-//    relying on the unique index alone (the index is still kept as a
-//    hard safety net in case two requests slip through simultaneously).
-// NOTE: Mongoose 9 removed the next() callback from regular pre/post
-// middleware. Just use a plain async function — return to proceed,
-// throw to abort the save with an error.
+
 function attachSlugMiddleware<T extends Document & { title: string; slug: string }>(
   schema: Schema<T>
 ) {
@@ -195,7 +171,7 @@ function attachSlugMiddleware<T extends Document & { title: string; slug: string
 
     const baseSlug = slugify(doc.slug || doc.title, {
       lower: true,
-      strict: true, // strips special characters
+      strict: true, 
       trim: true,
     });
 
@@ -204,8 +180,7 @@ function attachSlugMiddleware<T extends Document & { title: string; slug: string
 
     const DocModel = doc.constructor as Model<T>;
 
-    // Loop until we find a slug that doesn't belong to another document
-    // (excluding this document itself, in case of updates)
+    
     while (
       await DocModel.exists({
         slug: candidateSlug,
@@ -219,9 +194,7 @@ function attachSlugMiddleware<T extends Document & { title: string; slug: string
     doc.slug = candidateSlug;
   });
 
-  // ------------------------------------------------------------------
-  // Handle duplicate key errors gracefully (extra safety net)
-  // ------------------------------------------------------------------
+  
   schema.post('save', function (error: any, doc: T, next: (err?: Error) => void) {
     if (error.name === 'MongoServerError' && error.code === 11000 && error.keyPattern?.slug) {
       next(new Error('A record with this slug already exists. Please try again.'));
@@ -234,14 +207,7 @@ function attachSlugMiddleware<T extends Document & { title: string; slug: string
 attachSlugMiddleware(BaseProductSchema);
 attachSlugMiddleware(ProductItemSchema);
 
-// If you ever do bulk inserts (insertMany) or direct updates that bypass
-// .save(), the pre-save hooks above won't run. Handle those separately
-// in the controller/service layer, or generate slugs there before calling
-// insertMany.
 
-// ------------------------------------------------------------------
-// Model exports
-// ------------------------------------------------------------------
 export const BaseProduct: Model<IBaseProduct> = mongoose.model<IBaseProduct>(
   'BaseProduct',
   BaseProductSchema

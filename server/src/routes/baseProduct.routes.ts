@@ -10,11 +10,15 @@ import {
 
 const router = Router();
 
+
+// admin
 router.post('/', createBaseProduct);
+router.patch('/:id', updateBaseProduct);
+router.delete('/:id', deleteBaseProduct);
+
+// public
 router.get('/', getAllBaseProducts);
 router.get('/:slug', getBaseProductBySlug);
 router.get('/:slug/with-items', getBaseProductWithItems);
-router.patch('/:id', updateBaseProduct);
-router.delete('/:id', deleteBaseProduct);
 
 export default router;

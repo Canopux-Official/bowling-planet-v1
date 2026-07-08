@@ -12,16 +12,17 @@ import {
 
 const router = Router();
 
-// NOTE: specific/static routes must be declared BEFORE the ':slug'
-// catch-all, otherwise Express will treat "featured" or "by-base"
-// as a slug value.
+// admin
 router.post('/', createProductItem);
+router.patch('/:id', updateProductItem);
+router.patch('/:id/purchase', incrementPurchaseCount);
+router.delete('/:id', deleteProductItem);
+
+// public
 router.get('/', getAllProductItems);
 router.get('/featured', getFeaturedItems);
 router.get('/by-base/:baseProductId', getItemsByBaseProduct);
 router.get('/:slug', getProductItemBySlug);
-router.patch('/:id', updateProductItem);
-router.patch('/:id/purchase', incrementPurchaseCount);
-router.delete('/:id', deleteProductItem);
+
 
 export default router;

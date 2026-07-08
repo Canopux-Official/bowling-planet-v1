@@ -3,22 +3,14 @@ import { createProject, deleteProject, getAllProjects, getProjectBySlug, toggleP
 const router = express.Router()
 
 
-// CREATE
+// admin
 router.post('/', createProject);
- 
-// READ — list (pagination, filtering, search via query params)
-router.get('/', getAllProjects);
- 
-// READ — single (by slug)
-router.get('/:slug', getProjectBySlug);
- 
-// UPDATE
 router.patch('/:id', updateProject);
- 
-// DELETE (soft delete)
 router.delete('/:id', deleteProject);
- 
-// PUBLISH / UNPUBLISH toggle
 router.patch('/:id/publish', togglePublishProject);
+
+// public
+router.get('/', getAllProjects);
+router.get('/:slug', getProjectBySlug);
  
 export default router;

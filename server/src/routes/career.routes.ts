@@ -12,15 +12,14 @@ const router = Router();
 
 // Public
 router.get('/', getAllJobs);
+router.get('/:slug', getJobBySlug);
 
-// Admin (add your auth/role middleware here as needed)
+// Admin 
 router.post('/', createJob);
 router.get('/id/:id', getJobById);
 router.put('/:id', updateJob);
 router.delete('/:id', deleteJob);
 
-// Keep this LAST — it's a catch-all param route and would otherwise
-// shadow more specific paths like /id/:id.
-router.get('/:slug', getJobBySlug);
+
 
 export default router;

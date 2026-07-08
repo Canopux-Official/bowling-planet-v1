@@ -3,16 +3,13 @@ import { createTeamMember, deleteTeamMember, getAllTeamMembers, updateTeamMember
 const router = express.Router()
 
 
-// CREATE
+// admin
 router.post('/', createTeamMember);
- 
-// READ — list (pagination, filtering, search via query params)
-router.get('/', getAllTeamMembers);
- 
-// UPDATE
 router.patch('/:id', updateTeamMember);
- 
-// DELETE (soft delete)
 router.delete('/:id', deleteTeamMember);
- 
+
+
+// public
+router.get('/', getAllTeamMembers);
+
 export default router;

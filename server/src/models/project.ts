@@ -1,9 +1,7 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import slugify from 'slugify';
 
-// ------------------------------------------------------------------
-// Sub-document interfaces
-// ------------------------------------------------------------------
+
 export interface IMedia {
   type: 'image' | 'video';
   url: string;
@@ -39,9 +37,7 @@ export interface ITestimonial {
   updatedAt?: Date;
 }
 
-// ------------------------------------------------------------------
-// Main Project interface
-// ------------------------------------------------------------------
+
 export interface IProject extends Document {
   title: string;
   slug: string;
@@ -58,9 +54,7 @@ export interface IProject extends Document {
   updatedAt: Date;
 }
 
-// ------------------------------------------------------------------
-// Sub-schemas
-// ------------------------------------------------------------------
+
 const MediaSchema = new Schema<IMedia>(
   {
     type: { type: String, enum: ['image', 'video'], required: true },
@@ -106,12 +100,10 @@ const TestimonialSchema = new Schema<ITestimonial>(
     rating: { type: Number, min: 1, max: 5 },
     clientImage: MediaSchema,
   },
-  { timestamps: true, _id: true } // keep individual testimonial ids — remove _id:true if you don't need them
+  { timestamps: true, _id: true } 
 );
 
-// ------------------------------------------------------------------
-// Main Project schema
-// ------------------------------------------------------------------
+
 const ProjectSchema = new Schema<IProject>(
   {
     title: {
@@ -121,7 +113,7 @@ const ProjectSchema = new Schema<IProject>(
     },
     slug: {
       type: String,
-      unique: true, // DB-level guarantee (index)
+      unique: true, 
       lowercase: true,
       trim: true,
       index: true,
@@ -144,25 +136,13 @@ const ProjectSchema = new Schema<IProject>(
     isDeleted: {
       type: Boolean,
       default: false,
-      select: false, // hidden by default in query results
+      select: false, 
     },
   },
   { timestamps: true }
 );
 
-// ------------------------------------------------------------------
-// Slug generation + guaranteed uniqueness
-// ------------------------------------------------------------------
-// Strategy:
-// 1. Only auto-generate the slug when it's missing, OR when the title changed
-//    and the slug was never manually customized (adjust to your needs).
-// 2. Before saving, check the DB for collisions and append -1, -2, -3...
-//    until we find a free slug. This protects against races better than
-//    relying on the unique index alone (the index is still kept as a
-//    hard safety net in case two requests slip through simultaneously).
-// NOTE: Mongoose 9 removed the next() callback from regular pre/post
-// middleware. Just use a plain async function — return to proceed,
-// throw to abort the save with an error.
+
 ProjectSchema.pre('save', async function () {
   const doc = this as IProject;
 
@@ -174,7 +154,7 @@ ProjectSchema.pre('save', async function () {
 
   const baseSlug = slugify(doc.slug || doc.title, {
     lower: true,
-    strict: true, // strips special characters
+    strict: true, 
     trim: true,
   });
 
@@ -183,8 +163,7 @@ ProjectSchema.pre('save', async function () {
 
   const ProjectModel = doc.constructor as Model<IProject>;
 
-  // Loop until we find a slug that doesn't belong to another document
-  // (excluding this document itself, in case of updates)
+
   while (
     await ProjectModel.exists({
       slug: candidateSlug,
@@ -198,14 +177,7 @@ ProjectSchema.pre('save', async function () {
   doc.slug = candidateSlug;
 });
 
-// If you ever do bulk inserts (insertMany) or direct updates that bypass
-// .save(), the pre-save hook above won't run. Handle those separately
-// in the controller/service layer, or generate slugs there before calling
-// insertMany.
 
-// ------------------------------------------------------------------
-// Handle duplicate key errors gracefully (extra safety net)
-// ------------------------------------------------------------------
 ProjectSchema.post('save', function (error: any, doc: IProject, next: (err?: Error) => void) {
   if (error.name === 'MongoServerError' && error.code === 11000 && error.keyPattern?.slug) {
     next(new Error('A project with this slug already exists. Please try again.'));
@@ -214,9 +186,7 @@ ProjectSchema.post('save', function (error: any, doc: IProject, next: (err?: Err
   }
 });
 
-// ------------------------------------------------------------------
-// Model export
-// ------------------------------------------------------------------
+
 const Project: Model<IProject> = mongoose.model<IProject>('Project', ProjectSchema);
 
 export default Project;
