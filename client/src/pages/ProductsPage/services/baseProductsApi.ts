@@ -1,43 +1,34 @@
-import {
-  mockBaseProducts,
-  mockBaseProductsPagination,
-  type IBaseProduct,
-  type IPaginationMeta,
-} from './mockBaseProducts'
 
-export type { IBaseProduct, IPaginationMeta }
+import apiClient from '../../../hooks/apiClient'
+import type {
+  ApiListResponse,
+  GetAllBaseProductsParams,
+  GetAllBaseProductsResponse,
+  IBaseProduct,
+  IPaginationMeta,
+} from '../types'
 
-export interface GetAllBaseProductsParams {
-  search?: string
-  page?: number
-  limit?: number
-}
+export type { IBaseProduct, IPaginationMeta, GetAllBaseProductsResponse, GetAllBaseProductsParams }
 
-export interface GetAllBaseProductsResponse {
-  products: IBaseProduct[]
-  pagination: IPaginationMeta
-}
+const BASE = '/base-products'
 
-export async function getAllBaseProducts(
-  params: GetAllBaseProductsParams = {},
-): Promise<GetAllBaseProductsResponse> {
-  // TODO: implement API call
-  // Public listing always assumes status='active'.
-  const page = params.page ?? 1
-  const limit = params.limit ?? mockBaseProductsPagination.limit
-  let products = mockBaseProducts.filter((p) => p.status === 'active')
-
-  if (params.search?.trim()) {
-    const q = params.search.trim().toLowerCase()
-    products = products.filter((p) => p.title.toLowerCase().includes(q))
+// GET /base-products
+export const getAllBaseProducts = async (
+  params: GetAllBaseProductsParams = {}
+): Promise<GetAllBaseProductsResponse> => {
+  const query: Record<string, unknown> = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 20,
+    // Public listing always shows active products only.
+    status: 'active',
   }
 
-  const total = products.length
-  const pages = Math.max(1, Math.ceil(total / limit) || 1)
-  const start = (page - 1) * limit
+  if (params.search) query.search = params.search
 
-  return Promise.resolve({
-    products: products.slice(start, start + limit),
-    pagination: { page, limit, total, pages },
-  })
+  const res = await apiClient.get<ApiListResponse<IBaseProduct>>(BASE, query)
+
+  return {
+    products: res.data,
+    pagination: res.pagination,
+  }
 }

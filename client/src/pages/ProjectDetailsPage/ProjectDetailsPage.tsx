@@ -2,8 +2,6 @@ import { type FC, useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
-import type { IProject } from '../ProjectsPage/services/projectsApi'
-// 1. Import your mock project data array
 
 import ProjectHero from './components/ProjectHero'
 import ProjectGallery from './components/ProjectGallery'
@@ -12,7 +10,9 @@ import BulletListSection from './components/BulletListSection'
 import SetupStepsTimeline from './components/SetupStepsTimeline'
 import TestimonialsCarousel from './components/TestimonialsCarousel'
 import styles from './ProjectDetailsPage.module.css'
-import { MOCK_PROJECTS } from '../ProjectsPage/services/mockdata'
+
+import type { IProject } from '../ProjectsPage/types'
+import { getProjectBySlug } from './services/projectDetailsApi'
 
 const ProjectDetailsPage: FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -30,22 +30,14 @@ const ProjectDetailsPage: FC = () => {
     setLoading(true)
     setError(null)
     try {
-      // 2. Simulate network delay (e.g., 400ms) to witness your loader
-      await new Promise((resolve) => setTimeout(resolve, 400));
-
-      // 3. Find the specific project matching the URL slug parameter
-      const matchedProject = MOCK_PROJECTS.find((p) => p.slug === slug);
-
-      if (!matchedProject) {
-        setProject(null)
-        setError('Project not found.')
-      } else {
-        // Cast as IProject safely for template integration
-        setProject(matchedProject as unknown as IProject)
-      }
-    } catch {
-      setError('Unable to load this project.')
+      const data = await getProjectBySlug(slug)
+      setProject(data)
+    } catch (err) {
+      // The controller returns 404 + "Project not found" for a bad slug,
+      // so this surfaces that message directly instead of a generic one.
+      const message = err instanceof Error ? err.message : 'Unable to load this project.'
       setProject(null)
+      setError(message)
     } finally {
       setLoading(false)
     }

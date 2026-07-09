@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IPaginationMeta } from '../services/projectsApi'
+
 import styles from './Pagination.module.css'
+import type { IPaginationMeta } from '../types'
 
 interface PaginationProps {
   meta: IPaginationMeta

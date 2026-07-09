@@ -1,7 +1,8 @@
 import type { FC } from 'react'
-import type { IUsageLocation } from '../services/mockProductItems'
+
 import MediaItem from '../../../components/common/MediaItem'
 import styles from './ItemUsedIn.module.css'
+import type { IUsageLocation } from '../types'
 
 interface ItemUsedInProps {
   usedIn?: IUsageLocation[]

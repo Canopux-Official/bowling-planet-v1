@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { type FC, useCallback, useEffect, useState } from 'react'
 import Loader from '../../../components/common/Loader'
 import ErrorState from '../../../components/common/ErrorState'
 import EmptyState from '../../../components/common/EmptyState'
@@ -8,7 +8,6 @@ import {
   type IResource,
   type ResourceType,
 } from '../services/resourcesApi'
-import { mockResources } from '../services/mockResources'
 import ResourceCard from './ResourcesColumn/ResourceCard'
 import ResourcesPagination from './ResourcesColumn/ResourcesPagination'
 import styles from './ResourcesColumn.module.css'
@@ -17,6 +16,7 @@ const RESOURCE_TYPES: ResourceType[] = ['pdf', 'video', 'tool', 'link', 'guide']
 
 const ResourcesColumn: FC = () => {
   const [resources, setResources] = useState<IResource[]>([])
+  const [categories, setCategories] = useState<string[]>([]) // Derived state from loaded data
   const [meta, setMeta] = useState<IPaginationMeta>({
     page: 1,
     limit: 4,
@@ -29,11 +29,6 @@ const ResourcesColumn: FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const categories = useMemo(
-    () => Array.from(new Set(mockResources.map((r) => r.category))).sort(),
-    [],
-  )
-
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -44,8 +39,18 @@ const ResourcesColumn: FC = () => {
         category: category || undefined,
         type: type || undefined,
       })
+      
       setResources(data.resources)
       setMeta(data.meta)
+
+      // Dynamically extract unique categories from the fetched data array if not filtering
+      // This prevents the category dropdown from shrinking to only 1 item when a category filter is active
+      if (!category) {
+        const uniqueCategories = Array.from(
+          new Set(data.resources.map((r) => r.category))
+        ).sort()
+        setCategories(uniqueCategories)
+      }
     } catch {
       setError('Unable to load resources.')
     } finally {
@@ -74,7 +79,7 @@ const ResourcesColumn: FC = () => {
             value={category}
             onChange={(e) => {
               setCategory(e.target.value)
-              setPage(1)
+              setPage(1) // Reset to first page on filter change
             }}
           >
             <option value="">All</option>
@@ -96,7 +101,7 @@ const ResourcesColumn: FC = () => {
             value={type}
             onChange={(e) => {
               setType(e.target.value as ResourceType | '')
-              setPage(1)
+              setPage(1) // Reset to first page on filter change
             }}
           >
             <option value="">All</option>

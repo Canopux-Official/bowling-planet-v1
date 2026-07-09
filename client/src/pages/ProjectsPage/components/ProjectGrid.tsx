@@ -1,9 +1,10 @@
 import type { FC } from 'react'
-import type { IProject } from '../services/projectsApi'
+
 import EmptyState from '../../../components/common/EmptyState'
 import Loader from '../../../components/common/Loader'
 import ProjectCard from './ProjectCard'
 import styles from './ProjectGrid.module.css'
+import type { IProject } from '../types'
 
 interface ProjectGridProps {
   projects: IProject[]

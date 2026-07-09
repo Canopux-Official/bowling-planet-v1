@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { type FC, useCallback, useEffect, useState } from 'react'
 import Loader from '../../../components/common/Loader'
 import ErrorState from '../../../components/common/ErrorState'
 import EmptyState from '../../../components/common/EmptyState'
@@ -8,7 +8,6 @@ import {
   type BlogListItem,
   type IPaginationMeta,
 } from '../services/blogsApi'
-import { mockBlogsListView } from '../services/mockBlogs'
 import BlogCard from './BlogsColumn/BlogCard'
 import BlogsPagination from './BlogsColumn/BlogsPagination'
 import styles from './BlogsColumn.module.css'
@@ -26,10 +25,31 @@ const BlogsColumn: FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const availableTags = useMemo(
-    () => Array.from(new Set(mockBlogsListView.flatMap((b) => b.tags))).sort(),
-    [],
-  )
+  const [availableTags, setAvailableTags] = useState<string[]>([])
+
+  // Load once on mount, unfiltered and unpaginated (within reason), purely
+  // to build the tag filter list. There's no dedicated tags endpoint on the
+  // backend yet — if one gets added, replace this with that call.
+  useEffect(() => {
+    let cancelled = false
+
+    const loadTags = async () => {
+      try {
+        const data = await getPublishedBlogs({ page: 1, limit: 100 })
+        if (cancelled) return
+        const tags = Array.from(new Set(data.blogs.flatMap((b) => b.tags))).sort()
+        setAvailableTags(tags)
+      } catch {
+        // Non-critical — filter bar just won't populate. Main list load
+        // below still runs and will surface its own error state.
+      }
+    }
+
+    void loadTags()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)

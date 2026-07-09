@@ -1,16 +1,18 @@
-import {
-  mockJobs,
-  mockPagination,
-  type GetAllJobsParams,
-  type GetAllJobsResponse,
-  type IJob,
-  type IPaginationMeta,
-  type JobSort,
-  type JobStatus,
-  type JobType,
-  type ExperienceLevel,
-  type WorkMode,
-} from './mockJobs'
+
+import apiClient from '../../../hooks/apiClient'
+import type {
+  ApiListResponse,
+  ApiResponse,
+  GetAllJobsParams,
+  GetAllJobsResponse,
+  IJob,
+  IPaginationMeta,
+  JobSort,
+  JobStatus,
+  JobType,
+  ExperienceLevel,
+  WorkMode,
+} from '../types'
 
 export type {
   GetAllJobsParams,
@@ -24,46 +26,45 @@ export type {
   WorkMode,
 }
 
-export async function getAllJobs(params: GetAllJobsParams): Promise<GetAllJobsResponse> {
-  // TODO: implement API call
-  // Temporary local filter so UI filters work against mock data until the backend is wired.
-  let jobs = [...mockJobs]
+const BASE = '/career'
 
-  if (params.status) jobs = jobs.filter((j) => j.status === params.status)
-  if (params.jobType) jobs = jobs.filter((j) => j.jobType === params.jobType)
-  if (params.workMode) jobs = jobs.filter((j) => j.workMode === params.workMode)
-  if (params.experience) jobs = jobs.filter((j) => j.experience === params.experience)
-  if (params.department) jobs = jobs.filter((j) => j.department === params.department)
-  if (params.tags?.length) {
-    jobs = jobs.filter((j) => params.tags!.some((t) => j.tags.includes(t)))
-  }
-  if (params.search?.trim()) {
-    const q = params.search.trim().toLowerCase()
-    jobs = jobs.filter((j) => j.title.toLowerCase().includes(q))
+// GET /api/jobs
+export const getAllJobs = async (
+  params: GetAllJobsParams = {}
+): Promise<GetAllJobsResponse> => {
+  const query: Record<string, unknown> = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 10,
   }
 
-  switch (params.sort) {
+  if (params.status) query.status = params.status
+  if (params.jobType) query.jobType = params.jobType
+  if (params.workMode) query.workMode = params.workMode
+  if (params.experience) query.experience = params.experience
+  if (params.department) query.department = params.department
+  if (params.tags?.length) query.tags = params.tags.join(',')
+  if (params.search) query.search = params.search
+  // Controller expects a Mongoose sort string ('-createdAt' | 'createdAt' | 'title'),
+  // not the UI's 'newest' | 'oldest' | 'title', so translate it here.
+  if (params.sort) query.sort = mapSortToQuery(params.sort)
+
+  const res = await apiClient.get<ApiListResponse<IJob>>(BASE, query)
+
+  // Reshape the sibling { data, pagination } into the nested shape JobsPage expects.
+  return {
+    jobs: res.data,
+    pagination: res.pagination,
+  }
+}
+
+function mapSortToQuery(sort: JobSort): string {
+  switch (sort) {
     case 'oldest':
-      jobs.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-      break
+      return 'createdAt'
     case 'title':
-      jobs.sort((a, b) => a.title.localeCompare(b.title))
-      break
+      return 'title'
     case 'newest':
     default:
-      jobs.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      break
+      return '-createdAt'
   }
-
-  const page = params.page ?? 1
-  const limit = params.limit ?? mockPagination.limit
-  const total = jobs.length
-  const totalPages = Math.max(1, Math.ceil(total / limit) || 1)
-  const start = (page - 1) * limit
-  const pageJobs = jobs.slice(start, start + limit)
-
-  return Promise.resolve({
-    jobs: pageJobs,
-    pagination: { total, page, limit, totalPages },
-  })
 }

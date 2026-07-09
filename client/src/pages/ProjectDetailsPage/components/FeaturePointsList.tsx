@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IFeaturePoint } from '../../ProjectsPage/services/projectsApi'
+
 import styles from './FeaturePointsList.module.css'
+import type { IFeaturePoint } from '../../ProjectsPage/types'
 
 interface FeaturePointsListProps {
   featurePoints?: IFeaturePoint[]

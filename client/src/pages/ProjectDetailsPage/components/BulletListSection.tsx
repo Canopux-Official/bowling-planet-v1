@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IBulletList } from '../../ProjectsPage/services/projectsApi'
+
 import styles from './BulletListSection.module.css'
+import type { IBulletList } from '../../ProjectsPage/types'
 
 interface BulletListSectionProps {
   bulletList?: IBulletList[]

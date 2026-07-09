@@ -1,7 +1,8 @@
 import type { FC } from 'react'
-import type { ProjectSort } from '../services/projectsApi'
+
 import Tag from '../../../components/common/Tag'
 import styles from './ProjectFilters.module.css'
+import type { ProjectSort } from '../types'
 
 export interface ProjectFilterState {
   search: string

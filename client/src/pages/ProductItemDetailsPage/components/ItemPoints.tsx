@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IFeaturePoint } from '../services/mockProductItems'
+
 import styles from './ItemPoints.module.css'
+import type { IFeaturePoint } from '../../ProjectsPage/types'
 
 interface ItemPointsProps {
   points?: IFeaturePoint[]

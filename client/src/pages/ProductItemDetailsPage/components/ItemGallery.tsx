@@ -1,8 +1,9 @@
 import { type FC, useState } from 'react'
-import type { IMedia } from '../services/mockProductItems'
+
 import MediaItem from '../../../components/common/MediaItem'
 import Lightbox from '../../../components/common/Lightbox'
 import styles from './ItemGallery.module.css'
+import type { IMedia } from '../types'
 
 interface ItemGalleryProps {
   thumbnail: IMedia

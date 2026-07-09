@@ -3,12 +3,10 @@ import ErrorState from '../../components/common/ErrorState'
 import ProjectFilters, { type ProjectFilterState } from './components/ProjectFilters'
 import ProjectGrid from './components/ProjectGrid'
 import Pagination from './components/Pagination'
-import {
-  getAllProjects,
-  type IPaginationMeta,
-  type IProject,
-} from './services/projectsApi'
+
 import styles from './ProjectsPage.module.css'
+import type { IPaginationMeta, IProject } from './types'
+import { getAllProjects } from './services/projectsApi'
 
 const DEFAULT_FILTERS: ProjectFilterState = {
   search: '',

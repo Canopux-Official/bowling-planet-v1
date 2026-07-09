@@ -1,8 +1,9 @@
 import type { FC } from 'react'
-import type { ITestimonial } from '../../ProjectsPage/services/projectsApi'
+
 import MediaItem from '../../../components/common/MediaItem'
 import StarRating from '../../../components/common/StarRating'
 import styles from './TestimonialsCarousel.module.css'
+import type { ITestimonial } from '../../ProjectsPage/types'
 
 interface TestimonialsCarouselProps {
   testimonials?: ITestimonial[]

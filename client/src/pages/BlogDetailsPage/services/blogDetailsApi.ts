@@ -1,36 +1,24 @@
-import {
-  mockBlogs,
-  mockBlogsListView,
-  type BlogListItem,
-  type IBlog,
-} from '../../InsightsPage/services/mockBlogs'
+
+import apiClient from '../../../hooks/apiClient'
+import type { ApiListResponse, ApiResponse, BlogListItem, IBlog } from '../../InsightsPage/types'
 
 export type { BlogListItem, IBlog }
 
-export async function getBlogBySlug(slug: string): Promise<IBlog> {
-  // TODO: implement API call
-  const found = mockBlogs.find((b) => b.slug === slug)
-  return Promise.resolve(found ?? mockBlogs[0])
+const BASE = '/blog'
+
+// GET /api/blogs/:slug
+export const getBlogBySlug = async (slug: string): Promise<IBlog> => {
+  const res = await apiClient.get<ApiResponse<IBlog>>(`${BASE}/${slug}`)
+  return res.data
 }
 
-export async function getRelatedBlogs(
+// GET /api/blogs/:slug/related
+export const getRelatedBlogs = async (
   slug: string,
-  limit = 3,
-): Promise<BlogListItem[]> {
-  // TODO: implement API call
-  const current = mockBlogsListView.find((b) => b.slug === slug)
-  const related = mockBlogsListView
-    .filter((b) => b.slug !== slug)
-    .filter((b) =>
-      current ? b.tags.some((t) => current.tags.includes(t)) : true,
-    )
-    .slice(0, limit)
-
-  // Fallback if tag overlap is thin.
-  const result =
-    related.length > 0
-      ? related
-      : mockBlogsListView.filter((b) => b.slug !== slug).slice(0, limit)
-
-  return Promise.resolve(result)
+  limit = 3
+): Promise<BlogListItem[]> => {
+  // Note: the related-blogs route doesn't return meta, but reuse the
+  // list envelope shape since data is still an array here.
+  const res = await apiClient.get<ApiListResponse<BlogListItem>>(`${BASE}/${slug}/related`, { limit })
+  return res.data
 }

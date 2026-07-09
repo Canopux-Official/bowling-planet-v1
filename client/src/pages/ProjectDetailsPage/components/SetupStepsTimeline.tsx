@@ -1,7 +1,8 @@
 import type { FC } from 'react'
-import type { ISetupStep } from '../../ProjectsPage/services/projectsApi'
+
 import SetupStepCard from './SetupStepsTimeline/SetupStepCard'
 import styles from './SetupStepsTimeline.module.css'
+import type { ISetupStep } from '../../ProjectsPage/types'
 
 interface SetupStepsTimelineProps {
   setupSteps?: ISetupStep[]

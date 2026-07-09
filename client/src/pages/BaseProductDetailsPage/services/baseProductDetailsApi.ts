@@ -1,21 +1,17 @@
-import { mockBaseProducts, type IBaseProduct } from '../../ProductsPage/services/mockBaseProducts'
-import { mockProductItems, type IProductItem } from '../../ProductItemDetailsPage/services/mockProductItems'
+import apiClient from "../../../hooks/apiClient"
+import type { IProductItem } from "../../ProductItemDetailsPage/types"
+import type { IBaseProduct } from "../../ProductsPage/types"
+import type { ApiResponse } from "../../ProjectsPage/types"
+
 
 export type { IBaseProduct, IProductItem }
 
 export type BaseProductWithItems = IBaseProduct & { items: IProductItem[] }
 
-export async function getBaseProductWithItems(slug: string): Promise<BaseProductWithItems> {
-  // TODO: implement API call
-  const base =
-    mockBaseProducts.find((p) => p.slug === slug) ?? mockBaseProducts[0]
+const BASE = '/base-products'
 
-  const items = mockProductItems
-    .filter((item) => item.baseProduct.slug === base.slug)
-    .sort((a, b) => {
-      if (b.featuredOrder !== a.featuredOrder) return b.featuredOrder - a.featuredOrder
-      return b.purchaseCount - a.purchaseCount
-    })
-
-  return Promise.resolve({ ...base, items })
+// GET /base-products/:slug/with-items
+export const getBaseProductWithItems = async (slug: string): Promise<BaseProductWithItems> => {
+  const res = await apiClient.get<ApiResponse<BaseProductWithItems>>(`${BASE}/${slug}/with-items`)
+  return res.data
 }

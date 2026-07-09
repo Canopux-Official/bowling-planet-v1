@@ -1,9 +1,14 @@
-import { mockProductItems, type IProductItem } from './mockProductItems'
+import apiClient from "../../../hooks/apiClient"
+import type { ApiResponse } from "../types"
+import type { IProductItem } from "./mockProductItems"
+
 
 export type { IProductItem }
 
-export async function getProductItemBySlug(slug: string): Promise<IProductItem> {
-  // TODO: implement API call
-  const found = mockProductItems.find((item) => item.slug === slug)
-  return Promise.resolve(found ?? mockProductItems[0])
+const BASE = '/product-items'
+
+// GET /product-items/:slug
+export const getProductItemBySlug = async (slug: string): Promise<IProductItem> => {
+  const res = await apiClient.get<ApiResponse<IProductItem>>(`${BASE}/${slug}`)
+  return res.data
 }

@@ -1,8 +1,6 @@
-import {
-  mockBlogsListView,
-  type BlogListItem,
-  type IPaginationMeta,
-} from './mockBlogs'
+import apiClient from "../../../hooks/apiClient"
+import type { ApiListResponse, BlogListItem, IPaginationMeta } from "../types"
+
 
 export type { BlogListItem, IPaginationMeta }
 
@@ -17,26 +15,23 @@ export interface GetPublishedBlogsResponse {
   meta: IPaginationMeta
 }
 
-export async function getPublishedBlogs(
-  params: GetPublishedBlogsParams = {},
-): Promise<GetPublishedBlogsResponse> {
-  // TODO: implement API call
-  const page = params.page ?? 1
-  const limit = params.limit ?? 4
-  let blogs = [...mockBlogsListView]
+const BASE = '/blog'
 
-  if (params.tag) {
-    blogs = blogs.filter((b) => b.tags.includes(params.tag!))
+// GET /api/blogs
+export const getPublishedBlogs = async (
+  params: GetPublishedBlogsParams = {}
+): Promise<GetPublishedBlogsResponse> => {
+  const query: Record<string, unknown> = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 9,
   }
 
-  blogs.sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
+  if (params.tag) query.tag = params.tag
 
-  const total = blogs.length
-  const totalPages = Math.max(1, Math.ceil(total / limit) || 1)
-  const start = (page - 1) * limit
+  const res = await apiClient.get<ApiListResponse<BlogListItem>>(BASE, query)
 
-  return Promise.resolve({
-    blogs: blogs.slice(start, start + limit),
-    meta: { page, limit, total, totalPages },
-  })
+  return {
+    blogs: res.data,
+    meta: res.meta,
+  }
 }

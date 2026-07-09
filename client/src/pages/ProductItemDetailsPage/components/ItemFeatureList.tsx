@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IBulletList } from '../services/mockProductItems'
+
 import styles from './ItemFeatureList.module.css'
+import type { IBulletList } from '../../ProjectsPage/types'
 
 interface ItemFeatureListProps {
   featureList?: IBulletList[]

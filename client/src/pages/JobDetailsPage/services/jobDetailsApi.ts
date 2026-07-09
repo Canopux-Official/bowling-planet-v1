@@ -1,8 +1,10 @@
-import type { IJob } from '../../JobsPage/services/mockJobs'
-import { mockJobs } from '../../JobsPage/services/mockJobs'
+import apiClient from "../../../hooks/apiClient"
+import type { IJob } from "../../JobsPage/types"
+import type { ApiResponse } from "../../ProjectsPage/types"
 
-export async function getJobBySlug(slug: string): Promise<IJob> {
-  // TODO: implement API call
-  const found = mockJobs.find((job) => job.slug === slug)
-  return Promise.resolve(found ?? mockJobs[0])
+const BASE = '/career'
+
+export const getJobBySlug = async (slug: string): Promise<IJob> => {
+  const res = await apiClient.get<ApiResponse<IJob>>(`${BASE}/${slug}`)
+  return res.data
 }

@@ -1,9 +1,10 @@
 import type { FC } from 'react'
 import { Link } from 'react-router-dom'
-import type { IProject } from '../services/projectsApi'
+
 import Tag from '../../../components/common/Tag'
 import MediaItem from '../../../components/common/MediaItem'
 import styles from './ProjectCard.module.css'
+import type { IProject } from '../types'
 
 interface ProjectCardProps {
   project: IProject

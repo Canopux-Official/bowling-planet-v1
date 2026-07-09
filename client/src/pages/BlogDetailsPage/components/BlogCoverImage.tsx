@@ -1,6 +1,7 @@
 import type { FC } from 'react'
-import type { IMedia } from '../../InsightsPage/services/mockBlogs'
+
 import styles from './BlogCoverImage.module.css'
+import type { IMedia } from '../../InsightsPage/types'
 
 interface BlogCoverImageProps {
   coverImage?: IMedia

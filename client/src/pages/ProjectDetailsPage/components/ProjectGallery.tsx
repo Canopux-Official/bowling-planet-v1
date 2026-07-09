@@ -1,8 +1,9 @@
 import { type FC, useState } from 'react'
-import type { IMedia } from '../../ProjectsPage/services/projectsApi'
+
 import MediaItem from '../../../components/common/MediaItem'
 import Lightbox from '../../../components/common/Lightbox'
 import styles from './ProjectGallery.module.css'
+import type { IMedia } from '../../ProjectsPage/types'
 
 interface ProjectGalleryProps {
   media?: IMedia[]

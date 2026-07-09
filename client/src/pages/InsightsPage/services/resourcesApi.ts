@@ -1,9 +1,6 @@
-import {
-  mockResources,
-  type IResource,
-  type ResourceType,
-} from './mockResources'
-import type { IPaginationMeta } from './mockBlogs'
+
+import apiClient from '../../../hooks/apiClient'
+import type { ApiListResponse, IPaginationMeta, IResource, ResourceType } from '../types'
 
 export type { IResource, ResourceType, IPaginationMeta }
 
@@ -19,29 +16,24 @@ export interface GetPublishedResourcesResponse {
   meta: IPaginationMeta
 }
 
-export async function getPublishedResources(
-  params: GetPublishedResourcesParams = {},
-): Promise<GetPublishedResourcesResponse> {
-  // TODO: implement API call
-  const page = params.page ?? 1
-  const limit = params.limit ?? 4
-  let resources = [...mockResources]
+const BASE = '/resource'
 
-  if (params.category) {
-    resources = resources.filter((r) => r.category === params.category)
-  }
-  if (params.type) {
-    resources = resources.filter((r) => r.type === params.type)
+// GET /api/resources
+export const getPublishedResources = async (
+  params: GetPublishedResourcesParams = {}
+): Promise<GetPublishedResourcesResponse> => {
+  const query: Record<string, unknown> = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 12,
   }
 
-  resources.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  if (params.category) query.category = params.category
+  if (params.type) query.type = params.type
 
-  const total = resources.length
-  const totalPages = Math.max(1, Math.ceil(total / limit) || 1)
-  const start = (page - 1) * limit
+  const res = await apiClient.get<ApiListResponse<IResource>>(BASE, query)
 
-  return Promise.resolve({
-    resources: resources.slice(start, start + limit),
-    meta: { page, limit, total, totalPages },
-  })
+  return {
+    resources: res.data,
+    meta: res.meta,
+  }
 }

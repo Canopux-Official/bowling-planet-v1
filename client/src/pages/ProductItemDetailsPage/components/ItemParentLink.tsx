@@ -1,10 +1,11 @@
 import type { FC } from 'react'
 import { Link } from 'react-router-dom'
-import type { IProductItemRef } from '../services/mockProductItems'
+
 import styles from './ItemParentLink.module.css'
+import type { IBaseProductRef } from '../types'
 
 interface ItemParentLinkProps {
-  baseProduct: IProductItemRef
+  baseProduct: IBaseProductRef
 }
 
 const ItemParentLink: FC<ItemParentLinkProps> = ({ baseProduct }) => (

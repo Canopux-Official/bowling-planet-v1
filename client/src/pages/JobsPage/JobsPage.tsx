@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { type FC, useCallback, useEffect, useState } from 'react'
 import ErrorState from '../../components/common/ErrorState'
 import JobFilters, { type JobFilterState } from './components/JobFilters'
 import JobGrid from './components/JobGrid'
@@ -8,7 +8,6 @@ import {
   type IJob,
   type IPaginationMeta,
 } from './services/jobsApi'
-import { mockJobs } from './services/mockJobs'
 import styles from './JobsPage.module.css'
 
 const DEFAULT_FILTERS: JobFilterState = {
@@ -34,18 +33,9 @@ const JobsPage: FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Assumption: derive filter option lists from mockJobs until a dedicated metadata endpoint exists.
-  const availableDepartments = useMemo(
-    () =>
-      Array.from(
-        new Set(mockJobs.map((j) => j.department).filter((d): d is string => Boolean(d))),
-      ).sort(),
-    [],
-  )
-  const availableTags = useMemo(
-    () => Array.from(new Set(mockJobs.flatMap((j) => j.tags))).sort(),
-    [],
-  )
+  // Dynamic filter options extracted from API data arrays
+  const [availableDepartments, setAvailableDepartments] = useState<string[]>([])
+  const [availableTags, setAvailableTags] = useState<string[]>([])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -63,8 +53,26 @@ const JobsPage: FC = () => {
         tags: filters.tags.length ? filters.tags : undefined,
         sort: filters.sort,
       })
+      
       setJobs(data.jobs)
       setPagination(data.pagination)
+
+      // 1. Extract departments dynamically if no department filter is actively set
+      if (!filters.department) {
+        const uniqueDeps = Array.from(
+          new Set(data.jobs.map((j) => j.department).filter((d): d is string => Boolean(d)))
+        ).sort()
+        setAvailableDepartments(uniqueDeps)
+      }
+
+      // 2. Extract tags dynamically if no tag filters are actively set
+      if (filters.tags.length === 0) {
+        const uniqueTags = Array.from(
+          new Set(data.jobs.flatMap((j) => j.tags || []))
+        ).sort()
+        setAvailableTags(uniqueTags)
+      }
+
     } catch {
       setError('Unable to load jobs.')
     } finally {

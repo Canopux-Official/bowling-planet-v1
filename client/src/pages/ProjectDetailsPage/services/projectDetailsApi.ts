@@ -1,14 +1,9 @@
-import type { IProject } from '../../ProjectsPage/services/projectsApi'
+import apiClient from "../../../hooks/apiClient";
+import type { ApiResponse, IProject } from "../../ProjectsPage/types";
 
-export async function getProjectBySlug(slug: string): Promise<IProject> {
-  // TODO: implement API call
-  return {
-    _id: '',
-    title: '',
-    slug,
-    tags: [],
-    isPublished: true,
-    createdAt: '',
-    updatedAt: '',
-  }
+const BASE = `/project`
+
+export const getProjectBySlug = async (slug: string): Promise<IProject> => {
+  const res = await apiClient.get<ApiResponse<IProject>>(`${BASE}/${slug}`)
+  return res.data
 }

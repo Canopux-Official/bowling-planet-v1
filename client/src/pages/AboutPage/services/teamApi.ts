@@ -1,22 +1,22 @@
-import {
-  mockTeamMembers,
-  type ITeamMember,
-  type TeamMemberStatus,
-} from './mockTeamMembers'
+import apiClient from "../../../hooks/apiClient"
+import type { ApiResponse, GetAllTeamMembersParams, ITeamMember } from "../types"
 
-export type { ITeamMember, TeamMemberStatus }
 
-export interface GetAllTeamMembersParams {
-  status?: TeamMemberStatus
-}
 
-export async function getAllTeamMembers(
-  params?: GetAllTeamMembersParams,
-): Promise<ITeamMember[]> {
-  // TODO: implement API call
-  const status = params?.status ?? 'active'
-  const members = mockTeamMembers
-    .filter((m) => m.status === status)
-    .sort((a, b) => a.order - b.order)
-  return Promise.resolve(members)
+export type { ITeamMember, GetAllTeamMembersParams }
+
+const BASE = '/team'
+
+// GET /api/team-members
+export const getAllTeamMembers = async (
+  params: GetAllTeamMembersParams = {}
+): Promise<ITeamMember[]> => {
+  const query: Record<string, unknown> = {}
+
+  // Public listing defaults to active members only, matching the
+  // mock's default behavior — but stays overridable via params.
+  query.status = params.status ?? 'active'
+
+  const res = await apiClient.get<ApiResponse<ITeamMember[]>>(BASE, query)
+  return res.data
 }
