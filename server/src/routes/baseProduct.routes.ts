@@ -8,6 +8,8 @@ import {
   deleteBaseProduct,
 } from '../controllers/baseProduct.controller';
 import { upload } from '../middleware/multer';
+import { authenticateJWT } from '../middleware/authMiddleware';
+
 
 const router = Router();
 
@@ -17,9 +19,9 @@ const baseProductUpload = upload.fields([
 
 
 // admin
-router.post('/admin',baseProductUpload, createBaseProduct);
-router.patch('/admin/:id',baseProductUpload, updateBaseProduct);
-router.delete('/admin/:id', deleteBaseProduct);
+router.post('/admin',authenticateJWT,baseProductUpload, createBaseProduct);
+router.patch('/admin/:id',authenticateJWT,baseProductUpload, updateBaseProduct);
+router.delete('/admin/:id', authenticateJWT, deleteBaseProduct);
 
 // public
 router.get('/', getAllBaseProducts);

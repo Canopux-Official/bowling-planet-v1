@@ -8,6 +8,7 @@ import {
   getPublishedResources,
   getResourceBySlug,
 } from '../controllers/resource.controller';
+import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -16,10 +17,10 @@ router.get('/', getPublishedResources);
 router.get('/:slug', getResourceBySlug);       
 
 // admin
-router.post('/admin', createResource);                        
-router.put('/admin/:id', updateResource);                        
-router.delete('/admin/:id', deleteResource);                    
-router.get('/admin/all', getAllResourcesAdmin);                   
-router.patch('/admin/:id/toggle-publish', togglePublishResource); 
+router.post('/admin',authenticateJWT, createResource);                        
+router.put('/admin/:id', authenticateJWT, updateResource);                        
+router.delete('/admin/:id', authenticateJWT, deleteResource);                    
+router.get('/admin/all', authenticateJWT, getAllResourcesAdmin);                   
+router.patch('/admin/:id/toggle-publish', authenticateJWT, togglePublishResource); 
 
 export default router;

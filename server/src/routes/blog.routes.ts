@@ -11,6 +11,7 @@ import {
   getRelatedBlogs,
 } from '../controllers/blog.controller';
 import { upload } from '../middleware/multer';
+import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -22,11 +23,11 @@ router.get('/:slug/related', getRelatedBlogs);
 
 
 // admin
-router.post('/admin', createBlog);                           
-router.put('/admin/:id', updateBlog);                           
-router.delete('/admin/:id', deleteBlog);                        
-router.get('/admin/all', getAllBlogsAdmin);                     
-router.patch('/admin/:id/toggle-publish', togglePublishBlog);  
+router.post('/admin', authenticateJWT,createBlog);                           
+router.put('/admin/:id', authenticateJWT, updateBlog);                           
+router.delete('/admin/:id', authenticateJWT, deleteBlog);                        
+router.get('/admin/all', authenticateJWT, getAllBlogsAdmin);                     
+router.patch('/admin/:id/toggle-publish', authenticateJWT, togglePublishBlog);  
 router.post('/admin/upload-image', upload.single('image'), uploadBlogImage); 
 
 export default router;
