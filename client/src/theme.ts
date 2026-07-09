@@ -26,6 +26,25 @@ export const theme = {
     text2: '#86868B', // Secondary grey
     text3: '#48484A', // Tertiary dark grey
     
+    // Admin Portal Colors
+    adminBg: '#F4F6F9',
+    adminSurface: '#FFFFFF',
+    adminSurfaceHover: '#FAFBFC',
+    prussianBlue: '#030D1A',        // Darker Sidebar background
+    prussianBlue2: '#081729',       // Sidebar hover states
+    prussianBlueBorder: 'rgba(255,255,255,0.07)',
+    prussianBlueText: 'rgba(255,255,255,0.60)',
+    adminText: '#0F172A',
+    adminTextMuted: '#64748B',
+    adminTextLight: '#94A3B8',
+    adminBorder: '#E2E8F0',
+    adminBorderStrong: '#CBD5E1',
+    adminAccent: '#5FC1D1',         // Teal accent
+    adminAccentBg: 'rgba(95,193,209,0.08)',
+    adminDanger: '#EF4444',
+    adminSuccess: '#10B981',
+    adminWarning: '#F59E0B',
+    
     // Borders
     border: 'rgba(255, 255, 255, 0.08)',
     borderMd: 'rgba(255, 255, 255, 0.14)',

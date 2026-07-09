@@ -15,6 +15,7 @@ import cors from "cors";
 import express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/connectDB";
 import projectRoutes from './routes/project.routes';
 import baseProductRoutes from './routes/baseProduct.routes';
@@ -23,6 +24,8 @@ import careerRoutes from './routes/career.routes';
 import teamRoutes from './routes/team.routes';
 import blogRoutes from './routes/blog.routes';
 import resourceRoutes from './routes/resources.routes';
+import authRoutes from './routes/authRoutes';
+import { apiSecretMiddleware } from './middleware/apiSecretMiddleware';
 
 const app = express();
 
@@ -61,7 +64,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
   })
 );
 
@@ -72,6 +75,7 @@ app.use(
 // ------------------------------------------------------------------
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(cookieParser());
 
 // ------------------------------------------------------------------
 // 5. RATE LIMITING
@@ -94,16 +98,7 @@ app.set("trust proxy", 1); // Vercel sits behind a proxy layer
 //   },
 // });
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20, // strict — 20 login/register attempts per 15 min
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: "Too many auth attempts. Please try again in 15 minutes.",
-  },
-});
+
 
 // app.use(globalLimiter); // applied to every route
 
@@ -128,6 +123,8 @@ app.use(async (_req: Request, res: Response, next: NextFunction) => {
 // 7. ROUTES
 //    Auth route gets its own tighter rate limiter applied first.
 // ------------------------------------------------------------------
+app.use(apiSecretMiddleware);
+
 app.use("/project",projectRoutes);
 app.use('/base-products',baseProductRoutes);
 app.use('/product-items',productItemRoutes);
@@ -135,6 +132,7 @@ app.use('/career',careerRoutes);
 app.use('/team',teamRoutes);
 app.use('/blog',blogRoutes);
 app.use('/resource',resourceRoutes);
+app.use('/auth', authRoutes);
 
 // ------------------------------------------------------------------
 // 8. 404 HANDLER — catches any request that didn't match a route.

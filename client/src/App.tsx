@@ -9,6 +9,7 @@ import { HelmetProvider } from 'react-helmet-async'
 
 import Layout from './components/Layout'
 import { theme } from './theme'
+import { AuthProvider } from './context/AuthContext'
 
 const LandingPage = lazy(() => import('./pages/Landing/LandingPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage/AboutPage'))
@@ -27,8 +28,11 @@ const JobDetailsPage = lazy(() => import('./pages/JobDetailsPage/JobDetailsPage'
 const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
 const InsightsPage = lazy(() => import('./pages/InsightsPage/InsightsPage'))
 const BlogDetailsPage = lazy(() => import('./pages/BlogDetailsPage/BlogDetailsPage'))
-const LoginPage = lazy(() => import('./pages/Login/LoginPage'))
-const SignupPage = lazy(() => import('./pages/Signup/SignupPage'))
+const LoginPage = lazy(() => import('./pages/Auth/LoginPage'))
+const SignupPage = lazy(() => import('./pages/Auth/SignupPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/Auth/ForgotPasswordPage'))
+const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
+import { AdminGuard } from './pages/admin/AdminGuard'
 
 function RouteFallback() {
   return (
@@ -52,9 +56,10 @@ function RouteFallback() {
 export default function App() {
   return (
     <HelmetProvider>
-      <BrowserRouter>
-        <Suspense fallback={<RouteFallback />}>
-          <Routes>
+      <AuthProvider>
+        <BrowserRouter>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<LandingPage />} />
               <Route path="about" element={<AboutPage />} />
@@ -76,9 +81,16 @@ export default function App() {
 
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="admin/*" element={
+              <AdminGuard>
+                <AdminPage />
+              </AdminGuard>
+            } />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
     </HelmetProvider>
   )
 }

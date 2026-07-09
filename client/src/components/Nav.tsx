@@ -1,5 +1,6 @@
 import { useState, useEffect, type FC } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const NAV_LINKS = [
   { label: 'Home',      path: '/'          },
@@ -16,6 +17,7 @@ const NAV_LINKS = [
 const Nav: FC = () => {
   const [solid,    setSolid]    = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     const fn = () => setSolid(window.scrollY > 56)
@@ -103,7 +105,7 @@ const Nav: FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {/* CTA's */}
             <Link
-              to="/login"
+              to={isAuthenticated ? "/admin" : "/login"}
               className="btn nav-desktop-cta"
               style={{
                 padding: '10px 22px', fontSize: 14, textDecoration: 'none',
@@ -113,7 +115,7 @@ const Nav: FC = () => {
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
             >
-              Login
+              {isAuthenticated ? "Admin Portal" : "Login"}
             </Link>
             
             <Link
@@ -193,7 +195,7 @@ const Nav: FC = () => {
           Get in Touch
         </Link>
         <Link
-          to="/login"
+          to={isAuthenticated ? "/admin" : "/login"}
           style={{
             display: 'block', padding: '16px', marginTop: 14, background: 'rgba(255,255,255,0.05)',
             color: '#fff', textAlign: 'center', borderRadius: 8,
@@ -202,7 +204,7 @@ const Nav: FC = () => {
           }}
           onClick={() => setMenuOpen(false)}
         >
-          Login
+          {isAuthenticated ? "Admin Portal" : "Login"}
         </Link>
       </div>
     </>

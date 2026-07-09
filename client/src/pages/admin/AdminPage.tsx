@@ -1,0 +1,48 @@
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AdminLayout } from './layouts/AdminLayout';
+import { DashboardView } from './views/dashboard/DashboardView';
+import { CmsIndexView } from './views/cms/index/CmsIndexView';
+import { CmsHomeView } from './views/cms/home/CmsHomeView';
+import { CmsServicesView } from './views/cms/services/CmsServicesView';
+import { CmsProductsView } from './views/cms/products/CmsProductsView';
+import { CmsProjectsView } from './views/cms/projects/CmsProjectsView';
+import { CmsCareersView } from './views/cms/careers/CmsCareersView';
+import { CmsBlogView } from './views/cms/blog/CmsBlogView';
+import { CmsGlobalView } from './views/cms/global/CmsGlobalView';
+import { LeadsView } from './views/leads/LeadsView';
+import { ProfileView } from './views/profile/ProfileView';
+
+export default function AdminPage() {
+  return (
+    <Routes>
+      <Route path="/" element={<AdminLayout />}>
+        {/* Dashboard is the default view */}
+        <Route index element={<DashboardView />} />
+        
+        {/* Profile */}
+        <Route path="profile" element={<ProfileView />} />
+        
+        {/* Leads and CRM */}
+        <Route path="leads" element={<LeadsView />} />
+        
+        {/* Content Management System (CMS) */}
+        <Route path="cms" element={<CmsIndexView />} />
+        <Route path="cms/home" element={<CmsHomeView />} />
+        <Route path="cms/services" element={<CmsServicesView />} />
+        <Route path="cms/products" element={<CmsProductsView />} />
+        <Route path="cms/projects" element={<CmsProjectsView />} />
+        <Route path="cms/careers" element={<CmsCareersView />} />
+        <Route path="cms/blog" element={<CmsBlogView />} />
+        <Route path="cms/global" element={<CmsGlobalView />} />
+        
+        {/* Placeholders for future views */}
+        <Route path="media" element={<div style={{ padding: 24 }}>Media Library (Coming Soon)</div>} />
+        <Route path="directory" element={<div style={{ padding: 24 }}>Admin Directory (Coming Soon)</div>} />
+        
+        {/* Catch-all redirect back to dashboard */}
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Route>
+    </Routes>
+  );
+}
