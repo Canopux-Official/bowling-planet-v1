@@ -1,6 +1,6 @@
-import apiClient from "../../../hooks/apiClient"
-import type { ApiListResponse, BlogListItem, IPaginationMeta } from "../types"
 
+import { apiClient } from "../../../services/apiClient"
+import type { ApiListResponse, BlogListItem, IPaginationMeta } from "../types"
 
 export type { BlogListItem, IPaginationMeta }
 
@@ -21,17 +21,26 @@ const BASE = '/blog'
 export const getPublishedBlogs = async (
   params: GetPublishedBlogsParams = {}
 ): Promise<GetPublishedBlogsResponse> => {
-  const query: Record<string, unknown> = {
-    page: params.page ?? 1,
-    limit: params.limit ?? 9,
+  // 1. Construct URL search parameters
+  const searchParams = new URLSearchParams()
+  searchParams.append('page', String(params.page ?? 1))
+  searchParams.append('limit', String(params.limit ?? 9))
+  
+  if (params.tag) {
+    searchParams.append('tag', params.tag)
   }
 
-  if (params.tag) query.tag = params.tag
+  const url = `${BASE}?${searchParams.toString()}`
 
-  const res = await apiClient.get<ApiListResponse<BlogListItem>>(BASE, query)
+  // 2. Call apiClient directly with the required config and skip-refresh flag
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiListResponse<BlogListItem>
 
+  // 3. Return mapping matching the backend's sibling "pagination" property
   return {
     blogs: res.data,
-    meta: res.meta,
+    meta: res.meta, // Extracted from res.pagination based on your backend types
   }
 }

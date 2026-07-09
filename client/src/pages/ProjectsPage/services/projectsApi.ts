@@ -3,7 +3,8 @@
  * // Assumption: types colocated with list API to avoid an extra types folder.
  */
 
-import apiClient from "../../../hooks/apiClient";
+
+import { apiClient } from "../../../services/apiClient";
 import type { ApiResponse, GetAllProjectsParams, GetAllProjectsResponse } from "../types";
 
 const BASE = `/project`
@@ -11,16 +12,34 @@ const BASE = `/project`
 export const getAllProjects = async (
   params: GetAllProjectsParams = {}
 ): Promise<GetAllProjectsResponse> => {
-  const query: Record<string, unknown> = {
-    page: params.page ?? 1,
-    limit: params.limit ?? 9,
+  // 1. Construct URL search parameters
+  const searchParams = new URLSearchParams()
+  searchParams.append('page', String(params.page ?? 1))
+  searchParams.append('limit', String(params.limit ?? 9))
+
+  if (params.tags?.length) {
+    searchParams.append('tags', params.tags.join(','))
+  }
+  
+  if (params.isPublished !== undefined) {
+    searchParams.append('isPublished', String(params.isPublished))
+  }
+  
+  if (params.search) {
+    searchParams.append('search', params.search)
+  }
+  
+  if (params.sort) {
+    searchParams.append('sort', params.sort)
   }
 
-  if (params.tags?.length) query.tags = params.tags.join(',')
-  if (params.isPublished !== undefined) query.isPublished = params.isPublished
-  if (params.search) query.search = params.search
-  if (params.sort) query.sort = params.sort
+  const url = `${BASE}?${searchParams.toString()}`
 
-  const res = await apiClient.get<ApiResponse<GetAllProjectsResponse>>(BASE, query)
+  // 2. Call apiClient directly with the required config and skip-refresh flag
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiResponse<GetAllProjectsResponse>
+
   return res.data
 }

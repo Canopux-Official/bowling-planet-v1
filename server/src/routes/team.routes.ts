@@ -1,5 +1,6 @@
 import express from 'express'
 import { createTeamMember, deleteTeamMember, getAllTeamMembers, updateTeamMember } from '../controllers/team.controller';
+import { apiSecretMiddleware } from '../middleware/apiSecretMiddleware';
 const router = express.Router()
 
 

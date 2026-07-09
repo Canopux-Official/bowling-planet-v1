@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_SERVER_LINK || 'http://localhost:5000'
-const API_SECRET = import.meta.env.VITE_API_SECRET || ''
+const API_SECRET = import.meta.env.VITE_API_SECRET || 'hello'
 
 const defaultHeaders = {
   'Content-Type': 'application/json',

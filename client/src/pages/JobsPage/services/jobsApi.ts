@@ -1,8 +1,7 @@
 
-import apiClient from '../../../hooks/apiClient'
+import { apiClient } from '../../../services/apiClient'
 import type {
   ApiListResponse,
-  ApiResponse,
   GetAllJobsParams,
   GetAllJobsResponse,
   IJob,
@@ -32,25 +31,35 @@ const BASE = '/career'
 export const getAllJobs = async (
   params: GetAllJobsParams = {}
 ): Promise<GetAllJobsResponse> => {
-  const query: Record<string, unknown> = {
-    page: params.page ?? 1,
-    limit: params.limit ?? 10,
+  // 1. Construct URL search parameters
+  const searchParams = new URLSearchParams()
+  searchParams.append('page', String(params.page ?? 1))
+  searchParams.append('limit', String(params.limit ?? 10))
+
+  if (params.status) searchParams.append('status', params.status)
+  if (params.jobType) searchParams.append('jobType', params.jobType)
+  if (params.workMode) searchParams.append('workMode', params.workMode)
+  if (params.experience) searchParams.append('experience', params.experience)
+  if (params.department) searchParams.append('department', params.department)
+  if (params.search) searchParams.append('search', params.search)
+  
+  if (params.tags?.length) {
+    searchParams.append('tags', params.tags.join(','))
+  }
+  
+  if (params.sort) {
+    searchParams.append('sort', mapSortToQuery(params.sort))
   }
 
-  if (params.status) query.status = params.status
-  if (params.jobType) query.jobType = params.jobType
-  if (params.workMode) query.workMode = params.workMode
-  if (params.experience) query.experience = params.experience
-  if (params.department) query.department = params.department
-  if (params.tags?.length) query.tags = params.tags.join(',')
-  if (params.search) query.search = params.search
-  // Controller expects a Mongoose sort string ('-createdAt' | 'createdAt' | 'title'),
-  // not the UI's 'newest' | 'oldest' | 'title', so translate it here.
-  if (params.sort) query.sort = mapSortToQuery(params.sort)
+  const url = `${BASE}?${searchParams.toString()}`
 
-  const res = await apiClient.get<ApiListResponse<IJob>>(BASE, query)
+  // 2. Call apiClient directly with the required config and skip-refresh flag
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiListResponse<IJob>
 
-  // Reshape the sibling { data, pagination } into the nested shape JobsPage expects.
+  // 3. Reshape the sibling { data, pagination } into the nested shape JobsPage expects.
   return {
     jobs: res.data,
     pagination: res.pagination,

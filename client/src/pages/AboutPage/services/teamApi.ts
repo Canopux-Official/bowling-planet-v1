@@ -1,22 +1,21 @@
-import apiClient from "../../../hooks/apiClient"
+
+import { apiClient } from "../../../services/apiClient"
 import type { ApiResponse, GetAllTeamMembersParams, ITeamMember } from "../types"
-
-
 
 export type { ITeamMember, GetAllTeamMembersParams }
 
 const BASE = '/team'
 
-// GET /api/team-members
 export const getAllTeamMembers = async (
   params: GetAllTeamMembersParams = {}
 ): Promise<ITeamMember[]> => {
-  const query: Record<string, unknown> = {}
+  const status = params.status ?? 'active'
+  
+  // Construct a standard query string
+  const url = `${BASE}?status=${encodeURIComponent(status)}`
 
-  // Public listing defaults to active members only, matching the
-  // mock's default behavior — but stays overridable via params.
-  query.status = params.status ?? 'active'
-
-  const res = await apiClient.get<ApiResponse<ITeamMember[]>>(BASE, query)
+  // Call apiClient directly as a function instead of .get()
+  const res = await apiClient(url, { method: 'GET',headers: {'x-skip-auth-refresh': 'true'} }) as ApiResponse<ITeamMember[]>
+  
   return res.data
 }

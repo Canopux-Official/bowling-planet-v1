@@ -1,4 +1,5 @@
-import apiClient from "../../../hooks/apiClient"
+
+import { apiClient } from "../../../services/apiClient"
 import type { IProductItem } from "../../ProductItemDetailsPage/types"
 import type { IBaseProduct } from "../../ProductsPage/types"
 import type { ApiResponse } from "../../ProjectsPage/types"
@@ -12,6 +13,14 @@ const BASE = '/base-products'
 
 // GET /base-products/:slug/with-items
 export const getBaseProductWithItems = async (slug: string): Promise<BaseProductWithItems> => {
-  const res = await apiClient.get<ApiResponse<BaseProductWithItems>>(`${BASE}/${slug}/with-items`)
+  // 1. Construct the URL path
+  const url = `${BASE}/${slug}/with-items`
+
+  // 2. Call apiClient directly as a function and pass the method/headers config
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiResponse<BaseProductWithItems>
+
   return res.data
 }

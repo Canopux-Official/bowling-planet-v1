@@ -12,6 +12,7 @@ export const apiSecretMiddleware = (req: Request, res: Response, next: NextFunct
   const clientApiKey = req.headers['x-api-key'] || req.query['x-api-key'];
 
   if (!clientApiKey || clientApiKey !== API_SECRET) {
+    console.log(clientApiKey, API_SECRET);
     res.status(403).json({ message: 'Forbidden: Invalid or missing API Secret' });
     return;
   }

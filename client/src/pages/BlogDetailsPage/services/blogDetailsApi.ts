@@ -1,5 +1,5 @@
 
-import apiClient from '../../../hooks/apiClient'
+import { apiClient } from '../../../services/apiClient'
 import type { ApiListResponse, ApiResponse, BlogListItem, IBlog } from '../../InsightsPage/types'
 
 export type { BlogListItem, IBlog }
@@ -8,7 +8,13 @@ const BASE = '/blog'
 
 // GET /api/blogs/:slug
 export const getBlogBySlug = async (slug: string): Promise<IBlog> => {
-  const res = await apiClient.get<ApiResponse<IBlog>>(`${BASE}/${slug}`)
+  const url = `${BASE}/${slug}`
+
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiResponse<IBlog>
+
   return res.data
 }
 
@@ -17,8 +23,13 @@ export const getRelatedBlogs = async (
   slug: string,
   limit = 3
 ): Promise<BlogListItem[]> => {
-  // Note: the related-blogs route doesn't return meta, but reuse the
-  // list envelope shape since data is still an array here.
-  const res = await apiClient.get<ApiListResponse<BlogListItem>>(`${BASE}/${slug}/related`, { limit })
+  // Append limit as a query parameter string
+  const url = `${BASE}/${slug}/related?limit=${limit}`
+
+  const res = await apiClient(url, {
+    method: 'GET',
+    headers: { 'x-skip-auth-refresh': 'true' }
+  }) as ApiListResponse<BlogListItem>
+
   return res.data
 }
