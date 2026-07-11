@@ -32,8 +32,8 @@ interface CloudinaryPickerState {
 
 export const CloudinaryImagePicker: React.FC<CloudinaryImagePickerProps> = ({
     onSelect,
-    maxWidth = 1200,
-    maxHeight = 800,
+    maxWidth: _maxWidth = 1200,
+    maxHeight: _maxHeight = 800,
     folderPrefix = '',
 }) => {
     const [isOpen, setIsOpen] = useState(false);

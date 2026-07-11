@@ -35,7 +35,7 @@ export const RichTextEditor: React.FC<Props> = ({ content, onChange }) => {
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: { style: 'min-height: 400px; outline: none; padding: 16px;' },
-      handleDrop: (view, event) => {
+      handleDrop: (_view, event) => {
         const file = event.dataTransfer?.files?.[0];
         if (file && file.type.startsWith('image/')) {
           event.preventDefault();
@@ -44,7 +44,7 @@ export const RichTextEditor: React.FC<Props> = ({ content, onChange }) => {
         }
         return false;
       },
-      handlePaste: (view, event) => {
+      handlePaste: (_view, event) => {
         const file = Array.from(event.clipboardData?.files || []).find((f) => f.type.startsWith('image/'));
         if (file) {
           event.preventDefault();

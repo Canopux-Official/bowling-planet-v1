@@ -32,7 +32,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, setIsOpen })
   const { user } = useAuth();
   
   const portalName = user?.role === 'SuperAdmin' ? 'SuperAdmin Portal' : 'Admin Portal';
-  const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'A';
+  void user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <aside

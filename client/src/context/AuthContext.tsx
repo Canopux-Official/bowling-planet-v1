@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { authApi } from '../pages/Auth/services/authApi';
 import { SessionExpiredModal } from '../components/SessionExpiredModal';
 
