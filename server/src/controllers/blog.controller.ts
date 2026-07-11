@@ -138,10 +138,8 @@ export const uploadBlogImage = asyncHandler(async (req: Request, res: Response) 
     if (!req.file) {
         return res.status(400).json({ success: false, message: 'No image file provided' });
     }
-
     const result = await uploadImage(req.file.buffer, 'blog');
-
-    res.status(200).json({ success: true, data: result }); // { url, publicId }
+    res.status(200).json({ success: true, data: { ...result, type: 'image' } });
 });
 
 // ====================================================================

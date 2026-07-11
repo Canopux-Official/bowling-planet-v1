@@ -33,6 +33,7 @@ const SignupPage = lazy(() => import('./pages/Auth/SignupPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/Auth/ForgotPasswordPage'))
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
 import { AdminGuard } from './pages/admin/AdminGuard'
+import { ToastProvider } from './pages/admin/components/Toast'
 
 function RouteFallback() {
   return (
@@ -60,33 +61,35 @@ export default function App() {
         <BrowserRouter>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<LandingPage />} />
-              <Route path="about" element={<AboutPage />} />
-              <Route path="projects" element={<ProjectsPage />} />
-              <Route path="projects/:slug" element={<ProjectDetailsPage />} />
-              <Route path="products" element={<ProductsPage />} />
-              <Route
-                path="products/:baseSlug/:itemSlug"
-                element={<ProductItemDetailsPage />}
-              />
-              <Route path="products/:slug" element={<BaseProductDetailsPage />} />
-              <Route path="franchise" element={<FranchisePage />} />
-              <Route path="careers" element={<JobsPage />} />
-              <Route path="careers/:slug" element={<JobDetailsPage />} />
-              <Route path="contact" element={<ContactPage />} />
-              <Route path="blog" element={<InsightsPage />} />
-              <Route path="blog/:slug" element={<BlogDetailsPage />} />
-            </Route>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<LandingPage />} />
+                <Route path="about" element={<AboutPage />} />
+                <Route path="projects" element={<ProjectsPage />} />
+                <Route path="projects/:slug" element={<ProjectDetailsPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route
+                  path="products/:baseSlug/:itemSlug"
+                  element={<ProductItemDetailsPage />}
+                />
+                <Route path="products/:slug" element={<BaseProductDetailsPage />} />
+                <Route path="franchise" element={<FranchisePage />} />
+                <Route path="careers" element={<JobsPage />} />
+                <Route path="careers/:slug" element={<JobDetailsPage />} />
+                <Route path="contact" element={<ContactPage />} />
+                <Route path="blog" element={<InsightsPage />} />
+                <Route path="blog/:slug" element={<BlogDetailsPage />} />
+              </Route>
 
-            <Route path="login" element={<LoginPage />} />
-            <Route path="signup" element={<SignupPage />} />
-            <Route path="forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="admin/*" element={
-              <AdminGuard>
-                <AdminPage />
-              </AdminGuard>
-            } />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="signup" element={<SignupPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="admin/*" element={
+                <AdminGuard>
+                  <ToastProvider>
+                    <AdminPage />
+                  </ToastProvider>
+                </AdminGuard>
+              } />
             </Routes>
           </Suspense>
         </BrowserRouter>

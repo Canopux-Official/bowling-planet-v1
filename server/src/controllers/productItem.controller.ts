@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import 'multer'; 
+import 'multer';
 import { BaseProduct, ProductItem } from '../models/product';
 import { uploadMedia, deleteMedia } from '../utils/cloudinary';
 
@@ -38,6 +38,11 @@ export const createProductItem = async (req: Request, res: Response) => {
         publicId
       }));
     }
+
+    // in createProductItem, before ProductItem.create(req.body):
+    if (typeof req.body.featureList === 'string') req.body.featureList = JSON.parse(req.body.featureList);
+    if (typeof req.body.points === 'string') req.body.points = JSON.parse(req.body.points);
+    if (typeof req.body.usedIn === 'string') req.body.usedIn = JSON.parse(req.body.usedIn);
 
     const item = await ProductItem.create(req.body);
     return res.status(201).json({ success: true, data: item });
@@ -151,6 +156,10 @@ export const updateProductItem = async (req: Request, res: Response) => {
     let updateData = { ...req.body };
     if (typeof updateData.gallery === 'string') updateData.gallery = JSON.parse(updateData.gallery);
     if (typeof updateData.thumbnail === 'string') updateData.thumbnail = JSON.parse(updateData.thumbnail);
+    // in updateProductItem, alongside the existing gallery/thumbnail parse lines:
+    if (typeof updateData.featureList === 'string') updateData.featureList = JSON.parse(updateData.featureList);
+    if (typeof updateData.points === 'string') updateData.points = JSON.parse(updateData.points);
+    if (typeof updateData.usedIn === 'string') updateData.usedIn = JSON.parse(updateData.usedIn);
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
 

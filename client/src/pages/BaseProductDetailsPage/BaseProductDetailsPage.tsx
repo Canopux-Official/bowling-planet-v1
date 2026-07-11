@@ -75,7 +75,7 @@ const BaseProductDetailsPage: FC = () => {
   }, [load])
 
   const sortedItems = useMemo(
-    () => (data ? sortItems(data.items, sort) : []),
+    () => (data ? sortItems(data.items.filter(item => item.status === 'active'), sort) : []),
     [data, sort],
   )
 

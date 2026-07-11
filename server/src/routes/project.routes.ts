@@ -6,8 +6,8 @@ const router = express.Router()
 
 
 // admin
-router.post('/admin',authenticateJWT,upload.array('images', 5), createProject);
-router.patch('/admin/:id', authenticateJWT, upload.array('images', 5),updateProject);
+router.post('/admin',authenticateJWT,upload.any(), createProject);
+router.patch('/admin/:id', authenticateJWT, upload.any(),updateProject);
 router.delete('/admin/:id', authenticateJWT, deleteProject);
 router.patch('/admin/:id/publish', authenticateJWT, togglePublishProject);
 

@@ -21,22 +21,53 @@ const sendResponse = (
 // ------------------------------------------------------------------
 export const createProject = async (req: Request, res: Response) => {
     try {
-        // Handle initial image uploads via Multer memory storage buffers
-        if (req.files && Array.isArray(req.files)) {
-            const uploaded = await Promise.all(
-                (req.files as Express.Multer.File[]).map((f) =>
-                    uploadMedia(f.buffer, { folder: 'projects', resourceType: 'image' })
-                )
-            );
+        let projectData = { ...req.body };
 
-            req.body.media = uploaded.map(({ url, publicId }) => ({
-                type: 'image',
-                url,
-                publicId,
-            }));
+        if (typeof projectData.tags === 'string') {
+            projectData.tags = projectData.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+        }
+        // ADD THIS LINE — was missing:
+        if (typeof projectData.media === 'string') projectData.media = JSON.parse(projectData.media);
+
+        if (typeof projectData.setupSteps === 'string') projectData.setupSteps = JSON.parse(projectData.setupSteps);
+        if (typeof projectData.featurePoints === 'string') projectData.featurePoints = JSON.parse(projectData.featurePoints);
+        if (typeof projectData.bulletList === 'string') projectData.bulletList = JSON.parse(projectData.bulletList);
+        if (typeof projectData.testimonials === 'string') projectData.testimonials = JSON.parse(projectData.testimonials);
+
+        const { gallery, setupStepFiles, testimonialFiles } = groupIncomingFiles(
+            req.files as Express.Multer.File[]
+        );
+
+        // Gallery uploads — now correctly appends to an already-parsed array
+        if (gallery.length > 0) {
+            const uploaded = await Promise.all(
+                gallery.map((f) => uploadMedia(f.buffer, { folder: 'projects', resourceType: 'image' }))
+            );
+            const newMediaItems = uploaded.map(({ url, publicId }) => ({ type: 'image', url, publicId }));
+            projectData.media = [...(projectData.media || []), ...newMediaItems];
         }
 
-        const project = await Project.create(req.body);
+        // Setup-step images
+        if (Object.keys(setupStepFiles).length > 0 && Array.isArray(projectData.setupSteps)) {
+            const uploadedByIdx = await uploadIndexedFiles(setupStepFiles, 'projects/setup-steps');
+            for (const [idx, media] of Object.entries(uploadedByIdx)) {
+                if (projectData.setupSteps[Number(idx)]) {
+                    projectData.setupSteps[Number(idx)].image = media;
+                }
+            }
+        }
+
+        // Testimonial avatar images
+        if (Object.keys(testimonialFiles).length > 0 && Array.isArray(projectData.testimonials)) {
+            const uploadedByIdx = await uploadIndexedFiles(testimonialFiles, 'projects/testimonials');
+            for (const [idx, media] of Object.entries(uploadedByIdx)) {
+                if (projectData.testimonials[Number(idx)]) {
+                    projectData.testimonials[Number(idx)].clientImage = media;
+                }
+            }
+        }
+
+        const project = await Project.create(projectData);
         return sendResponse(res, 201, true, 'Project created successfully', project);
     } catch (error: any) {
         return sendResponse(res, 400, false, error.message || 'Failed to create project');
@@ -118,55 +149,71 @@ export const getProjectBySlug = async (req: Request, res: Response) => {
 export const updateProject = async (req: Request, res: Response) => {
     try {
         const project = await Project.findOne({ _id: req.params.id, isDeleted: false });
+        if (!project) return sendResponse(res, 404, false, 'Project not found');
 
-        if (!project) {
-            return sendResponse(res, 404, false, 'Project not found');
-        }
-
-        // Parse req.body properties if sent via multipart/form-data
         let updateData = { ...req.body };
-        if (typeof updateData.media === 'string') {
-            updateData.media = JSON.parse(updateData.media);
-        }
 
-        // 1. Check if the user wants to remove items from the existing array
+        if (typeof updateData.tags === 'string') {
+            updateData.tags = updateData.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+        }
+        if (typeof updateData.media === 'string') updateData.media = JSON.parse(updateData.media);
+        if (typeof updateData.setupSteps === 'string') updateData.setupSteps = JSON.parse(updateData.setupSteps);
+        if (typeof updateData.featurePoints === 'string') updateData.featurePoints = JSON.parse(updateData.featurePoints);
+        if (typeof updateData.bulletList === 'string') updateData.bulletList = JSON.parse(updateData.bulletList);
+        if (typeof updateData.testimonials === 'string') updateData.testimonials = JSON.parse(updateData.testimonials);
+
+        // Gallery: diff-delete removed images (existing logic, unchanged)
         if (updateData.media && Array.isArray(updateData.media)) {
             const incomingPublicIds = updateData.media.map((m: any) => m.publicId).filter(Boolean);
-
-            // Collect any asset currently saved that is omitted from the incoming modification payload
             const imagesToDelete = project.media?.filter(
                 (existingImg: any) => existingImg.publicId && !incomingPublicIds.includes(existingImg.publicId)
             ) || [];
-
-            // Purge deleted photos from Cloudinary storage
             if (imagesToDelete.length > 0) {
                 await Promise.all(imagesToDelete.map((img: any) => deleteMedia(img.publicId)));
             }
         }
 
-        // 2. Process completely new binary file replacements
-        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        const { gallery, setupStepFiles, testimonialFiles } = groupIncomingFiles(
+            req.files as Express.Multer.File[]
+        );
+
+        // New gallery uploads get appended
+        if (gallery.length > 0) {
             const uploaded = await Promise.all(
-                (req.files as Express.Multer.File[]).map((f) =>
-                    uploadMedia(f.buffer, { folder: 'projects', resourceType: 'image' })
-                )
+                gallery.map((f) => uploadMedia(f.buffer, { folder: 'projects', resourceType: 'image' }))
             );
+            const newMediaItems = uploaded.map(({ url, publicId }) => ({ type: 'image', url, publicId }));
+            updateData.media = updateData.media
+                ? [...updateData.media, ...newMediaItems]
+                : [...(project.media || []), ...newMediaItems];
+        }
 
-            const newMediaItems = uploaded.map(({ url, publicId }) => ({
-                type: 'image',
-                url,
-                publicId,
-            }));
-
-            // Append new ones to whatever remains or assign them fresh
-            if (updateData.media && Array.isArray(updateData.media)) {
-                updateData.media = [...updateData.media, ...newMediaItems];
-            } else {
-                updateData.media = [...(project.media || []), ...newMediaItems];
+        // Setup-step images — replace, and clean up the old Cloudinary asset if swapped
+        if (Object.keys(setupStepFiles).length > 0 && Array.isArray(updateData.setupSteps)) {
+            const uploadedByIdx = await uploadIndexedFiles(setupStepFiles, 'projects/setup-steps');
+            for (const [idx, media] of Object.entries(uploadedByIdx)) {
+                const i = Number(idx);
+                const oldPublicId = project.setupSteps?.[i]?.image?.publicId;
+                if (oldPublicId && oldPublicId !== media.publicId) {
+                    await deleteMedia(oldPublicId).catch(() => {});
+                }
+                if (updateData.setupSteps[i]) updateData.setupSteps[i].image = media;
             }
         }
 
-        // Apply remaining changes and fire pre-save validations safely
+        // Testimonial avatars — same replace + cleanup pattern
+        if (Object.keys(testimonialFiles).length > 0 && Array.isArray(updateData.testimonials)) {
+            const uploadedByIdx = await uploadIndexedFiles(testimonialFiles, 'projects/testimonials');
+            for (const [idx, media] of Object.entries(uploadedByIdx)) {
+                const i = Number(idx);
+                const oldPublicId = project.testimonials?.[i]?.clientImage?.publicId;
+                if (oldPublicId && oldPublicId !== media.publicId) {
+                    await deleteMedia(oldPublicId).catch(() => {});
+                }
+                if (updateData.testimonials[i]) updateData.testimonials[i].clientImage = media;
+            }
+        }
+
         Object.assign(project, updateData);
         await project.save();
 
@@ -230,4 +277,42 @@ export const togglePublishProject = async (req: Request, res: Response) => {
     } catch (error: any) {
         return sendResponse(res, 500, false, error.message || 'Failed to update publish status');
     }
+};
+
+
+const groupIncomingFiles = (files: Express.Multer.File[] = []) => {
+    const gallery: Express.Multer.File[] = [];
+    const setupStepFiles: Record<number, Express.Multer.File> = {};
+    const testimonialFiles: Record<number, Express.Multer.File> = {};
+
+    for (const f of files) {
+        const setupMatch = f.fieldname.match(/^setupStepImage_(\d+)$/);
+        const testiMatch = f.fieldname.match(/^testimonialImage_(\d+)$/);
+
+        if (f.fieldname === 'images') {
+            gallery.push(f);
+        } else if (setupMatch) {
+            setupStepFiles[Number(setupMatch[1])] = f;
+        } else if (testiMatch) {
+            testimonialFiles[Number(testiMatch[1])] = f;
+        }
+        // unrecognized fieldnames are silently ignored — could log/reject instead
+    }
+
+    return { gallery, setupStepFiles, testimonialFiles };
+};
+
+// Uploads a map of {index: file} to Cloudinary and returns {index: IMedia}
+const uploadIndexedFiles = async (
+    fileMap: Record<number, Express.Multer.File>,
+    folder: string
+): Promise<Record<number, IMedia>> => {
+    const entries = Object.entries(fileMap);
+    const uploaded = await Promise.all(
+        entries.map(async ([idx, file]) => {
+            const { url, publicId } = await uploadMedia(file.buffer, { folder, resourceType: 'image' });
+            return [Number(idx), { type: 'image', url, publicId }] as [number, IMedia];
+        })
+    );
+    return Object.fromEntries(uploaded);
 };
