@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Download, MoreVertical, Mail, Phone, Clock } from 'lucide-react';
+import { Search, Filter, MoreVertical } from 'lucide-react';
 import { theme } from '../../../../theme';
 
 type LeadStatus = 'New' | 'Contacted' | 'In Progress' | 'Closed' | 'Lost';

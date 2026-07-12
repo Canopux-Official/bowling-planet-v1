@@ -1,15 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
-/**
- * Attaches an IntersectionObserver to a div ref.
- * Adds class `visible` when the element enters the viewport.
- * Unobserves after first trigger (fire-once).
- */
 export function useReveal(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = ref.current
+  const obsRef = useRef<IntersectionObserver | null>(null)
+
+  const ref = useCallback((el: HTMLDivElement | null) => {
+    // clean up any previous observer
+    if (obsRef.current) {
+      obsRef.current.disconnect()
+      obsRef.current = null
+    }
     if (!el) return
+
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -20,7 +21,8 @@ export function useReveal(threshold = 0.12) {
       { threshold }
     )
     obs.observe(el)
-    return () => obs.disconnect()
+    obsRef.current = obs
   }, [threshold])
+
   return ref
 }
