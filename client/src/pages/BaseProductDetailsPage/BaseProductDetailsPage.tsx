@@ -48,6 +48,7 @@ const BaseProductDetailsPage: FC = () => {
     setLoading(true); setError(null)
     try {
       const result = await getBaseProductWithItems(slug)
+      console.log(result)
       setData(result)
     } catch {
       setError('Unable to load this product category.')

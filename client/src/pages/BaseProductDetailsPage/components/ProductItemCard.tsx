@@ -20,6 +20,7 @@ function formatPrice(price: number): string {
 }
 
 const ProductItemCard: FC<ProductItemCardProps> = ({ item }) => {
+  console.log(item)
   const accent = ACCENT_COLORS[(item.title.charCodeAt(0) ?? 0) % ACCENT_COLORS.length]
 
   return (
