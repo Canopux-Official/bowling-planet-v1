@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, FileText, MousePointerClick, TrendingUp, ArrowUpRight, ArrowDownRight, Circle } from 'lucide-react';
+import { Users, FileText, MousePointerClick, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { theme } from '../../../../theme';
 
 const statCards = [

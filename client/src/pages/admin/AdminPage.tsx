@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AdminLayout } from './layouts/AdminLayout';
 import { DashboardView } from './views/dashboard/DashboardView';
@@ -12,6 +12,10 @@ import { CmsBlogView } from './views/cms/blog/CmsBlogView';
 import { CmsGlobalView } from './views/cms/global/CmsGlobalView';
 import { LeadsView } from './views/leads/LeadsView';
 import { ProfileView } from './views/profile/ProfileView';
+import { ProductItemsView } from './views/cms/products/components/ProductItemsView';
+import { CmsTeamView } from './views/cms/team/CmsTeamView';
+import { CmsResourceView } from './views/cms/resources/CmsResourceView';
+import { BlogEditorPage } from './views/cms/blog/components/BlogEditorPage';
 
 export default function AdminPage() {
   return (
@@ -19,27 +23,37 @@ export default function AdminPage() {
       <Route path="/" element={<AdminLayout />}>
         {/* Dashboard is the default view */}
         <Route index element={<DashboardView />} />
-        
+
         {/* Profile */}
         <Route path="profile" element={<ProfileView />} />
-        
+
         {/* Leads and CRM */}
         <Route path="leads" element={<LeadsView />} />
-        
+
         {/* Content Management System (CMS) */}
         <Route path="cms" element={<CmsIndexView />} />
         <Route path="cms/home" element={<CmsHomeView />} />
         <Route path="cms/services" element={<CmsServicesView />} />
+
         <Route path="cms/products" element={<CmsProductsView />} />
+        <Route path="cms/products/:slug/items" element={<ProductItemsView />} />
+
         <Route path="cms/projects" element={<CmsProjectsView />} />
         <Route path="cms/careers" element={<CmsCareersView />} />
+
         <Route path="cms/blog" element={<CmsBlogView />} />
+        <Route path="cms/blog/new" element={<BlogEditorPage />} />
+        <Route path="cms/blog/edit/:id" element={<BlogEditorPage />} />
+
+
+        <Route path="cms/resources" element={<CmsResourceView />} />
         <Route path="cms/global" element={<CmsGlobalView />} />
-        
+        <Route path="cms/team" element={<CmsTeamView />} />
+
         {/* Placeholders for future views */}
         <Route path="media" element={<div style={{ padding: 24 }}>Media Library (Coming Soon)</div>} />
         <Route path="directory" element={<div style={{ padding: 24 }}>Admin Directory (Coming Soon)</div>} />
-        
+
         {/* Catch-all redirect back to dashboard */}
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Route>

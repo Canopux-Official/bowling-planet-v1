@@ -25,6 +25,7 @@ import teamRoutes from './routes/team.routes';
 import blogRoutes from './routes/blog.routes';
 import resourceRoutes from './routes/resources.routes';
 import authRoutes from './routes/authRoutes';
+import cloudinaryRoutes from './routes/cloudinary.routes'
 import { apiSecretMiddleware } from './middleware/apiSecretMiddleware';
 
 const app = express();
@@ -133,7 +134,7 @@ app.use('/team',teamRoutes);
 app.use('/blog',blogRoutes);
 app.use('/resource',resourceRoutes);
 app.use('/auth', authRoutes);
-
+app.use('/cloudinary',cloudinaryRoutes)
 // ------------------------------------------------------------------
 // 8. 404 HANDLER — catches any request that didn't match a route.
 //    Must come AFTER all app.use() route registrations.

@@ -150,7 +150,7 @@ export const SessionExpiredModal = ({ userEmail, onRenewSuccess, onForceLogout }
                 email={email}
                 purpose="login"
                 role="SuperAdmin"
-                onResendSuccess={(msg) => { setError(''); }}
+                onResendSuccess={(_msg) => { setError(''); }}
                 onResendError={(err) => setError(err)}
                 lightMode={true}
               />

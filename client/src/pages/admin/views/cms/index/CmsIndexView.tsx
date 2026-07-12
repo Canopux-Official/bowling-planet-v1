@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutTemplate, Briefcase, ShoppingBag, FolderKanban, FileText, Share2, ChevronRight } from 'lucide-react';
+import { LayoutTemplate, Briefcase, ShoppingBag, FolderKanban, FileText, Share2, ChevronRight, Users, BookOpen } from 'lucide-react';
 import { theme } from '../../../../../theme';
 
 const cmsCards = [
@@ -17,6 +17,13 @@ const cmsCards = [
     icon: Briefcase, 
     path: '/admin/cms/services',
     tag: 'Core'
+  },
+  { 
+    title: 'Team Details', 
+    description: 'Manage team member information and roles.', 
+    icon: Users, 
+    path: '/admin/cms/team',
+    tag: 'Team'
   },
   { 
     title: 'Products', 
@@ -45,6 +52,13 @@ const cmsCards = [
     icon: FileText, 
     path: '/admin/cms/blog',
     tag: 'Content'
+  },
+  { 
+    title: 'Resources', 
+    description: 'Manage educational materials and helpful resources.', 
+    icon: BookOpen, 
+    path: '/admin/cms/resources',
+    tag: 'Resources'
   },
   { 
     title: 'Global Settings', 

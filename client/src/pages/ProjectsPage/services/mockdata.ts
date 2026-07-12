@@ -54,8 +54,8 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
         rating: 5
       }
     ],
-    createdAt: new Date("2026-01-15T10:00:00.000Z"),
-    updatedAt: new Date("2026-01-20T14:30:00.000Z")
+    createdAt: "2026-01-15T10:00:00.000Z",
+    updatedAt: "2026-01-20T14:30:00.000Z"
   },
   {
     _id: "65a1bc23e4b01234567890ac",
@@ -91,8 +91,8 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
         rating: 5
       }
     ],
-    createdAt: new Date("2026-02-10T08:15:00.000Z"),
-    updatedAt: new Date("2026-02-11T09:00:00.000Z")
+    createdAt: "2026-02-10T08:15:00.000Z",
+    updatedAt: "2026-02-11T09:00:00.000Z"
   },
   {
     _id: "65a1bc23e4b01234567890ad",
@@ -115,8 +115,8 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     bulletList: [],
     setupSteps: [],
     testimonials: [],
-    createdAt: new Date("2025-11-05T12:00:00.000Z"),
-    updatedAt: new Date("2025-11-05T12:00:00.000Z")
+    createdAt: "2025-11-05T12:00:00.000Z",
+    updatedAt: "2025-11-05T12:00:00.000Z"
   },
   {
     _id: "65a1bc23e4b01234567890ae",
@@ -294,7 +294,7 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
         rating: 5
       }
     ],
-    createdAt: new Date("2026-03-01T09:00:00.000Z"),
-    updatedAt: new Date("2026-03-15T18:22:00.000Z")
+    createdAt: "2026-03-01T09:00:00.000Z",
+    updatedAt: "2026-03-15T18:22:00.000Z"
   }
 ];

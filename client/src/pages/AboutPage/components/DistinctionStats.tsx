@@ -1,24 +1,57 @@
 import type { FC } from 'react'
-import styles from './DistinctionStats.module.css'
+import { theme } from '../../../theme'
 
 const STATS = [
-  { value: '700+', label: 'Games Options' },
-  { value: '32%', label: 'Avg Annual ROI' },
-  { value: '17+', label: 'Years of Experience' },
-  { value: '21+', label: 'High-End Projects' },
+  { num: '17+', label: 'Years of Experience' },
+  { num: '21+', label: 'High-End Projects' },
+  { num: '700+', label: 'Game Options' },
+  { num: '32%', label: 'Avg. Annual ROI' },
+  { num: '₹0', label: 'Franchise Fees' },
 ]
 
 const DistinctionStats: FC = () => (
-  <section className={styles.section} aria-label="Company distinctions">
-    <div className={styles.inner}>
-      {STATS.map((stat) => (
-        <div key={stat.label} className={styles.stat}>
-          <p className={styles.value}>{stat.value}</p>
-          <p className={styles.label}>{stat.label}</p>
+  <div
+    className="dist-stats-wrap"
+    style={{
+      background: theme.colors.surface,
+      borderTop: `1px solid ${theme.colors.border}`,
+      borderBottom: `1px solid ${theme.colors.border}`,
+      padding: '40px 28px',
+    }}
+  >
+    <div style={{
+      maxWidth: 1100,
+      margin: '0 auto',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: 32,
+    }}>
+      {STATS.map((s) => (
+        <div key={s.label} style={{ textAlign: 'center', flex: '1 1 140px' }}>
+          <div className="stat-num" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', display: 'block' }}>
+            {s.num}
+          </div>
+          <div style={{
+            fontSize: 12,
+            color: theme.colors.text3,
+            fontFamily: theme.typography.fontBody,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+            marginTop: 6,
+          }}>
+            {s.label}
+          </div>
         </div>
       ))}
     </div>
-  </section>
+
+    <style>{`
+      @media (max-width: 600px) { .dist-stats-wrap { padding: 32px 20px !important; } }
+    `}</style>
+  </div>
 )
 
 export default DistinctionStats
