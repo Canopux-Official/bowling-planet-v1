@@ -5,43 +5,13 @@
 import { type FC, useState } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseFAQ } from '../../../services/franchisePageApi';
 
-const FAQS = [
-  {
-    q: 'Why should I choose Bowling Planet for my FEC business?',
-    a: 'You get a strong, proven partner with Bowling Planet! We bring 17+ years of industry expertise, a seasoned team, and 700+ game options. You also get tailor-made business models for different investment levels, support for complex high-end projects, and a data-driven approach focused on ROI. We help you from pre-opening planning to smooth operations.',
-  },
-  {
-    q: 'What kinds of games and entertainment are offered?',
-    a: 'Over 700+ games across diverse segments — Bowling, VR, Arcade, Redemption, Kiddie Rides, Laser Tag, Bumper Cars, Rock Climbing, Trampolines, Mini Golf, Go-Karts, and much more. No competitor in India offers this breadth under one consulting roof.',
-  },
-  {
-    q: 'What is the minimum investment required?',
-    a: 'Our Economy tier starts from just ₹35 Lakhs for a 1,500 sq ft neighbourhood game lounge, scaling all the way to ₹20 Crore for a 35,000 sq ft mega-complex. Every model is designed to be profitable at its own scale.',
-  },
-  {
-    q: 'Do I need prior experience in the entertainment industry?',
-    a: 'Not at all! Our comprehensive training and onboarding program covers everything — game operations, staff management, customer service, marketing, and business operations. We turn first-timers into successful FEC operators.',
-  },
-  {
-    q: 'Is there flexibility and customisation in the franchise model?',
-    a: 'Absolutely. Every business plan is tailor-made based on your location, target audience, investment level, and growth ambitions. There is no cookie-cutter approach here.',
-  },
-  {
-    q: 'What are the franchise fees or deposits?',
-    a: 'We charge ZERO traditional franchise fees. Instead, we offer a transparent pre-opening setup and consultation package. This covers site analysis, ROI forecasting, design, licensing support, staff training, and grand opening preparation. Fees vary by investment tier — but there are no surprise costs.',
-  },
-  {
-    q: 'How are royalty fees structured?',
-    a: 'We typically charge 5% on Gross Sales as a royalty fee. For Premium and Deluxe investment models, this covers an all-inclusive package of business operations services. For other tiers, services are customisable at an additional charge, giving you full flexibility.',
-  },
-  {
-    q: 'What licenses and permits do I need to operate?',
-    a: 'The key licenses include: Trade License from the municipal corporation, Company and Store registrations, PPL License (music), FSSAI License (if F&B), FIRE NOC, GST Registration, Principal Employer Certificate, and various other state/central government NOCs. We guide you through every single one — no confusion, no delays.',
-  },
-]
+interface FranchiseFAQProps {
+  faqs: IFranchiseFAQ[];
+}
 
-const FranchiseFAQ: FC = () => {
+const FranchiseFAQ: FC<FranchiseFAQProps> = ({ faqs }) => {
   const [open, setOpen] = useState<number | null>(0)
   const headRef = useReveal()
 
@@ -76,7 +46,7 @@ const FranchiseFAQ: FC = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {FAQS.map((faq, i) => {
+          {faqs.map((faq, i) => {
             const isOpen = open === i
             return (
               <div

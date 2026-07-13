@@ -1,8 +1,10 @@
 import type { FC } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { IBaseProduct } from '../services/baseProductsApi'
 import MediaItem from '../../../components/common/MediaItem'
 import { theme } from '../../../theme'
+import { Plus, Check } from 'lucide-react'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 
 interface BaseProductCardProps {
   product: IBaseProduct
@@ -16,16 +18,19 @@ function truncate(text: string, max = 130): string {
 }
 
 const BaseProductCard: FC<BaseProductCardProps> = ({ product }) => {
+  const navigate = useNavigate()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = state.enquiryCart.some(i => i.id === (product._id || product.slug))
   const accent = ACCENT_COLORS[(product.title.charCodeAt(0) ?? 0) % ACCENT_COLORS.length]
 
   return (
-    <Link
-      to={`/products/${product.slug}`}
+    <div
+      onClick={() => navigate(`/products/${product.slug}`)}
       style={{
+        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        textDecoration: 'none',
         color: 'inherit',
         background: `linear-gradient(180deg, ${accent}06, rgba(255,255,255,0.01))`,
         border: `1px solid ${accent}18`,
@@ -67,8 +72,22 @@ const BaseProductCard: FC<BaseProductCardProps> = ({ product }) => {
             View variants →
           </span>
         </div>
+        <button 
+          className={`btn-enquiry ${isAdded ? 'added' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            addToEnquiry({ id: product._id || product.slug, type: 'product', title: product.title })
+          }}
+          style={{ marginTop: 'auto' }}
+        >
+          {isAdded ? (
+            <><Check size={14} /> Remove from Enquiry</>
+          ) : (
+            <><Plus size={14} /> Add to Enquiry</>
+          )}
+        </button>
       </div>
-    </Link>
+    </div>
   )
 }
 

@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   User,
   X,
-  ChevronRight
+  ChevronRight,
+  PieChart
 } from 'lucide-react';
 import { theme } from '../../../theme';
 
@@ -20,6 +21,7 @@ interface AdminSidebarProps {
 
 const navItems = [
   { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
+  { label: 'Analytics & Reports', path: '/admin/analytics', icon: PieChart, exact: false },
   { label: 'CRM & Leads', path: '/admin/leads', icon: Users, exact: false },
   { label: 'Content (CMS)', path: '/admin/cms', icon: LayoutTemplate, exact: false },
   { label: 'Media Library', path: '/admin/media', icon: Image, exact: false },

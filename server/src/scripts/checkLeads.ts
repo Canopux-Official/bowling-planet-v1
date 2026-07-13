@@ -1,0 +1,1 @@
+import mongoose from "mongoose"; import Lead from "../models/Lead"; (async () => { await mongoose.connect("mongodb://localhost:27017/bowling-planet"); const leads = await Lead.find({ phone: "9998887776" }); console.log(JSON.stringify(leads, null, 2)); process.exit(0); })();

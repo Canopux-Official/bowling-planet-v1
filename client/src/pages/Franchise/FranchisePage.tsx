@@ -2,7 +2,8 @@
  * Franchise Page — Full conversion-focused page
  * Composed from modular franchise/ components
  */
-import { type FC } from 'react'
+import { type FC, useEffect, useState } from 'react'
+import { franchisePageApi, type FranchisePageData } from '../../services/franchisePageApi'
 import FranchiseHero          from './components/FranchiseHero'
 import FranchiseTrustBar      from './components/FranchiseTrustBar'
 import FranchiseWhyUs         from './components/FranchiseWhyUs'
@@ -14,10 +15,26 @@ import FranchiseFAQ           from './components/FranchiseFAQ'
 import FranchiseApply         from './components/FranchiseApply'
 
 const FranchisePage: FC = () => {
+  const [data, setData] = useState<FranchisePageData | null>(null)
+
+  useEffect(() => {
+    const fetchFranchiseData = async () => {
+      try {
+        const res = await franchisePageApi.getFranchisePageData()
+        if (res.success && res.data) {
+          setData(res.data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch franchise page data', err)
+      }
+    }
+    fetchFranchiseData()
+  }, [])
+
   return (
     <>
       {/* 1. Hero + value props grid */}
-      <FranchiseHero />
+      <FranchiseHero valueProps={data?.valueProps || []} />
 
       {/* 2. Trust bar — numbers at a glance */}
       <FranchiseTrustBar />
@@ -26,7 +43,7 @@ const FranchisePage: FC = () => {
       <FranchiseWhyUs />
 
       {/* 4. Investment Models — interactive tier selector */}
-      <FranchiseInvestment />
+      <FranchiseInvestment tiers={data?.investmentTiers || []} />
 
       {/* 5. The 7-Step Process */}
       <FranchiseProcess />
@@ -38,7 +55,7 @@ const FranchisePage: FC = () => {
       <FranchiseQualifications />
 
       {/* 8. FAQ Accordion */}
-      <FranchiseFAQ />
+      <FranchiseFAQ faqs={data?.faqs || []} />
 
       {/* 9. Application Form — the conversion point */}
       <FranchiseApply />

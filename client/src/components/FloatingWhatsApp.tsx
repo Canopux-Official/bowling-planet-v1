@@ -1,16 +1,25 @@
 import { type FC } from 'react'
+import { useGlobalSettings } from '../context/GlobalSettingsContext'
+import { useLeadTracker } from '../context/LeadTrackerContext'
 
 const FloatingWhatsApp: FC = () => {
+  const { settings } = useGlobalSettings()
+  const { logCTAEvent } = useLeadTracker()
+  
+  // Default to placeholder if not loaded yet
+  const whatsappNumber = settings?.socials?.whatsappNumber || '919876543210'
+  
   return (
     <a
-      href="https://wa.me/919876543210" // TODO: replace with actual number
+      href={`https://wa.me/${whatsappNumber}`}
+      onClick={() => logCTAEvent('Floating WhatsApp Icon')}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
       style={{
         position: 'fixed',
         bottom: 24,
-        right: 24,
+        left: 24,
         zIndex: 9999,
         width: 60,
         height: 60,

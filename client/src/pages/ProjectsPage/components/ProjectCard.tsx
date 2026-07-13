@@ -1,9 +1,11 @@
 import type { FC } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Tag from '../../../components/common/Tag'
 import MediaItem from '../../../components/common/MediaItem'
 import type { IProject } from '../types'
 import { theme } from '../../../theme'
+import { Plus, Check } from 'lucide-react'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 
 interface ProjectCardProps {
   project: IProject
@@ -18,18 +20,22 @@ function truncate(text: string, max = 120): string {
 }
 
 const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
+  const navigate = useNavigate()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = state.enquiryCart.some(i => i.id === (project._id || project.slug))
+
   const thumb = project.media?.[0]
   // Use first tag's hash to pick a stable accent color
   const accent = ACCENT_COLORS[(project.title.charCodeAt(0) ?? 0) % ACCENT_COLORS.length]
 
   return (
-    <Link
-      to={`/projects/${project.slug}`}
+    <div
+      onClick={() => navigate(`/projects/${project.slug}`)}
       style={{
+        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        textDecoration: 'none',
         color: 'inherit',
         background: `linear-gradient(180deg, ${accent}06, rgba(255,255,255,0.01))`,
         border: `1px solid ${accent}18`,
@@ -76,8 +82,23 @@ const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
             ))}
           </div>
         ) : null}
+
+        <button 
+          className={`btn-enquiry ${isAdded ? 'added' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            addToEnquiry({ id: project._id || project.slug, type: 'project', title: project.title })
+          }}
+          style={{ marginTop: 'auto' }}
+        >
+          {isAdded ? (
+            <><Check size={14} /> Remove from Enquiry</>
+          ) : (
+            <><Plus size={14} /> Add to Enquiry</>
+          )}
+        </button>
       </div>
-    </Link>
+    </div>
   )
 }
 

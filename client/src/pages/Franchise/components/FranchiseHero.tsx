@@ -5,19 +5,13 @@
 import { type FC } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseValueProp } from '../../../services/franchisePageApi';
 
-const VALUE_PROPS = [
-  { icon: '📈', label: 'Attractive ROI', sub: '32% avg. annual return' },
-  { icon: '🚀', label: 'Fastest Growing Industry', sub: 'FEC market expanding rapidly' },
-  { icon: '🎯', label: 'Flexible Business Model', sub: 'Economy to Deluxe tiers' },
-  { icon: '🎮', label: '700+ Games', sub: 'Curated entertainment tech' },
-  { icon: '💸', label: 'Zero Franchise Fees', sub: 'No entry barrier' },
-  { icon: '🏆', label: '17+ Years Experience', sub: 'Proven partner since day one' },
-  { icon: '👨‍👩‍👧‍👦', label: 'Youth & Family Appeal', sub: 'Universal audience, loyal repeat visits' },
-  { icon: '🌐', label: 'Long-Term Business Model', sub: 'Built for scale & sustainability' },
-]
+interface FranchiseHeroProps {
+  valueProps: IFranchiseValueProp[];
+}
 
-const FranchiseHero: FC = () => {
+const FranchiseHero: FC<FranchiseHeroProps> = ({ valueProps }) => {
   const headRef = useReveal()
   const gridRef = useReveal()
 
@@ -99,7 +93,7 @@ const FranchiseHero: FC = () => {
             marginTop: 80,
           }}
         >
-          {VALUE_PROPS.map((vp) => (
+          {valueProps.map((vp) => (
             <div
               key={vp.label}
               className="glass-card"

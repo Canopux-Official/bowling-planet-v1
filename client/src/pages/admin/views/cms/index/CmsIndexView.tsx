@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutTemplate, Briefcase, ShoppingBag, FolderKanban, FileText, Share2, ChevronRight, Users, BookOpen } from 'lucide-react';
+import { LayoutTemplate, ShoppingBag, FolderKanban, FileText, Share2, ChevronRight, Users, BookOpen, MonitorPlay } from 'lucide-react';
 import { theme } from '../../../../../theme';
 
 const cmsCards = [
@@ -12,10 +12,10 @@ const cmsCards = [
     tag: 'Core'
   },
   { 
-    title: 'Services', 
-    description: 'Update service listings, descriptions and icons.', 
-    icon: Briefcase, 
-    path: '/admin/cms/services',
+    title: 'Franchise Page', 
+    description: 'Manage value propositions, investment tiers, and frequently asked questions.', 
+    icon: MonitorPlay, 
+    path: '/admin/cms/franchise',
     tag: 'Core'
   },
   { 
@@ -64,7 +64,7 @@ const cmsCards = [
     title: 'Global Settings', 
     description: 'Update footer links, contact info, and social media.', 
     icon: Share2, 
-    path: '/admin/cms/global',
+    path: '/admin/cms/settings',
     tag: 'Settings'
   },
 ];

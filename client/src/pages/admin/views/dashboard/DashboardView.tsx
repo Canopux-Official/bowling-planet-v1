@@ -1,32 +1,72 @@
-import React from 'react';
-import { Users, FileText, MousePointerClick, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Users, FileText, MousePointerClick, TrendingUp } from 'lucide-react';
 import { theme } from '../../../../theme';
+import { leadService } from '../leads/lead.service';
+import { useToast } from '../../components/Toast';
 
-const statCards = [
-  { label: 'Total Leads (30d)', value: '142', change: '+12%', isUp: true, icon: Users, iconColor: '#3B82F6', iconBg: 'rgba(59,130,246,0.08)' },
-  { label: 'New Inquiries', value: '18', change: '+4%', isUp: true, icon: FileText, iconColor: '#10B981', iconBg: 'rgba(16,185,129,0.08)' },
-  { label: 'Avg. Conversion', value: '4.2%', change: '+1.1%', isUp: true, icon: TrendingUp, iconColor: '#8B5CF6', iconBg: 'rgba(139,92,246,0.08)' },
-  { label: 'Link Clicks', value: '1,204', change: '-2%', isUp: false, icon: MousePointerClick, iconColor: '#F59E0B', iconBg: 'rgba(245,158,11,0.08)' },
-];
-
-const recentLeads = [
-  { name: 'Rohan Sharma', interest: 'Franchise Inquiry', time: '12 min ago', status: 'New' },
-  { name: 'Priya Mehta', interest: 'Bowling Alley Setup', time: '1h ago', status: 'Contacted' },
-  { name: 'Arjun Patel', interest: 'Arcade Lane Package', time: '3h ago', status: 'In Progress' },
-  { name: 'Kavita Singh', interest: 'Corporate Event', time: 'Yesterday', status: 'Closed' },
-];
 
 const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
   'New': { bg: 'rgba(59,130,246,0.08)', text: '#3B82F6', dot: '#3B82F6' },
   'Contacted': { bg: 'rgba(245,158,11,0.08)', text: '#D97706', dot: '#F59E0B' },
   'In Progress': { bg: 'rgba(139,92,246,0.08)', text: '#7C3AED', dot: '#8B5CF6' },
   'Closed': { bg: 'rgba(16,185,129,0.08)', text: '#059669', dot: '#10B981' },
+  'Abandoned': { bg: 'rgba(239,68,68,0.08)', text: '#EF4444', dot: '#EF4444' },
 };
 
 export const DashboardView: React.FC = () => {
+  const { showToast } = useToast();
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const res = await leadService.getAll();
+        setLeads(Array.isArray(res) ? res : res?.data || []);
+      } catch (error) {
+        showToast('error', 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeads();
+  }, [showToast]);
+
+  const { pipelineCards, recentLeadsData, totalEvents } = useMemo(() => {
+    const newLeads = leads.filter(l => l.status === 'New').length;
+    const closedLeads = leads.filter(l => l.status === 'Closed').length;
+    // Conversion rate not needed here anymore, but keeping totalLeads check is fine
+
+    let totalEvents = 0;
+    leads.forEach(l => {
+      if (l.behavior?.eventLog) {
+        totalEvents += l.behavior.eventLog.length;
+      }
+    });
+
+    const pipelineCards = [
+      { label: 'New Inquiries', value: newLeads.toString(), icon: Users, iconColor: '#3B82F6', iconBg: 'rgba(59,130,246,0.08)' },
+      { label: 'In Progress', value: leads.filter(l => l.status === 'In Progress').length.toString(), icon: FileText, iconColor: '#8B5CF6', iconBg: 'rgba(139,92,246,0.08)' },
+      { label: 'Contacted', value: leads.filter(l => l.status === 'Contacted').length.toString(), icon: MousePointerClick, iconColor: '#F59E0B', iconBg: 'rgba(245,158,11,0.08)' },
+      { label: 'Closed Won', value: closedLeads.toString(), icon: TrendingUp, iconColor: '#10B981', iconBg: 'rgba(16,185,129,0.08)' },
+    ];
+
+    const sortedLeads = [...leads].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const topRecent = sortedLeads.slice(0, 4).map(l => ({
+      name: l.name || 'Anonymous',
+      interest: l.inquiryType || 'General',
+      time: new Date(l.createdAt).toLocaleDateString(),
+      status: l.status || 'New',
+    }));
+
+    return { pipelineCards, recentLeadsData: topRecent, totalEvents };
+  }, [leads]);
+
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  if (loading) return <div style={{ padding: '32px', color: theme.colors.adminTextMuted }}>Loading dashboard...</div>;
 
   return (
     <div>
@@ -37,19 +77,29 @@ export const DashboardView: React.FC = () => {
         <p style={{ color: theme.colors.adminTextMuted, margin: '4px 0 0 0', fontSize: '14px' }}>Your business at a glance — as of today.</p>
       </div>
 
-      {/* Stat Cards */}
+      {/* Pipeline Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-        {statCards.map((stat, i) => (
+        {pipelineCards.map((stat, i) => (
           <div key={i} style={{ 
             backgroundColor: theme.colors.adminSurface, 
             borderRadius: '14px', 
             padding: '22px',
             border: `1px solid ${theme.colors.adminBorder}`,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-            transition: 'box-shadow 0.2s ease',
+            borderLeft: `4px solid ${stat.iconColor}`,
+            boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
+            transition: 'box-shadow 0.2s ease, transform 0.2s ease',
             position: 'relative',
             overflow: 'hidden'
-          }}>
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 16px rgba(0,0,0,0.1)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 8px rgba(0,0,0,0.06)';
+          }}
+          >
             {/* Top row */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <p style={{ color: '#000000', fontSize: '15px', fontWeight: 600, margin: 0 }}>{stat.label}</p>
@@ -58,51 +108,32 @@ export const DashboardView: React.FC = () => {
               </div>
             </div>
             {/* Value */}
-            <h3 style={{ color: theme.colors.adminText, fontSize: '30px', fontWeight: 700, margin: '0 0 10px 0', letterSpacing: '-0.8px' }}>{stat.value}</h3>
-            {/* Change badge */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <span style={{ 
-                display: 'inline-flex', alignItems: 'center', gap: '3px',
-                color: stat.isUp ? theme.colors.adminSuccess : theme.colors.adminDanger, 
-                fontSize: '12px', fontWeight: 600,
-                backgroundColor: stat.isUp ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-                padding: '2px 7px', borderRadius: '20px'
-              }}>
-                {stat.isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                {stat.change}
-              </span>
-              <span style={{ color: theme.colors.adminTextLight, fontSize: '12px' }}>vs last month</span>
-            </div>
+            <h3 style={{ color: theme.colors.adminText, fontSize: '32px', fontWeight: 800, margin: '0 0 10px 0', letterSpacing: '-0.8px' }}>{stat.value}</h3>
           </div>
         ))}
       </div>
 
       {/* Charts Row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '16px', marginBottom: '16px' }}>
-        {/* Chart Placeholder */}
         <div style={{ backgroundColor: theme.colors.adminSurface, borderRadius: '14px', padding: '24px', border: `1px solid ${theme.colors.adminBorder}`, boxShadow: '0 1px 4px rgba(0,0,0,0.04)', minHeight: '280px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: theme.colors.adminText, margin: '0 0 2px 0' }}>Traffic Overview</h3>
-              <p style={{ fontSize: '13px', color: theme.colors.adminTextMuted, margin: 0 }}>Visitor data for the last 30 days</p>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: theme.colors.adminText, margin: '0 0 2px 0' }}>Activity Feed</h3>
+              <p style={{ fontSize: '13px', color: theme.colors.adminTextMuted, margin: 0 }}>Latest engagements</p>
             </div>
-            <select style={{ 
-              padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`,
-              fontSize: '13px', color: theme.colors.adminText, backgroundColor: theme.colors.adminBg,
-              cursor: 'pointer', outline: 'none'
-            }}>
-              <option>Last 30 days</option>
-              <option>Last 7 days</option>
-            </select>
           </div>
-          <div style={{ 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            height: '190px', backgroundColor: theme.colors.adminBg, 
-            borderRadius: '10px', border: `1px dashed ${theme.colors.adminBorderStrong}`,
-            flexDirection: 'column', gap: '8px'
-          }}>
-            <TrendingUp size={28} color={theme.colors.adminBorderStrong} />
-            <span style={{ color: theme.colors.adminTextLight, fontSize: '13px' }}>Chart integration coming soon</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {recentLeadsData.length > 0 ? (
+              <div style={{ fontSize: '14px', color: theme.colors.adminText }}>
+                <b>Total leads in pipeline:</b> {leads.length}<br/>
+                <b>Total button clicks tracked:</b> {totalEvents}
+                <div style={{ marginTop: '24px', padding: '16px', backgroundColor: theme.colors.adminBg, borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}` }}>
+                  For detailed engagement charts, traffic sources, and UTM analytics, please visit the <b>Analytics</b> tab.
+                </div>
+              </div>
+            ) : (
+              <div style={{ color: theme.colors.adminTextLight, fontSize: '13px', textAlign: 'center', marginTop: '40px' }}>No recent activity to show.</div>
+            )}
           </div>
         </div>
 
@@ -115,8 +146,8 @@ export const DashboardView: React.FC = () => {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {recentLeads.map((lead, i) => {
-              const sc = statusColors[lead.status];
+            {recentLeadsData.map((lead, i) => {
+              const sc = statusColors[lead.status] || { bg: '#F3F4F6', text: '#374151', dot: '#374151' };
               return (
                 <div key={i} style={{ 
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
@@ -134,7 +165,7 @@ export const DashboardView: React.FC = () => {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '12px', fontWeight: 700, color: '#fff', flexShrink: 0
                     }}>
-                      {lead.name.split(' ').map(n => n[0]).join('')}
+                      {lead.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '13px', color: theme.colors.adminText }}>{lead.name}</div>

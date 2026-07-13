@@ -1,10 +1,11 @@
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
-
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 
 const CareersSection: FC = () => {
   const ref = useReveal()
+  const { logCTAEvent } = useLeadTracker()
 
   return (
     <section id="careers" style={{ background: '#000000', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
@@ -33,6 +34,7 @@ const CareersSection: FC = () => {
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <Link
               to="/careers"
+              onClick={() => logCTAEvent('Landing: View Careers')}
               className="btn btn-primary"
               aria-label="Visit Career Page"
               style={{ padding: '14px 32px', fontSize: 16 }}

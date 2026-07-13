@@ -13,8 +13,10 @@ const BRANDS = [
   'Essel World',
 ]
 
-const TrustedBrands: FC = () => {
+const TrustedBrands: FC<{ data?: string[] }> = ({ data }) => {
   const ref = useReveal()
+
+  const activeBrands = data && data.length > 0 ? data : BRANDS;
 
   return (
     <section style={{
@@ -74,7 +76,7 @@ const TrustedBrands: FC = () => {
             animation: 'marquee 22s linear infinite',
             width: 'max-content',
           }}>
-            {[...BRANDS, ...BRANDS].map((brand, i) => (
+            {[...activeBrands, ...activeBrands].map((brand, i) => (
               <div
                 key={`${brand}-${i}`}
                 style={{

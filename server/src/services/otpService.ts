@@ -25,7 +25,7 @@ export const createOrUpdateOtp = async (userId: mongoose.Types.ObjectId, purpose
       ]
     },
     { $set: { lastOtpSentAt: new Date() } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!user) {
@@ -67,7 +67,7 @@ export const verifyOtp = async (userId: mongoose.Types.ObjectId, providedOtp: st
       expiresAt: { $gt: new Date() },
     },
     { $inc: { attempts: 1 } },
-    { new: true, sort: { _id: -1 } }
+    { returnDocument: 'after', sort: { _id: -1 } }
   );
 
   if (!otpRecord) {

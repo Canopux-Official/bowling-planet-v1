@@ -1,14 +1,26 @@
 import { type FC } from 'react'
 import { useReveal } from '../../../hooks/useReveal'
-
-const CONTACTS = [
-  { label: 'Email',    value: 'pr@bowlingplanet.co.in', href: 'mailto:pr@bowlingplanet.co.in' },
-  { label: 'Phone',    value: '+91 95125 45959',         href: 'tel:+919512545959'             },
-  { label: 'Location', value: 'Surat, Gujarat, India',   href: undefined                       },
-]
+import { useGlobalSettings } from '../../../context/GlobalSettingsContext'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 
 const ContactSection: FC = () => {
   const ctaRef = useReveal()
+  const { settings } = useGlobalSettings()
+  const { logCTAEvent } = useLeadTracker()
+
+  const contactData = settings?.contact || {
+    email: 'pr@bowlingplanet.co.in',
+    phoneDisplay: '+91 95125 45959',
+    location: 'Surat, Gujarat, India',
+  };
+
+  const whatsappNumber = settings?.socials?.whatsappNumber || '919512545959';
+
+  const CONTACTS = [
+    { label: 'Email',    value: contactData.email, href: `mailto:${contactData.email}` },
+    { label: 'Phone',    value: contactData.phoneDisplay, href: `tel:${contactData.phoneDisplay.replace(/[\s-]/g, '')}` },
+    { label: 'Location', value: contactData.location, href: undefined },
+  ]
 
   return (
     <section
@@ -50,7 +62,8 @@ const ContactSection: FC = () => {
         <div className="btn-group" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 72 }}>
           {/* TODO: connect to contact form */}
           <a
-            href="mailto:pr@bowlingplanet.co.in"
+            href={`mailto:${contactData.email}`}
+            onClick={() => logCTAEvent('Landing: Send Us a Message')}
             className="btn btn-primary"
             style={{ fontSize: 16, padding: '16px 36px' }}
             aria-label="Email Bowling Planet"
@@ -58,7 +71,8 @@ const ContactSection: FC = () => {
             Send Us a Message
           </a>
           <a
-            href="https://wa.me/919512545959"
+            href={`https://wa.me/${whatsappNumber}`}
+            onClick={() => logCTAEvent('Landing: WhatsApp Us')}
             target="_blank" rel="noopener noreferrer"
             className="btn btn-ghost"
             style={{ fontSize: 16, padding: '15px 36px' }}

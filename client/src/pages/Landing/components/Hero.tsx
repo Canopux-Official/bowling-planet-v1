@@ -4,6 +4,7 @@
 
 import { type FC, Suspense, useState, useEffect } from 'react'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import Hero3DScene from './Hero3DScene'
 
 const ACTIVITIES = [
@@ -22,20 +23,22 @@ const ACTIVITIES = [
 ]
 
 /** Rotating activity word in the hero heading */
-const RotatingWord: FC = () => {
+const RotatingWord: FC<{ activities?: string[] }> = ({ activities = ACTIVITIES }) => {
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
+
+  const activeActivities = activities.length > 0 ? activities : ACTIVITIES;
 
   useEffect(() => {
     const cycle = setInterval(() => {
       setVisible(false)
       setTimeout(() => {
-        setIdx(i => (i + 1) % ACTIVITIES.length)
+        setIdx(i => (i + 1) % activeActivities.length)
         setVisible(true)
       }, 350)
     }, 2200)
     return () => clearInterval(cycle)
-  }, [])
+  }, [activeActivities.length])
 
   return (
     <span
@@ -48,13 +51,15 @@ const RotatingWord: FC = () => {
         transition: 'opacity 0.3s ease, transform 0.3s ease',
       }}
     >
-      {ACTIVITIES[idx]}
+      {activeActivities[idx]}
     </span>
   )
 }
 
-const Hero: FC = () => {
+const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
   const ref = useReveal(0.1)
+  const { logCTAEvent } = useLeadTracker()
+  const activeActivities = data?.rotatingActivities?.length ? data.rotatingActivities : ACTIVITIES;
 
   return (
     <section
@@ -111,7 +116,7 @@ const Hero: FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <RotatingWord />
+            <RotatingWord activities={activeActivities} />
           </span>
           <span className="text-metallic" style={{ display: 'block' }}>Experience.</span>
         </h1>
@@ -137,7 +142,7 @@ const Hero: FC = () => {
             marginBottom: 40, transitionDelay: '250ms',
           }}
         >
-          {ACTIVITIES.slice(0, 6).map(a => (
+          {activeActivities.slice(0, 6).map(a => (
             <div key={a} style={{
               padding: '5px 14px',
               borderRadius: 100,
@@ -167,14 +172,20 @@ const Hero: FC = () => {
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', transitionDelay: '300ms' }}>
           <button
             className="btn btn-primary"
-            onClick={() => console.log('TODO: connect to Start Your Project page')}
+            onClick={() => {
+              logCTAEvent('Hero: Start Your Project')
+              console.log('TODO: connect to Start Your Project page')
+            }}
             aria-label="Start your FEC project"
           >
             Start Your Project
           </button>
           <button
             className="btn btn-ghost"
-            onClick={() => document.getElementById('franchise')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => {
+              logCTAEvent('Hero: Explore Franchise')
+              document.getElementById('franchise')?.scrollIntoView({ behavior: 'smooth' })
+            }}
             aria-label="Explore franchise opportunities"
           >
             Explore Franchise

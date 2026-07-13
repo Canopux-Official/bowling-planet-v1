@@ -1,11 +1,11 @@
 import { useState, useEffect, type FC } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLeadTracker } from '../context/LeadTrackerContext'
 
 const NAV_LINKS = [
   { label: 'Home',      path: '/'          },
   { label: 'About',     path: '/about'     },
-  { label: 'Services',  path: '/#services' },
   { label: 'Projects',  path: '/projects'  },
   { label: 'Products',  path: '/products'  },
   { label: 'Franchise', path: '/franchise' },
@@ -18,6 +18,7 @@ const Nav: FC = () => {
   const [solid,    setSolid]    = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const { isAuthenticated } = useAuth()
+  const { logCTAEvent } = useLeadTracker()
 
   useEffect(() => {
     const fn = () => setSolid(window.scrollY > 56)
@@ -34,6 +35,7 @@ const Nav: FC = () => {
     } else {
       setMenuOpen(false)
     }
+    logCTAEvent(`Navigated to ${path}`)
   }
 
   return (
@@ -120,6 +122,7 @@ const Nav: FC = () => {
             
             <Link
               to="/contact"
+              onClick={() => logCTAEvent('Header: Get in Touch')}
               className="btn btn-primary nav-desktop-cta"
               style={{ padding: '10px 22px', fontSize: 14, textDecoration: 'none' }}
               aria-label="Get in touch"
@@ -190,7 +193,10 @@ const Nav: FC = () => {
           to="/contact"
           className="btn btn-primary"
           style={{ marginTop: 28, justifyContent: 'center', textDecoration: 'none' }}
-          onClick={() => setMenuOpen(false)}
+          onClick={() => {
+            setMenuOpen(false)
+            logCTAEvent('Mobile Nav: Get in Touch')
+          }}
         >
           Get in Touch
         </Link>

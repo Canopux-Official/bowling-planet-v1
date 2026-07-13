@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { Menu, Bell, Search, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown, Globe } from 'lucide-react';
 import { theme } from '../../../theme';
 
 interface AdminHeaderProps {
@@ -31,9 +31,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button 
           onClick={toggleSidebar}
+          className="flex lg:hidden"
           style={{ 
             background: 'none', border: `1px solid ${theme.colors.adminBorder}`, cursor: 'pointer', 
-            padding: '7px', color: theme.colors.adminTextMuted, display: 'flex',
+            padding: '7px', color: theme.colors.adminTextMuted,
             borderRadius: '8px', transition: 'all 0.15s ease'
           }}
         >
@@ -48,47 +49,52 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
           </span>
         </div>
 
-        {/* Global Search */}
-        <div className="hidden md:flex" style={{ position: 'relative', alignItems: 'center' }}>
-          <Search size={15} color={theme.colors.adminTextLight} style={{ position: 'absolute', left: '12px' }} />
-          <input 
-            type="text" 
-            placeholder="Search anything..." 
-            style={{
-              padding: '8px 16px 8px 36px',
-              borderRadius: '8px',
-              border: `1px solid ${theme.colors.adminBorder}`,
-              backgroundColor: theme.colors.adminBg,
-              fontSize: '14px',
-              width: '260px',
-              outline: 'none',
-              color: theme.colors.adminText,
-              transition: 'border-color 0.15s ease'
-            }}
-          />
+        {/* Desktop Greeting */}
+        <div className="hidden lg:block">
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            Welcome back, {user?.name?.split(' ')[0] || 'Admin'} <span style={{ fontSize: '18px' }}>👋</span>
+          </h2>
+          <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginTop: '2px', fontWeight: 500 }}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+          </div>
         </div>
       </div>
 
       {/* Right: Actions + User */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* Notifications */}
-        <button style={{ 
-          background: 'none', border: `1px solid ${theme.colors.adminBorder}`, 
-          cursor: 'pointer', position: 'relative', color: theme.colors.adminTextMuted, 
-          display: 'flex', padding: '7px', borderRadius: '8px', transition: 'all 0.15s ease'
-        }}>
-          <Bell size={18} />
-          <span style={{ 
-            position: 'absolute', top: '6px', right: '6px', 
-            width: '7px', height: '7px', 
-            backgroundColor: theme.colors.teal, 
-            borderRadius: '50%',
-            border: `2px solid ${theme.colors.adminSurface}`
-          }} />
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        
+        {/* View Website Button */}
+        <a 
+          href="/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '8px 14px',
+            backgroundColor: theme.colors.adminBg,
+            border: `1px solid ${theme.colors.adminBorder}`,
+            borderRadius: '8px',
+            color: theme.colors.adminText,
+            fontSize: '13px',
+            fontWeight: 600,
+            textDecoration: 'none',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = theme.colors.adminSurfaceHover;
+            e.currentTarget.style.borderColor = theme.colors.adminBorderStrong;
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = theme.colors.adminBg;
+            e.currentTarget.style.borderColor = theme.colors.adminBorder;
+          }}
+        >
+          <Globe size={14} color={theme.colors.adminTextMuted} />
+          <span className="hidden sm:inline">View Website</span>
+        </a>
 
         {/* Divider */}
-        <div style={{ width: '1px', height: '28px', backgroundColor: theme.colors.adminBorder, margin: '0 8px' }} />
+        <div style={{ width: '1px', height: '28px', backgroundColor: theme.colors.adminBorder, margin: '0 4px' }} />
 
         {/* User Pill */}
         <Link

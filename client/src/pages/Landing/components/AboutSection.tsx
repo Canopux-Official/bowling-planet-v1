@@ -1,10 +1,13 @@
 import { type FC } from 'react'
+import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 
 const AboutSection: FC = () => {
   const titleRef = useReveal()
   const leftRef  = useReveal()
   const rightRef = useReveal()
+  const { logCTAEvent } = useLeadTracker()
 
   return (
     <section
@@ -205,13 +208,14 @@ const AboutSection: FC = () => {
               ))}
             </div>
 
-            <button
+            <Link
+              to="/about"
               className="btn btn-ghost"
-              onClick={() => console.log('TODO: connect to Meet the Team page')}
+              onClick={() => logCTAEvent('Landing: Meet the Team')}
               aria-label="Meet the Bowling Planet team"
             >
               Meet the Team →
-            </button>
+            </Link>
           </div>
         </div>
 

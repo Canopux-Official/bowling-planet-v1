@@ -82,7 +82,11 @@ const ProductItemDetailsPage: FC = () => {
         <ItemFeatureList featureList={item.featureList} />
         <ItemPoints points={item.points} />
         <ItemUsedIn usedIn={item.usedIn} />
-        <ItemPurchaseCTA hasPrice={item.price !== undefined} />
+        <ItemPurchaseCTA 
+          hasPrice={item.price !== undefined} 
+          itemTitle={item.title}
+          itemId={item._id || item.slug}
+        />
       </div>
     </main>
   )

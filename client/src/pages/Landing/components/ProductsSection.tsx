@@ -1,6 +1,8 @@
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
+import { Plus, Check } from 'lucide-react'
 
 const CATEGORIES = [
   {
@@ -38,10 +40,18 @@ const ATTRACTION_TAGS = [
   'Soft Play Areas', 'Laser Tag', 'Bumper Cars', 'Rock Climbing',
 ]
 
-const ProductsSection: FC = () => {
+const ProductsSection: FC<{ data?: any }> = ({ data }) => {
   const titleRef = useReveal()
   const cardsRef = useReveal()
   const tagsRef  = useReveal()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
+
+  const activeCategories = [
+    { ...CATEGORIES[0], count: data?.arcadeGamesCount || CATEGORIES[0].count },
+    { ...CATEGORIES[1], count: data?.majorAttractionsCount || CATEGORIES[1].count },
+    { ...CATEGORIES[2], count: data?.redemptionGamesCount || CATEGORIES[2].count },
+  ];
 
   return (
     <section id="products" style={{ background: '#000000', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
@@ -77,11 +87,11 @@ const ProductsSection: FC = () => {
             gap: 20, marginBottom: 60,
           }}
         >
-          {CATEGORIES.map(cat => (
+          {activeCategories.map(cat => (
             <div
               key={cat.id}
               className="glass-card"
-              style={{ padding: '36px 32px', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+              style={{ padding: '36px 32px', position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
             >
               {/* Top gradient accent line */}
               <div style={{
@@ -115,7 +125,21 @@ const ProductsSection: FC = () => {
               <h3 className="font-display text-metallic" style={{ fontWeight: 700, fontSize: 20, letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: 12 }}>
                 {cat.title}
               </h3>
-              <p style={{ fontSize: 14, color: '#86868B', lineHeight: 1.65 }}>{cat.desc}</p>
+              <p style={{ fontSize: 14, color: '#86868B', lineHeight: 1.65, marginBottom: 24, flex: 1 }}>{cat.desc}</p>
+              
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToEnquiry({ id: cat.id, type: 'product', title: cat.title });
+                }}
+                className={`btn-enquiry ${isAdded(cat.id) ? 'added' : ''}`}
+              >
+                {isAdded(cat.id) ? (
+                  <><Check size={14} /> Remove from Enquiry</>
+                ) : (
+                  <><Plus size={14} /> Add to Enquiry</>
+                )}
+              </button>
             </div>
           ))}
         </div>
@@ -157,6 +181,7 @@ const ProductsSection: FC = () => {
         <div style={{ textAlign: 'center' }}>
           <Link
             to="/projects"
+            onClick={() => logCTAEvent('Landing: View Projects')}
             className="btn btn-primary"
             aria-label="Browse projects"
           >

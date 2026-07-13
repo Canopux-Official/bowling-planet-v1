@@ -9,7 +9,6 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     description: "A premium 12-lane cosmic bowling installation inside the Hyperion Mall, complete with interactive lane projection maps and custom scoring displays.",
     tags: ["bowling", "malls", "led-lighting", "interactive"],
     isPublished: true,
-    isDeleted: false,
     media: [
       {
         type: "image",
@@ -64,7 +63,6 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     description: "A massive multi-attraction resort integration featuring boutique VIP bowling lanes, an indoor tactical laser tag arena, and a multi-level redemption arcade.",
     tags: ["bowling", "resorts", "laser-tag", "arcade"],
     isPublished: true,
-    isDeleted: false,
     media: [
       {
         type: "image",
@@ -101,7 +99,6 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     description: "A retro-themed 1950s style luxury boutique diner built alongside a premium duckpin bowling experience for hotel attractions.",
     tags: ["duckpin", "hotels", "retro", "boutique"],
     isPublished: true,
-    isDeleted: false,
     media: [
       {
         type: "image",
@@ -125,7 +122,6 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     description: "Our largest turn-key entertainment ecosystem to date. A massive 50,000 sq. ft. multi-attraction destination featuring 16 boutique bowling lanes, hyper-immersive projection mapping, custom arcade structures, and a premium hospitality lounge layout.",
     tags: ["bowling", "resorts", "malls", "interactive", "arcade", "vip-lounge", "laser-tag"],
     isPublished: true,
-    isDeleted: false,
 
     // 10 Media Items (Mix of images and video)
     media: [

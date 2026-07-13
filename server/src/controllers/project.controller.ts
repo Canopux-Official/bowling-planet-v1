@@ -265,7 +265,7 @@ export const togglePublishProject = async (req: Request, res: Response) => {
         const project = await Project.findOneAndUpdate(
             { _id: req.params.id, isDeleted: false },
             { isPublished: req.body.isPublished },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!project) {

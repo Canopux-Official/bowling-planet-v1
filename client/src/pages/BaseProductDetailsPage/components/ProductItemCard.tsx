@@ -1,7 +1,9 @@
 import type { FC } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { IProductItem } from '../services/baseProductDetailsApi'
 import MediaItem from '../../../components/common/MediaItem'
+import { Plus, Check } from 'lucide-react'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { theme } from '../../../theme'
 
 interface ProductItemCardProps {
@@ -20,17 +22,19 @@ function formatPrice(price: number): string {
 }
 
 const ProductItemCard: FC<ProductItemCardProps> = ({ item }) => {
-  console.log(item)
+  const navigate = useNavigate()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = state.enquiryCart.some((i: any) => i.id === (item._id || item.slug))
   const accent = ACCENT_COLORS[(item.title.charCodeAt(0) ?? 0) % ACCENT_COLORS.length]
 
   return (
-    <Link
-      to={`/products/${item.baseProduct.slug}/${item.slug}`}
+    <div
+      onClick={() => navigate(`/products/${item.baseProduct.slug}/${item.slug}`)}
       style={{
+        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        textDecoration: 'none',
         color: 'inherit',
         background: `linear-gradient(180deg, ${accent}06, rgba(255,255,255,0.01))`,
         border: `1px solid ${accent}18`,
@@ -71,8 +75,22 @@ const ProductItemCard: FC<ProductItemCardProps> = ({ item }) => {
             <span style={{ fontSize: 12, color: theme.colors.text3, fontFamily: theme.typography.fontBody }}>{item.purchaseCount} purchased</span>
           ) : null}
         </div>
+        <button 
+          className={`btn-enquiry ${isAdded ? 'added' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            addToEnquiry({ id: item._id || item.slug, type: 'product', title: item.title })
+          }}
+          style={{ marginTop: 'auto' }}
+        >
+          {isAdded ? (
+            <><Check size={14} /> Remove from Enquiry</>
+          ) : (
+            <><Plus size={14} /> Add to Enquiry</>
+          )}
+        </button>
       </div>
-    </Link>
+    </div>
   )
 }
 

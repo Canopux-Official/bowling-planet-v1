@@ -7,8 +7,7 @@
     "dev": "npx nodemon --exec npx ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed:superadmin": "ts-node src/scripts/seedSuperAdmin.ts",
-    "db:clear": "ts-node src/scripts/clearDb.ts"
+    "seed": "ts-node src/scripts/masterSeed.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,39 +1,61 @@
-import React, { useState } from 'react';
-import { Search, Filter, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Eye, Trash2 } from 'lucide-react';
 import { theme } from '../../../../theme';
+import { useNavigate } from 'react-router-dom';
+import { leadService } from './lead.service';
+import { useToast } from '../../components/Toast';
 
-type LeadStatus = 'New' | 'Contacted' | 'In Progress' | 'Closed' | 'Lost';
 
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  city: string;
-  source: string;
-  status: LeadStatus;
-  date: string;
-}
-
-const mockLeads: Lead[] = [
-  { id: '1', name: 'Acme Corp', email: 'hello@acmecorp.com', city: 'Mumbai', source: 'Google Ads', status: 'New', date: '2026-07-09' },
-  { id: '2', name: 'Rajesh Kumar', email: 'rajesh.k@gmail.com', city: 'Delhi', source: 'Organic', status: 'In Progress', date: '2026-07-08' },
-  { id: '3', name: 'FunZone Entertainment', email: 'info@funzone.in', city: 'Bangalore', source: 'Direct', status: 'Closed', date: '2026-07-05' },
-  { id: '4', name: 'Priya Sharma', email: 'priyas@yahoo.com', city: 'Pune', source: 'Instagram', status: 'Contacted', date: '2026-07-07' },
-  { id: '5', name: 'Strike Alley', email: 'contact@strikealley.com', city: 'Hyderabad', source: 'Referral', status: 'Lost', date: '2026-07-01' },
-];
-
-const getStatusColor = (status: LeadStatus) => {
+const getStatusColor = (status: string) => {
   switch(status) {
     case 'New': return { bg: '#DBEAFE', text: '#1D4ED8' };
     case 'Contacted': return { bg: '#FEF3C7', text: '#B45309' };
-    case 'In Progress': return { bg: '#E0E7FF', text: '#4338CA' };
     case 'Closed': return { bg: '#D1FAE5', text: '#047857' };
-    case 'Lost': return { bg: '#FEE2E2', text: '#B91C1C' };
+    case 'Abandoned': return { bg: '#FEE2E2', text: '#B91C1C' };
+    default: return { bg: '#F3F4F6', text: '#374151' };
   }
 };
 
 export const LeadsView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  const fetchLeads = async () => {
+    setLoading(true);
+    try {
+      const res = await leadService.getAll();
+      setLeads(Array.isArray(res) ? res : res?.data || []);
+    } catch (err) {
+      showToast('error', 'Failed to load leads');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this lead forever?')) return;
+    try {
+      await leadService.delete(id);
+      showToast('success', 'Lead deleted');
+      fetchLeads();
+    } catch (err) {
+      showToast('error', 'Failed to delete lead');
+    }
+  };
+
+  const filteredLeads = leads.filter(l => 
+    (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (l.phone || '').includes(searchTerm) ||
+    (l.city || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
@@ -71,13 +93,6 @@ export const LeadsView: React.FC = () => {
           }}>
             <Filter size={16} /> Filter
           </button>
-          <button style={{ 
-            padding: '8px 16px', borderRadius: '8px', border: 'none', 
-            backgroundColor: theme.colors.teal, color: '#0B2B4A', cursor: 'pointer',
-            fontSize: '14px', fontWeight: 600
-          }}>
-            Export CSV
-          </button>
         </div>
       </div>
 
@@ -91,46 +106,81 @@ export const LeadsView: React.FC = () => {
                 <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Location / Source</th>
                 <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
                 <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</th>
-                <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', letterSpacing: '0.05em', width: '60px' }}></th>
+                <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {mockLeads.map((lead) => {
-                const statusColors = getStatusColor(lead.status);
-                return (
-                  <tr key={lead.id} style={{ borderBottom: `1px solid ${theme.colors.adminBorder}`, transition: 'background-color 0.2s', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.backgroundColor = theme.colors.adminBg} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{ fontWeight: 600, color: theme.colors.adminText, fontSize: '14px' }}>{lead.name}</div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.email}</div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.city}</div>
-                      <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>{lead.source}</div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <span style={{ 
-                        backgroundColor: statusColors.bg, 
-                        color: statusColors.text, 
-                        padding: '4px 12px', 
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        display: 'inline-block'
-                      }}>
-                        {lead.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px 24px', color: '#4B5563', fontSize: '14px' }}>
-                      {lead.date}
-                    </td>
-                    <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}><MoreVertical size={16} /></button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {loading ? (
+                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>Loading leads...</td></tr>
+              ) : filteredLeads.length === 0 ? (
+                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>No leads found.</td></tr>
+              ) : (
+                filteredLeads.map((lead) => {
+                  const statusColors = getStatusColor(lead.status);
+                  const isReturning = lead.behavior?.isReturningVisitor;
+                  return (
+                    <tr 
+                      key={lead._id} 
+                      onClick={() => navigate(`/admin/leads/${lead._id}`)}
+                      style={{ 
+                        borderBottom: `1px solid ${theme.colors.adminBorder}`, 
+                        transition: 'background-color 0.2s', 
+                        cursor: 'pointer',
+                        backgroundColor: lead.status === 'New' ? '#F0F9FF' : 'transparent'
+                      }} 
+                      onMouseOver={e => e.currentTarget.style.backgroundColor = lead.status === 'New' ? '#E0F2FE' : theme.colors.adminBg} 
+                      onMouseOut={e => e.currentTarget.style.backgroundColor = lead.status === 'New' ? '#F0F9FF' : 'transparent'}
+                    >
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{ fontWeight: 600, color: theme.colors.adminText, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {lead.name || 'Unknown'} 
+                          {isReturning && <span style={{ fontSize: '10px', backgroundColor: '#F3F4F6', padding: '2px 6px', borderRadius: '4px', color: '#4B5563' }}>Returning</span>}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.phone || '-'}</div>
+                        {lead.email && <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>{lead.email}</div>}
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.city || '-'}</div>
+                        <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>
+                          {lead.utm?.source ? `${lead.utm.source} / ${lead.utm.medium || ''}` : 'Direct'}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <span style={{ 
+                          backgroundColor: statusColors.bg, 
+                          color: statusColors.text, 
+                          padding: '4px 12px', 
+                          borderRadius: '9999px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          display: 'inline-block'
+                        }}>
+                          {lead.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '16px 24px', color: '#4B5563', fontSize: '14px' }}>
+                        {new Date(lead.createdAt).toLocaleDateString()}
+                      </td>
+                      <td style={{ padding: '16px 24px', textAlign: 'right', display: 'flex', gap: '8px' }}>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); navigate(`/admin/leads/${lead._id}`); }}
+                          style={{ background: 'none', border: `1px solid ${theme.colors.adminBorder}`, borderRadius: '6px', cursor: 'pointer', padding: '6px', color: '#4B5563' }}
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button 
+                          onClick={(e) => handleDelete(lead._id, e)}
+                          style={{ background: 'none', border: `1px solid ${theme.colors.adminBorder}`, borderRadius: '6px', cursor: 'pointer', padding: '6px', color: '#EF4444' }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

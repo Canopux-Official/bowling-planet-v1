@@ -1,4 +1,4 @@
-import { type FC } from 'react'
+import { type FC, useEffect, useState } from 'react'
 import Hero            from './components/Hero'
 import StatsBar        from './components/StatsBar'
 import TrustedBrands   from './components/TrustedBrands'
@@ -10,17 +10,24 @@ import PortfolioSection from './components/PortfolioSection'
 import WhySection      from './components/WhySection'
 import CareersSection  from './components/CareersSection'
 import ContactSection  from './components/ContactSection'
+import { homePageApi, type HomePageData } from '../../services/homePageApi'
 
 const LandingPage: FC = () => {
+  const [data, setData] = useState<HomePageData | null>(null);
+
+  useEffect(() => {
+    homePageApi.getHomePageData().then(setData).catch(console.error);
+  }, []);
+
   return (
     <>
-      <Hero />
-      <StatsBar />
-      <TrustedBrands />
+      <Hero data={data?.hero} />
+      <StatsBar data={data?.stats} />
+      <TrustedBrands data={data?.trustedBrands} />
       <AboutSection />
-      <PortfolioSection />
+      <PortfolioSection data={data?.featuredProjects} />
       <ServicesSection />
-      <ProductsSection />
+      <ProductsSection data={data?.productInventory} />
       <FranchiseSection />
       <WhySection />
       <CareersSection />

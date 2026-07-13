@@ -4,13 +4,15 @@ import { AdminLayout } from './layouts/AdminLayout';
 import { DashboardView } from './views/dashboard/DashboardView';
 import { CmsIndexView } from './views/cms/index/CmsIndexView';
 import { CmsHomeView } from './views/cms/home/CmsHomeView';
-import { CmsServicesView } from './views/cms/services/CmsServicesView';
 import { CmsProductsView } from './views/cms/products/CmsProductsView';
 import { CmsProjectsView } from './views/cms/projects/CmsProjectsView';
 import { CmsCareersView } from './views/cms/careers/CmsCareersView';
 import { CmsBlogView } from './views/cms/blog/CmsBlogView';
-import { CmsGlobalView } from './views/cms/global/CmsGlobalView';
+import CmsSettingsView from './views/cms/settings/CmsSettingsView';
+import CmsFranchiseView from './views/cms/franchise/CmsFranchiseView';
 import { LeadsView } from './views/leads/LeadsView';
+import { LeadDetailView } from './views/leads/LeadDetailView';
+import { CmsAnalyticsView } from './views/analytics/CmsAnalyticsView';
 import { ProfileView } from './views/profile/ProfileView';
 import { ProductItemsView } from './views/cms/products/components/ProductItemsView';
 import { CmsTeamView } from './views/cms/team/CmsTeamView';
@@ -28,13 +30,16 @@ export default function AdminPage() {
         {/* Profile */}
         <Route path="profile" element={<ProfileView />} />
 
+        {/* Analytics */}
+        <Route path="analytics" element={<CmsAnalyticsView />} />
+
         {/* Leads and CRM */}
         <Route path="leads" element={<LeadsView />} />
+        <Route path="leads/:id" element={<LeadDetailView />} />
 
         {/* Content Management System (CMS) */}
         <Route path="cms" element={<CmsIndexView />} />
         <Route path="cms/home" element={<CmsHomeView />} />
-        <Route path="cms/services" element={<CmsServicesView />} />
 
         <Route path="cms/products" element={<CmsProductsView />} />
         <Route path="cms/products/:slug/items" element={<ProductItemsView />} />
@@ -46,9 +51,10 @@ export default function AdminPage() {
         <Route path="cms/blog/new" element={<BlogEditorPage />} />
         <Route path="cms/blog/edit/:id" element={<BlogEditorPage />} />
 
+        <Route path="cms/franchise" element={<CmsFranchiseView />} />
 
         <Route path="cms/resources" element={<CmsResourceView />} />
-        <Route path="cms/global" element={<CmsGlobalView />} />
+        <Route path="cms/settings" element={<CmsSettingsView />} />
         <Route path="cms/team" element={<CmsTeamView />} />
 
         {/* Placeholders for future views */}

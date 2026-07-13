@@ -12,6 +12,8 @@ import {
 import { theme } from '../../theme'
 import { useReveal } from '../../hooks/useReveal'
 import MediaItem from '../../components/common/MediaItem'
+import { Plus, Check } from 'lucide-react'
+import { useLeadTracker } from '../../context/LeadTrackerContext'
 
 function sortItems(items: IProductItem[], sort: ProductItemsSortOption): IProductItem[] {
   const next = [...items]
@@ -42,6 +44,7 @@ const BaseProductDetailsPage: FC = () => {
   const [sort, setSort] = useState<ProductItemsSortOption>('featured')
   const headRef = useReveal()
   const gridRef = useReveal()
+  const { state, addToEnquiry } = useLeadTracker()
 
   const load = useCallback(async () => {
     if (!slug) { setError('Product category not found.'); setLoading(false); return }
@@ -103,6 +106,20 @@ const BaseProductDetailsPage: FC = () => {
                   {data.description}
                 </p>
               ) : null}
+              <div style={{ marginTop: '32px' }}>
+                <button
+                  type="button"
+                  className={`btn-enquiry ${state.enquiryCart.some(i => i.id === (data._id || data.slug)) ? 'added' : ''}`}
+                  style={{ width: 'auto', padding: '14px 28px', fontSize: 14 }}
+                  onClick={() => addToEnquiry({ id: data._id || data.slug, type: 'product', title: data.title })}
+                >
+                  {state.enquiryCart.some(i => i.id === (data._id || data.slug)) ? (
+                    <><Check size={16} /> Remove from Enquiry</>
+                  ) : (
+                    <><Plus size={16} /> Enquire About Category</>
+                  )}
+                </button>
+              </div>
             </div>
             <div style={{ aspectRatio: '16/10', borderRadius: 20, overflow: 'hidden', border: `1px solid ${theme.colors.border}` }}>
               <MediaItem media={data.thumbnail} alt={data.title} />

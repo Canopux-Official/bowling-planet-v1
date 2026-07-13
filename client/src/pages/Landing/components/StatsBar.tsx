@@ -8,8 +8,15 @@ const STATS = [
   { num: '10+',  label: 'Cities Served'         },
 ]
 
-const StatsBar: FC = () => {
+const StatsBar: FC<{ data?: any }> = ({ data }) => {
   const ref = useReveal(0.1)
+
+  const activeStats = [
+    { num: data?.yearsOfExperience || STATS[0].num, label: 'Years of Experience' },
+    { num: data?.productsAndEquip || STATS[1].num, label: 'Products & Equipment' },
+    { num: data?.projectsDelivered || STATS[2].num, label: 'Projects Delivered' },
+    { num: data?.citiesServed || STATS[3].num, label: 'Cities Served' },
+  ];
 
   return (
     <section style={{ background: '#0A0A0F', position: 'relative' }}>
@@ -23,7 +30,7 @@ const StatsBar: FC = () => {
           gridTemplateColumns: 'repeat(4, 1fr)',
         }}
       >
-        {STATS.map((s, i) => (
+        {activeStats.map((s, i) => (
           <div
             key={s.num}
             style={{

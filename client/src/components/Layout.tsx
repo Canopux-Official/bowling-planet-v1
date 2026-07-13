@@ -4,6 +4,7 @@ import Nav from './Nav'
 import Footer from './Footer'
 import SplashScreen from './SplashScreen'
 import FloatingWhatsApp from './FloatingWhatsApp'
+import { EnquiryCartWidget } from './EnquiryCartWidget'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -26,6 +27,7 @@ const Layout: FC = () => {
       </main>
       <Footer />
       <FloatingWhatsApp />
+      <EnquiryCartWidget />
     </>
   )
 }

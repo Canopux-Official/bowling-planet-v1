@@ -2,6 +2,8 @@ import { type FC } from 'react'
 import { Link } from 'react-router-dom'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
+import { Plus, Check } from 'lucide-react'
 
 const HIGHLIGHTS = [
   {
@@ -36,6 +38,8 @@ const HIGHLIGHTS = [
 
 const FranchiseSection: FC = () => {
   const ref = useReveal()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
 
   return (
     <section id="franchise" style={{ background: '#0A0A0F', padding: '120px 28px', position: 'relative', overflow: 'hidden' }}>
@@ -86,12 +90,20 @@ const FranchiseSection: FC = () => {
             </p>
 
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <Link to="/franchise" className="btn btn-primary btn-primary-green" style={{ textDecoration: 'none' }}>
+              <Link to="/franchise" onClick={() => logCTAEvent('Landing: Explore Franchise')} className="btn btn-primary btn-primary-green" style={{ textDecoration: 'none' }}>
                 Explore Franchise
               </Link>
-              <Link to="/contact" className="btn btn-ghost" style={{ textDecoration: 'none' }}>
-                Apply Now →
-              </Link>
+              <button 
+                onClick={() => addToEnquiry({ id: 'franchise-general', type: 'franchise', title: 'Franchise Opportunity' })}
+                className={`btn-enquiry ${isAdded('franchise-general') ? 'added' : ''}`} 
+                style={{ width: 'auto', marginTop: 0 }}
+              >
+                {isAdded('franchise-general') ? (
+                  <><Check size={16} /> Remove from Enquiry</>
+                ) : (
+                  <><Plus size={16} /> Add to Enquiry</>
+                )}
+              </button>
             </div>
           </div>
 

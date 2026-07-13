@@ -1,5 +1,7 @@
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
+import { useGlobalSettings } from '../context/GlobalSettingsContext'
+import { useLeadTracker } from '../context/LeadTrackerContext'
 
 const NAV_COLS = [
   {
@@ -8,7 +10,7 @@ const NAV_COLS = [
       { l: 'About',     path: '/about'     },
       { l: 'Portfolio', path: '/portfolio' },
       { l: 'Careers',   path: '/careers'   },
-      { l: 'Contact',   path: '/'          },
+      { l: 'Contact',   path: '/contact'          },
     ],
   },
   {
@@ -22,13 +24,26 @@ const NAV_COLS = [
   },
 ]
 
-const SOCIALS = [
-  { label: 'Facebook',  href: 'https://facebook.com',  txt: 'f' },
-  { label: 'Instagram', href: 'https://instagram.com', txt: '◎' },
-  { label: 'LinkedIn',  href: 'https://linkedin.com',  txt: 'in' },
-]
-
 const Footer: FC = () => {
+  const { settings } = useGlobalSettings()
+  const { logCTAEvent } = useLeadTracker()
+
+  const companyData = settings?.company || {
+    name: 'Bowling Planet',
+    tagline: 'FEC consulting, equipment distribution, and franchise development. Based in Surat, Gujarat — building entertainment destinations across India and beyond.'
+  };
+
+  const contactData = settings?.contact || {
+    email: 'pr@bowlingplanet.co.in',
+    location: 'Surat, Gujarat, India'
+  };
+
+  const SOCIALS = settings?.socials?.links || [
+    { platform: 'Facebook',  url: 'https://facebook.com' },
+    { platform: 'Instagram', url: 'https://instagram.com' },
+    { platform: 'LinkedIn',  url: 'https://linkedin.com' },
+  ];
+
   return (
     <>
 
@@ -45,13 +60,12 @@ const Footer: FC = () => {
                 <img src="/logo.avif" alt="Bowling Planet" style={{ height: 48, width: 'auto' }}
                   onError={e => { const t = e.currentTarget; if (!t.dataset.fb2) { t.dataset.fb2='1'; t.src='/logo.avif' } }} />
                 <div>
-                  <div style={{ fontFamily: '"Sora",sans-serif', fontWeight: 700, fontSize: 20, color: '#F5F5F7', letterSpacing: '-0.01em' }}>Bowling Planet</div>
+                  <div style={{ fontFamily: '"Sora",sans-serif', fontWeight: 700, fontSize: 20, color: '#F5F5F7', letterSpacing: '-0.01em' }}>{companyData.name}</div>
                   <div className="label" style={{ fontSize: 10, marginBottom: 0 }}>FEC Consulting</div>
                 </div>
               </div>
               <p style={{ color: '#48484A', fontSize: 13, lineHeight: 1.65, fontFamily: 'Inter,sans-serif' }}>
-                FEC consulting, equipment distribution, and franchise development.
-                Based in Surat, Gujarat — building entertainment destinations across India and beyond.
+                {companyData.tagline}
               </p>
             </div>
 
@@ -67,6 +81,7 @@ const Footer: FC = () => {
                       <li key={link.l}>
                         <Link
                           to={link.path}
+                          onClick={() => logCTAEvent(`Footer Link: ${link.l}`)}
                           style={{ textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: '"Sora",sans-serif', fontWeight: 600, fontSize: 14, color: '#48484A', padding: 0, transition: 'color 0.2s ease', letterSpacing: '-0.01em' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#86868B' }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#48484A' }}
@@ -87,8 +102,9 @@ const Footer: FC = () => {
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
                 {SOCIALS.map(s => (
-                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                    aria-label={`Bowling Planet on ${s.label}`}
+                  <a key={s.platform} href={s.url} target="_blank" rel="noopener noreferrer"
+                    onClick={() => logCTAEvent(`Footer Social: ${s.platform}`)}
+                    aria-label={`${companyData.name} on ${s.platform}`}
                     style={{
                       width: 38, height: 38, borderRadius: 8,
                       border: '1px solid rgba(255,255,255,0.08)',
@@ -99,7 +115,7 @@ const Footer: FC = () => {
                     onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(95,193,209,0.4)'; el.style.color = '#5FC1D1'; el.style.background = 'rgba(95,193,209,0.07)' }}
                     onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,255,255,0.08)'; el.style.color = '#48484A'; el.style.background = 'transparent' }}
                   >
-                    {s.txt}
+                    {s.platform.substring(0, 2).toUpperCase()}
                   </a>
                 ))}
               </div>
@@ -110,10 +126,10 @@ const Footer: FC = () => {
           <div className="divider" style={{ marginBottom: 24 }} />
           <div className="footer-bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <p style={{ color: '#48484A', fontSize: 12, fontFamily: 'Inter,sans-serif' }}>
-              © {new Date().getFullYear()} Bowling Planet. All rights reserved.
+              © {new Date().getFullYear()} {companyData.name}. All rights reserved.
             </p>
             <p style={{ color: '#48484A', fontSize: 12, fontFamily: 'Inter,sans-serif' }}>
-              Surat, Gujarat, India · pr@bowlingplanet.co.in
+              {contactData.location.split(',')[0]} · {contactData.email}
             </p>
           </div>
         </div>

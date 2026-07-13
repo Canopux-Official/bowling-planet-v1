@@ -79,6 +79,7 @@ const ProjectDetailsPage: FC = () => {
         title={project.title}
         description={project.description}
         tags={project.tags}
+        projectId={project._id || project.slug}
       />
       <ProjectGallery media={project.media} />
       <FeaturePointsList featurePoints={project.featurePoints} />

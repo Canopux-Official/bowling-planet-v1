@@ -5,94 +5,7 @@
 import { type FC, useState } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
-
-const TIERS = [
-  {
-    name: 'Economy',
-    color: '#86868B',
-    size: '1,500 sq ft',
-    totalInvestment: '₹35 Lakhs',
-    majorAttractions: 0,
-    arcadeGames: 8,
-    otherHorizons: '—',
-    gamesCost: '₹28 Lakhs',
-    interiorCost: '₹5 Lakhs',
-    franchiseFee: '₹0',
-    consultingFee: '₹2 Lakhs',
-    ideal: 'Small town / kiosk format',
-  },
-  {
-    name: 'Value',
-    color: '#5FC1D1',
-    size: '3,000 sq ft',
-    totalInvestment: '₹65 Lakhs',
-    majorAttractions: 1,
-    arcadeGames: 10,
-    otherHorizons: '—',
-    gamesCost: '₹53.5 Lakhs',
-    interiorCost: '₹9 Lakhs',
-    franchiseFee: '₹0',
-    consultingFee: '₹2.5 Lakhs',
-    ideal: 'Tier-2 city neighbourhood',
-  },
-  {
-    name: 'Basic',
-    color: '#6DBD4E',
-    size: '6,000 sq ft',
-    totalInvestment: '₹2.5 Crore',
-    majorAttractions: 2,
-    arcadeGames: 14,
-    otherHorizons: '—',
-    gamesCost: '₹2 Crore',
-    interiorCost: '₹45 Lakhs',
-    franchiseFee: '₹0',
-    consultingFee: '₹4 Lakhs',
-    ideal: 'Standalone FEC, mid-city',
-  },
-  {
-    name: 'Standard',
-    color: '#FFAA33',
-    size: '12,000 sq ft',
-    totalInvestment: '₹7 Crore',
-    majorAttractions: 5,
-    arcadeGames: 32,
-    otherHorizons: '1',
-    gamesCost: '₹5.5 Crore',
-    interiorCost: '₹1.4 Crore',
-    franchiseFee: '₹0',
-    consultingFee: '₹8 Lakhs',
-    ideal: 'Mall or high-footfall location',
-    popular: true,
-  },
-  {
-    name: 'Premium',
-    color: '#C084FC',
-    size: '20,000 sq ft',
-    totalInvestment: '₹12 Crore',
-    majorAttractions: 8,
-    arcadeGames: 45,
-    otherHorizons: '3',
-    gamesCost: '₹9.5 Crore',
-    interiorCost: '₹2.4 Crore',
-    franchiseFee: '₹0',
-    consultingFee: '₹10.5 Lakhs',
-    ideal: 'Metro city landmark destination',
-  },
-  {
-    name: 'Deluxe',
-    color: '#F5C542',
-    size: '35,000 sq ft',
-    totalInvestment: '₹20 Crore',
-    majorAttractions: 12,
-    arcadeGames: 55,
-    otherHorizons: '5',
-    gamesCost: '₹15.8 Crore',
-    interiorCost: '₹4 Crore',
-    franchiseFee: '₹0',
-    consultingFee: '₹15 Lakhs',
-    ideal: 'Mega-resort entertainment complex',
-  },
-]
+import type { IFranchiseInvestmentTier } from '../../../services/franchisePageApi';
 
 const ROWS = [
   { key: 'size',           label: 'Store Size' },
@@ -106,10 +19,19 @@ const ROWS = [
   { key: 'totalInvestment', label: 'Total Investment' },
 ]
 
-const FranchiseInvestment: FC = () => {
-  const [selected, setSelected] = useState(3) // Standard by default
+interface FranchiseInvestmentProps {
+  tiers: IFranchiseInvestmentTier[];
+}
+
+const FranchiseInvestment: FC<FranchiseInvestmentProps> = ({ tiers }) => {
+  const [selected, setSelected] = useState(3) // Standard by default (or index 3 if available)
   const headRef = useReveal()
-  const tier = TIERS[selected]
+  
+  // Safe fallback if tiers are empty
+  if (!tiers || tiers.length === 0) return null;
+  
+  const safeSelected = selected >= tiers.length ? 0 : selected;
+  const tier = tiers[safeSelected];
 
   return (
     <section
@@ -149,16 +71,16 @@ const FranchiseInvestment: FC = () => {
           flexWrap: 'wrap',
           marginBottom: 40,
         }}>
-          {TIERS.map((t, i) => (
+          {tiers.map((t, i) => (
             <button
               key={t.name}
               onClick={() => setSelected(i)}
               style={{
                 padding: '10px 20px',
                 borderRadius: 980,
-                border: `1.5px solid ${selected === i ? t.color : theme.colors.border}`,
-                background: selected === i ? `${t.color}20` : 'transparent',
-                color: selected === i ? t.color : theme.colors.text3,
+                border: `1.5px solid ${safeSelected === i ? t.color : theme.colors.border}`,
+                background: safeSelected === i ? `${t.color}20` : 'transparent',
+                color: safeSelected === i ? t.color : theme.colors.text3,
                 fontFamily: theme.typography.fontDisplay,
                 fontWeight: 700,
                 fontSize: 13,
@@ -224,7 +146,7 @@ const FranchiseInvestment: FC = () => {
             gap: 16,
           }}>
             {ROWS.map((row) => {
-              const val = (tier as Record<string, unknown>)[row.key] as string | number
+              const val = (tier as unknown as Record<string, unknown>)[row.key] as string | number
               const isTotal = row.key === 'totalInvestment'
               const isFree = row.key === 'franchiseFee'
               return (

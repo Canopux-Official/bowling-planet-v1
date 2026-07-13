@@ -1,32 +1,30 @@
 import { type FC } from 'react'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
+import { Plus, Check } from 'lucide-react'
+import { MOCK_PROJECTS } from '../../ProjectsPage/services/mockdata'
 
-const PROJECTS = [
-  { 
-    name: 'Bowling Lane Dubai', 
-    image: '/products/Bowling_Lane_Dubai.avif',
-    color: '#5FC1D1'
-  },
-  { 
-    name: 'Arcade Games Calicut', 
-    image: '/products/Arcade_Games_Calicut.avif',
-    color: '#6DBD4E'
-  },
-  { 
-    name: 'Softplay Ahmedabad', 
-    image: '/products/Softplay_Ahemdabad.avif',
-    color: '#A78BFA'
-  },
-  { 
-    name: 'Softplay New Delhi', 
-    image: '/products/Softplay_New_Delhi.avif',
-    color: '#5FC1D1'
-  },
-]
+const DEFAULT_PROJECTS = MOCK_PROJECTS.slice(0, 4).map(p => ({
+  id: p._id || p.slug || '',
+  name: p.title || '',
+  image: p.media?.[0]?.url || '/products/Bowling_Lane_Dubai.avif',
+  color: '#5FC1D1'
+}));
 
-const PortfolioSection: FC = () => {
+const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
   const titleRef = useReveal()
   const gridRef  = useReveal()
+  const { state, addToEnquiry } = useLeadTracker()
+  const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
+
+  const featuredProjects = data?.projectIds && data.projectIds.length > 0 
+    ? data.projectIds.map(p => ({
+        id: p._id || p.id,
+        name: p.title || p.name,
+        image: p.media?.[0]?.url || p.image || '/products/Bowling_Lane_Dubai.avif',
+        color: '#5FC1D1'
+      }))
+    : DEFAULT_PROJECTS;
 
   return (
     <section id="portfolio" style={{ background: '#000000', padding: '80px 28px 0px', position: 'relative', overflow: 'hidden' }}>
@@ -61,7 +59,7 @@ const PortfolioSection: FC = () => {
             gap: 24, marginBottom: 64,
           }}
         >
-          {PROJECTS.map((p, idx) => (
+          {featuredProjects.map((p, idx) => (
             <div
               key={idx}
               className="glass-card"
@@ -79,11 +77,25 @@ const PortfolioSection: FC = () => {
               </div>
               
               {/* Details Container */}
-              <div className="portfolio-card-details" style={{ padding: '24px 28px', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="portfolio-card-details" style={{ padding: '24px 28px', background: 'rgba(10, 10, 15, 0.5)', borderTop: '1px solid rgba(255,255,255,0.05)', flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <h3 className="font-display portfolio-title" style={{ fontSize: 20, fontWeight: 700, color: '#F5F5F7', marginBottom: 4 }}>
                   {p.name}
                 </h3>
-                <div style={{ width: 40, height: 2, background: p.color, borderRadius: 2, marginTop: 12 }} />
+                <div style={{ width: 40, height: 2, background: p.color, borderRadius: 2, marginTop: 12, marginBottom: 24 }} />
+                
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToEnquiry({ id: p.id || p.name, type: 'project', title: p.name });
+                  }}
+                  className={`btn-enquiry ${isAdded(p.id || p.name) ? 'added' : ''}`}
+                >
+                  {isAdded(p.id || p.name) ? (
+                    <><Check size={14} /> Remove from Enquiry</>
+                  ) : (
+                    <><Plus size={14} /> Add to Enquiry</>
+                  )}
+                </button>
               </div>
             </div>
           ))}

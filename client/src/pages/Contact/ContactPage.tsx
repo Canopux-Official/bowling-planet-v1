@@ -1,6 +1,8 @@
 import { useState, type FC } from 'react'
 import { theme } from '../../theme'
 import { useReveal } from '../../hooks/useReveal'
+import { apiClient } from '../../services/apiClient'
+import { useLeadTracker } from '../../context/LeadTrackerContext'
 
 const ContactPage: FC = () => {
   const headRef = useReveal()
@@ -21,9 +23,35 @@ const ContactPage: FC = () => {
     setForm(prev => ({ ...prev, [field]: e.target.value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { state, logCTAEvent } = useLeadTracker()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setIsSubmitting(true)
+    try {
+      await apiClient('/leads', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          businessDetails: form.company ? `Company: ${form.company}\nMessage: ${form.message}` : form.message,
+          utm: state.utm,
+          behavior: {
+            isReturningVisitor: state.isReturningVisitor,
+            eventLog: state.eventLog,
+          },
+          enquiryItems: state.enquiryCart,
+        }),
+      })
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Failed to submit contact form', err)
+      alert('Something went wrong, please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const labelStyle = {
@@ -117,7 +145,7 @@ const ContactPage: FC = () => {
               <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody }}>
                 Drop us a line anytime. We aim to respond to all inquiries within 24 hours.
               </p>
-              <a href="mailto:sales@bowlingplanet.in" style={{ 
+              <a href="mailto:sales@bowlingplanet.in" onClick={() => logCTAEvent('Contact Page: Email Sales')} style={{ 
                 color: theme.colors.green, 
                 textDecoration: 'none', 
                 fontWeight: 600, 
@@ -143,7 +171,7 @@ const ContactPage: FC = () => {
               <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody }}>
                 Available Monday - Friday, 9:00 AM to 6:00 PM (IST).
               </p>
-              <a href="tel:+919876543210" style={{ 
+              <a href="tel:+919876543210" onClick={() => logCTAEvent('Contact Page: Call Support')} style={{ 
                 color: theme.colors.purple, 
                 textDecoration: 'none', 
                 fontWeight: 600, 
@@ -252,8 +280,8 @@ const ContactPage: FC = () => {
                     />
                   </div>
                   
-                  <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '16px' }}>
-                    Send Message
+                  <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '16px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>
               )}
