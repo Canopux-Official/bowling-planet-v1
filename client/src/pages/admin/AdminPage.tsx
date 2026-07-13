@@ -16,6 +16,7 @@ import { ProductItemsView } from './views/cms/products/components/ProductItemsVi
 import { CmsTeamView } from './views/cms/team/CmsTeamView';
 import { CmsResourceView } from './views/cms/resources/CmsResourceView';
 import { BlogEditorPage } from './views/cms/blog/components/BlogEditorPage';
+import { MediaManagement } from './views/media/MediaManagement';
 
 export default function AdminPage() {
   return (
@@ -51,7 +52,7 @@ export default function AdminPage() {
         <Route path="cms/team" element={<CmsTeamView />} />
 
         {/* Placeholders for future views */}
-        <Route path="media" element={<div style={{ padding: 24 }}>Media Library (Coming Soon)</div>} />
+        <Route path="media" element={<MediaManagement/>} />
         <Route path="directory" element={<div style={{ padding: 24 }}>Admin Directory (Coming Soon)</div>} />
 
         {/* Catch-all redirect back to dashboard */}

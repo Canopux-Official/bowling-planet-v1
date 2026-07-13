@@ -7,6 +7,7 @@
 
 import express from 'express';
 import { v2 as cloudinary } from 'cloudinary';
+import { getUsedPublicIds } from '../utils/mediaUsage';
 
 // Configure Cloudinary with your credentials
 cloudinary.config({
@@ -26,34 +27,30 @@ const router = express.Router();
  * - limit: (optional) Number of images to fetch (default: 100, max: 500)
  * - page: (optional) Page number for pagination (default: 1)
  */
+
 router.get('/images', async (req, res) => {
   try {
     const folder = req.query.folder as string || '';
     const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
     const cursor = req.query.cursor as string | undefined;
 
-    // Build the search expression - filter by folder prefix if provided
     let expression = 'resource_type:image AND type:upload';
     if (folder) {
-      expression += ` AND folder:${folder}*`;
+      expression += ` AND folder:${folder}/*`;
     }
 
-    // Fetch resources from Cloudinary
-    // Note: cloudinary.search is an object with chainable methods, not a function - no ()
     let query = cloudinary.search
       .expression(expression)
       .sort_by('created_at', 'desc')
       .max_results(limit);
 
-    // Cloudinary Search API uses cursor-based pagination, not page numbers.
-    // Pass the `nextCursor` value from a previous response to fetch the next batch.
     if (cursor) {
       query = query.next_cursor(cursor);
     }
 
     const result = await query.execute();
+    const usedPublicIds = await getUsedPublicIds(); // add this line
 
-    // Transform response to match frontend expectations
     const resources = (result.resources || []).map((resource: any) => ({
       public_id: resource.public_id,
       secure_url: resource.secure_url,
@@ -62,6 +59,7 @@ router.get('/images', async (req, res) => {
       bytes: resource.bytes,
       created_at: resource.created_at,
       format: resource.format,
+      inUse: usedPublicIds.has(resource.public_id), // add this field
     }));
 
     res.json({
@@ -122,9 +120,16 @@ router.post('/upload', async (req, res) => {
 router.delete('/images/:publicId', async (req, res) => {
   try {
     const { publicId } = req.params;
-
     if (!publicId) {
       return res.status(400).json({ error: 'Public ID is required' });
+    }
+
+    // add this check
+    const usedPublicIds = await getUsedPublicIds();
+    if (usedPublicIds.has(publicId)) {
+      return res.status(409).json({
+        error: 'Image is currently in use and cannot be deleted',
+      });
     }
 
     const result = await cloudinary.uploader.destroy(publicId);
