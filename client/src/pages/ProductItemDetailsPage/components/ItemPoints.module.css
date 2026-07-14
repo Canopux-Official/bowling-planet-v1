@@ -17,12 +17,32 @@
 }
 
 .card {
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  position: relative;
+  padding: 24px 20px 20px;
+  border-left: 2px solid #5FC1D1;
+  background: linear-gradient(135deg, rgba(95, 193, 209, 0.06), transparent 60%);
+  overflow: hidden;
+  transition: background 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover {
+  background: linear-gradient(135deg, rgba(95, 193, 209, 0.1), transparent 60%);
+}
+
+.ghostNumber {
+  position: absolute;
+  top: -6px;
+  right: 8px;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 3.25rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.05);
+  line-height: 1;
+  user-select: none;
 }
 
 .title {
+  position: relative;
   margin: 0 0 8px;
   font-size: 15px;
   font-weight: 700;
@@ -30,6 +50,7 @@
 }
 
 .description {
+  position: relative;
   margin: 0;
   font-size: 14px;
   line-height: 1.65;
@@ -39,5 +60,9 @@
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .ghostNumber {
+    font-size: 2.75rem;
   }
 }

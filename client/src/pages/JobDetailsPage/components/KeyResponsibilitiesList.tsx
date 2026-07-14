@@ -12,12 +12,18 @@ const KeyResponsibilitiesList: FC<KeyResponsibilitiesListProps> = ({
 
   return (
     <section className={styles.section} aria-labelledby="responsibilities-heading">
-      <h2 id="responsibilities-heading" className={styles.heading}>
-        Key responsibilities
-      </h2>
+      <div className={styles.headingRow}>
+        <span className={styles.index}>04</span>
+        <h2 id="responsibilities-heading" className={styles.heading}>
+          Key Responsibilities
+        </h2>
+      </div>
       <ul className={styles.list}>
-        {keyResponsibilities.map((item) => (
-          <li key={item}>{item}</li>
+        {keyResponsibilities.map((item, i) => (
+          <li key={i} className={styles.listItem}>
+            <span className={styles.dash} aria-hidden="true" />
+            <span>{item}</span>
+          </li>
         ))}
       </ul>
     </section>

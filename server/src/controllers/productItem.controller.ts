@@ -15,34 +15,61 @@ export const createProductItem = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Invalid or missing baseProduct' });
     }
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    const files = (req.files as Express.Multer.File[]) || [];
 
-    // 1. Process single thumbnail drop
-    if (files?.thumbnail?.[0]) {
-      const uploadedThumbnail = await uploadMedia(files.thumbnail[0].buffer, { folder: 'product-items/thumbnails' });
+    // Helper to grab all files for a given exact fieldname
+    const filesFor = (fieldname: string) => files.filter((f) => f.fieldname === fieldname);
+
+    // 1. Thumbnail (single file)
+    const thumbnailFile = filesFor('thumbnail')[0];
+    if (thumbnailFile) {
+      const uploadedThumbnail = await uploadMedia(thumbnailFile.buffer, { folder: 'product-items/thumbnails' });
       req.body.thumbnail = {
         type: 'image',
         url: uploadedThumbnail.url,
-        publicId: uploadedThumbnail.publicId
+        publicId: uploadedThumbnail.publicId,
       };
     }
 
-    // 2. Process multiple gallery items drop
-    if (files?.gallery && files.gallery.length > 0) {
+    // 2. Gallery (multiple files)
+    const galleryFiles = filesFor('gallery');
+    if (galleryFiles.length > 0) {
       const uploadedGallery = await Promise.all(
-        files.gallery.map((file) => uploadMedia(file.buffer, { folder: 'product-items/gallery' }))
+        galleryFiles.map((file) => uploadMedia(file.buffer, { folder: 'product-items/gallery' }))
       );
       req.body.gallery = uploadedGallery.map(({ url, publicId }) => ({
         type: 'image',
         url,
-        publicId
+        publicId,
       }));
     }
 
-    // in createProductItem, before ProductItem.create(req.body):
+    // Parse JSON string fields first, so usedIn array exists before we attach images
     if (typeof req.body.featureList === 'string') req.body.featureList = JSON.parse(req.body.featureList);
     if (typeof req.body.points === 'string') req.body.points = JSON.parse(req.body.points);
     if (typeof req.body.usedIn === 'string') req.body.usedIn = JSON.parse(req.body.usedIn);
+
+    // 3. usedInImages_0, usedInImages_1, ... -> usedIn[i].images
+    if (Array.isArray(req.body.usedIn)) {
+      req.body.usedIn = await Promise.all(
+        req.body.usedIn.map(async (entry: any, i: number) => {
+          const groupFiles = filesFor(`usedInImages_${i}`);
+          if (groupFiles.length === 0) return entry;
+
+          const uploaded = await Promise.all(
+            groupFiles.map((file) => uploadMedia(file.buffer, { folder: 'product-items/used-in' }))
+          );
+
+          return {
+            ...entry,
+            images: [
+              ...(entry.images || []),
+              ...uploaded.map(({ url, publicId }) => ({ type: 'image', url, publicId })),
+            ],
+          };
+        })
+      );
+    }
 
     const item = await ProductItem.create(req.body);
     return res.status(201).json({ success: true, data: item });
@@ -146,6 +173,9 @@ export const getFeaturedItems = async (req: Request, res: Response) => {
 // ------------------------------------------------------------------
 // PATCH /product-items/:id
 // ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// PATCH /product-items/:id (admin)
+// ------------------------------------------------------------------
 export const updateProductItem = async (req: Request, res: Response) => {
   try {
     const item = await ProductItem.findById(req.params.id);
@@ -156,23 +186,25 @@ export const updateProductItem = async (req: Request, res: Response) => {
     let updateData = { ...req.body };
     if (typeof updateData.gallery === 'string') updateData.gallery = JSON.parse(updateData.gallery);
     if (typeof updateData.thumbnail === 'string') updateData.thumbnail = JSON.parse(updateData.thumbnail);
-    // in updateProductItem, alongside the existing gallery/thumbnail parse lines:
     if (typeof updateData.featureList === 'string') updateData.featureList = JSON.parse(updateData.featureList);
     if (typeof updateData.points === 'string') updateData.points = JSON.parse(updateData.points);
     if (typeof updateData.usedIn === 'string') updateData.usedIn = JSON.parse(updateData.usedIn);
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+    // req.files is now a flat array (upload.any()), so group by fieldname
+    const files = (req.files as Express.Multer.File[]) || [];
+    const filesFor = (fieldname: string) => files.filter((f) => f.fieldname === fieldname);
 
     // 1. Check if thumbnail is being updated/replaced
-    if (files?.thumbnail?.[0]) {
+    const thumbnailFile = filesFor('thumbnail')[0];
+    if (thumbnailFile) {
       if (item.thumbnail?.publicId) {
         await deleteMedia(item.thumbnail.publicId);
       }
-      const uploadedThumbnail = await uploadMedia(files.thumbnail[0].buffer, { folder: 'product-items/thumbnails' });
+      const uploadedThumbnail = await uploadMedia(thumbnailFile.buffer, { folder: 'product-items/thumbnails' });
       updateData.thumbnail = {
         type: 'image',
         url: uploadedThumbnail.url,
-        publicId: uploadedThumbnail.publicId
+        publicId: uploadedThumbnail.publicId,
       };
     }
 
@@ -189,12 +221,51 @@ export const updateProductItem = async (req: Request, res: Response) => {
     }
 
     // 3. Append new images dropped into gallery
-    if (files?.gallery && files.gallery.length > 0) {
+    const galleryFiles = filesFor('gallery');
+    if (galleryFiles.length > 0) {
       const uploadedGallery = await Promise.all(
-        files.gallery.map((file) => uploadMedia(file.buffer, { folder: 'product-items/gallery' }))
+        galleryFiles.map((file) => uploadMedia(file.buffer, { folder: 'product-items/gallery' }))
       );
       const newItems = uploadedGallery.map(({ url, publicId }) => ({ type: 'image', url, publicId }));
       updateData.gallery = [...(updateData.gallery || item.gallery || []), ...newItems];
+    }
+
+    // 4. usedInImages_0, usedInImages_1, ... -> usedIn[i].images (with diff/cleanup, same pattern as gallery)
+    if (Array.isArray(updateData.usedIn)) {
+      const existingUsedIn = item.usedIn || [];
+
+      updateData.usedIn = await Promise.all(
+        updateData.usedIn.map(async (entry: any, i: number) => {
+          const existingEntry = existingUsedIn[i];
+
+          // Remove images that were dropped from this entry's payload
+          if (existingEntry?.images?.length) {
+            const incomingPublicIds = (entry.images || []).map((img: any) => img.publicId).filter(Boolean);
+            const imagesToRemove = existingEntry.images.filter(
+              (existing: any) => existing.publicId && !incomingPublicIds.includes(existing.publicId)
+            );
+            if (imagesToRemove.length > 0) {
+              await Promise.all(imagesToRemove.map((img: any) => deleteMedia(img.publicId)));
+            }
+          }
+
+          // Append newly uploaded files for this usedIn entry
+          const groupFiles = filesFor(`usedInImages_${i}`);
+          if (groupFiles.length === 0) return entry;
+
+          const uploaded = await Promise.all(
+            groupFiles.map((file) => uploadMedia(file.buffer, { folder: 'product-items/used-in' }))
+          );
+
+          return {
+            ...entry,
+            images: [
+              ...(entry.images || []),
+              ...uploaded.map(({ url, publicId }) => ({ type: 'image', url, publicId })),
+            ],
+          };
+        })
+      );
     }
 
     Object.assign(item, updateData);

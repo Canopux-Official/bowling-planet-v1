@@ -14,7 +14,10 @@ const BulletListSection: FC<BulletListSectionProps> = ({ bulletList }) => {
     <section className={styles.section} aria-label="Project details lists">
       {bulletList.map((block) => (
         <div key={block.heading} className={styles.block}>
-          <h2 className={styles.heading}>{block.heading}</h2>
+          <div className={styles.headingCol}>
+            <span className={styles.accentBar} aria-hidden="true" />
+            <h2 className={styles.heading}>{block.heading}</h2>
+          </div>
           <ul className={styles.list}>
             {block.items.map((item) => (
               <li key={item}>{item}</li>

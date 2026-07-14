@@ -11,9 +11,12 @@ const SkillsList: FC<SkillsListProps> = ({ skills }) => {
 
   return (
     <section className={styles.section} aria-labelledby="skills-heading">
-      <h2 id="skills-heading" className={styles.heading}>
-        Skills
-      </h2>
+      <div className={styles.headingRow}>
+        <span className={styles.index}>05</span>
+        <h2 id="skills-heading" className={styles.heading}>
+          Skills
+        </h2>
+      </div>
       <div className={styles.tags}>
         {skills.map((skill) => (
           <Tag key={skill} label={skill} />

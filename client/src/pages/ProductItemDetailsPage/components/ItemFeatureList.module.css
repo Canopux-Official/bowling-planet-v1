@@ -10,25 +10,66 @@
   color: #F5F5F7;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
 .group {
-  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 20px 22px;
+  background: #0A0A0F;
+  transition: border-color 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.group:hover {
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .groupTitle {
-  margin: 0 0 10px;
-  font-size: 15px;
-  font-weight: 600;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: #5FC1D1;
 }
 
 .list {
   margin: 0;
-  padding-left: 1.15rem;
-  color: #86868B;
-  font-size: 14px;
-  line-height: 1.7;
+  padding: 0;
+  list-style: none;
 }
 
-.list li + li {
-  margin-top: 6px;
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #86868B;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.listItem + .listItem {
+  margin-top: 10px;
+}
+
+.checkIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #6DBD4E;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }

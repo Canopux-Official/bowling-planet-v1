@@ -18,6 +18,7 @@ const FeaturePointsList: FC<FeaturePointsListProps> = ({ featurePoints }) => {
       <ul className={styles.list}>
         {featurePoints.map((point) => (
           <li key={point.title} className={styles.card}>
+            <span className={styles.accentBar} aria-hidden="true" />
             <h3 className={styles.title}>{point.title}</h3>
             {point.description ? (
               <p className={styles.description}>{point.description}</p>

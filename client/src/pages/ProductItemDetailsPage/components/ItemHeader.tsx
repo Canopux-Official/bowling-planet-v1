@@ -16,11 +16,17 @@ function formatPrice(price: number): string {
 
 const ItemHeader: FC<ItemHeaderProps> = ({ title, description, price }) => (
   <header className={styles.header}>
-    <h1 className={styles.title}>{title}</h1>
+    <div className={styles.titleRow}>
+      <h1 className={styles.title}>{title}</h1>
+      {price !== undefined ? (
+        <div className={styles.priceBadge}>
+          <span className={styles.priceLabel}>Price</span>
+          <span className={styles.price}>{formatPrice(price)}</span>
+        </div>
+      ) : null}
+    </div>
     {description ? <p className={styles.description}>{description}</p> : null}
-    {price !== undefined ? (
-      <p className={styles.price}>{formatPrice(price)}</p>
-    ) : null}
+    <div className={styles.divider} aria-hidden="true" />
   </header>
 )
 

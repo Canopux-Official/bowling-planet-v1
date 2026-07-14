@@ -4,8 +4,23 @@
   padding: 24px 28px;
 }
 
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.index {
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #5FC1D1;
+}
+
 .heading {
-  margin: 0 0 14px;
+  margin: 0;
   font-family: "Plus Jakarta Sans", "Sora", sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -14,18 +29,58 @@
 
 .list {
   margin: 0;
-  padding-left: 20px;
-  color: #86868B;
-  font-size: 15px;
-  line-height: 1.7;
+  padding: 0;
+  list-style: none;
 }
 
-.list li + li {
-  margin-top: 8px;
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #C8C8CC;
+}
+
+.listItem + .listItem {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.check {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 5px;
+  background: rgba(95, 193, 209, 0.1);
+  color: #5FC1D1;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+}
+
+.marker {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 1px;
+  background: #5FC1D1;
+  transform: rotate(45deg);
+}
+
+.dash {
+  flex-shrink: 0;
+  width: 14px;
+  height: 2px;
+  margin-top: 9px;
+  background: #5FC1D1;
 }

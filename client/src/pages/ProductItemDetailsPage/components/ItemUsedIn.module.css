@@ -10,10 +10,59 @@
   color: #F5F5F7;
 }
 
-.location {
-  margin-bottom: 32px;
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
+.location {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 40px;
+}
+
+.location:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ---------- Hero image with overlaid name ---------- */
+
+.hero {
+  position: relative;
+  aspect-ratio: 21 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.hero > *:first-child {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+.heroName {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #F5F5F7;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* fallback when no hero image */
 .name {
   margin: 0 0 8px;
   font-size: 16px;
@@ -26,16 +75,20 @@
   font-size: 14px;
   line-height: 1.65;
   color: #86868B;
-  max-width: 560px;
+  max-width: 640px;
 }
 
-.images {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+/* ---------- Filmstrip for additional images ---------- */
+
+.filmstrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
-.image {
+.thumb {
+  flex: 0 0 140px;
   aspect-ratio: 4 / 3;
   border-radius: 4px;
   overflow: hidden;
@@ -43,8 +96,18 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.thumb > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 @media (max-width: 700px) {
-  .images {
-    grid-template-columns: 1fr;
+  .hero {
+    aspect-ratio: 16 / 10;
+  }
+
+  .thumb {
+    flex-basis: 110px;
   }
 }

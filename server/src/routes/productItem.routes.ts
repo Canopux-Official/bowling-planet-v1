@@ -20,8 +20,8 @@ const productItemUpload = upload.fields([
 ]);
 
 // admin
-router.post('/admin',authenticateJWT, productItemUpload,createProductItem);
-router.patch('/admin/:id', authenticateJWT, productItemUpload,updateProductItem);
+router.post('/admin',authenticateJWT, upload.any(),createProductItem);
+router.patch('/admin/:id', authenticateJWT, upload.any(),updateProductItem);
 router.patch('/admin/:id/purchase', authenticateJWT, incrementPurchaseCount);
 router.delete('/admin/:id', authenticateJWT, deleteProductItem);
 

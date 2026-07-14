@@ -2,9 +2,56 @@
   margin-bottom: 48px;
 }
 
-.hero {
-  aspect-ratio: 16 / 9;
+.layout {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 16px;
+}
+
+/* ---------- Thumbnail rail ---------- */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.thumbBtn {
+  aspect-ratio: 1 / 1;
   border-radius: 4px;
+  overflow: hidden;
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.thumbBtn:hover {
+  opacity: 0.9;
+}
+
+.thumbBtnActive {
+  opacity: 1;
+  border-color: #5FC1D1;
+}
+
+.thumbBtn:focus-visible {
+  outline: 2px solid #5FC1D1;
+  outline-offset: 2px;
+}
+
+/* ---------- Main image ---------- */
+
+.hero {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
   overflow: hidden;
   background: #111118;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -14,25 +61,59 @@
   display: block;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 12px;
+.hero > * {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.thumbBtn {
-  aspect-ratio: 4 / 3;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #111118;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0;
-  cursor: zoom-in;
+.zoomHint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(4px);
+  color: #F5F5F7;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
+
+.hero:hover .zoomHint,
+.hero:focus-visible .zoomHint {
+  opacity: 1;
+}
+
+/* ---------- Responsive ---------- */
 
 @media (max-width: 700px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    flex-direction: row;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .thumbBtn {
+    width: 64px;
+    flex-shrink: 0;
+  }
+
+  .hero {
+    order: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumbBtn,
+  .zoomHint {
+    transition: none;
   }
 }

@@ -4,8 +4,23 @@
   padding: 40px 28px 16px;
 }
 
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.index {
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #5FC1D1;
+}
+
 .heading {
-  margin: 0 0 14px;
+  margin: 0;
   font-family: "Plus Jakarta Sans", "Sora", sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -14,6 +29,8 @@
 
 .description {
   margin: 0;
+  padding-left: 18px;
+  border-left: 2px solid rgba(95, 193, 209, 0.25);
   font-size: 16px;
   line-height: 1.75;
   color: #86868B;

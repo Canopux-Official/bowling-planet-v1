@@ -14,23 +14,39 @@ const ItemUsedIn: FC<ItemUsedInProps> = ({ usedIn }) => {
   return (
     <section className={styles.section}>
       <h2 className={styles.heading}>Used in</h2>
-      {usedIn.map((location) => (
-        <article key={location.name} className={styles.location}>
-          <h3 className={styles.name}>{location.name}</h3>
-          {location.description ? (
-            <p className={styles.description}>{location.description}</p>
-          ) : null}
-          {location.images && location.images.length > 0 ? (
-            <div className={styles.images}>
-              {location.images.map((media, i) => (
-                <div key={`${media.url}-${i}`} className={styles.image}>
-                  <MediaItem media={media} alt={`${location.name} ${i + 1}`} />
+      <div className={styles.list}>
+        {usedIn.map((location) => {
+          const [hero, ...rest] = location.images ?? []
+
+          return (
+            <article key={location.name} className={styles.location}>
+              {hero ? (
+                <div className={styles.hero}>
+                  <MediaItem media={hero} alt={location.name} />
+                  <div className={styles.heroScrim} aria-hidden="true" />
+                  <h3 className={styles.heroName}>{location.name}</h3>
                 </div>
-              ))}
-            </div>
-          ) : null}
-        </article>
-      ))}
+              ) : (
+                <h3 className={styles.name}>{location.name}</h3>
+              )}
+
+              {location.description ? (
+                <p className={styles.description}>{location.description}</p>
+              ) : null}
+
+              {rest.length > 0 ? (
+                <div className={styles.filmstrip}>
+                  {rest.map((media, i) => (
+                    <div key={`${media.url}-${i}`} className={styles.thumb}>
+                      <MediaItem media={media} alt={`${location.name} ${i + 2}`} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </article>
+          )
+        })}
+      </div>
     </section>
   )
 }

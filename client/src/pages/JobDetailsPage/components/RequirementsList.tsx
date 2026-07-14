@@ -10,12 +10,18 @@ const RequirementsList: FC<RequirementsListProps> = ({ requirements }) => {
 
   return (
     <section className={styles.section} aria-labelledby="requirements-heading">
-      <h2 id="requirements-heading" className={styles.heading}>
-        Requirements
-      </h2>
+      <div className={styles.headingRow}>
+        <span className={styles.index}>03</span>
+        <h2 id="requirements-heading" className={styles.heading}>
+          Requirements
+        </h2>
+      </div>
       <ul className={styles.list}>
-        {requirements.map((item) => (
-          <li key={item}>{item}</li>
+        {requirements.map((item, i) => (
+          <li key={i} className={styles.listItem}>
+            <span className={styles.marker} aria-hidden="true" />
+            <span>{item}</span>
+          </li>
         ))}
       </ul>
     </section>

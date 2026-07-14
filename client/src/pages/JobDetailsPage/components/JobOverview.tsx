@@ -10,9 +10,12 @@ const JobOverview: FC<JobOverviewProps> = ({ description }) => {
 
   return (
     <section className={styles.section} aria-labelledby="job-overview-heading">
-      <h2 id="job-overview-heading" className={styles.heading}>
-        Overview
-      </h2>
+      <div className={styles.headingRow}>
+        <span className={styles.index}>01</span>
+        <h2 id="job-overview-heading" className={styles.heading}>
+          Overview
+        </h2>
+      </div>
       <p className={styles.description}>{description}</p>
     </section>
   )

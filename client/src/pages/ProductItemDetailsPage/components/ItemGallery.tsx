@@ -13,46 +13,46 @@ interface ItemGalleryProps {
 
 const ItemGallery: FC<ItemGalleryProps> = ({ thumbnail, gallery, title }) => {
   const [open, setOpen] = useState(false)
-  const [index, setIndex] = useState(0)
+  const [selected, setSelected] = useState(0)
 
   const extras = gallery ?? []
   const allMedia = [thumbnail, ...extras]
 
-  const openAt = (i: number) => {
-    setIndex(i)
-    setOpen(true)
-  }
-
   return (
     <section className={styles.section} aria-label={`${title} gallery`}>
-      <button
-        type="button"
-        className={styles.hero}
-        onClick={() => openAt(0)}
-        aria-label={`View ${title}`}
-      >
-        <MediaItem media={thumbnail} alt={title} />
-      </button>
+      <div className={styles.layout}>
+        {allMedia.length > 1 ? (
+          <div className={styles.rail} role="tablist" aria-label="Select image">
+            {allMedia.map((media, i) => (
+              <button
+                key={`${media.url}-${i}`}
+                type="button"
+                role="tab"
+                aria-selected={selected === i}
+                className={`${styles.thumbBtn} ${selected === i ? styles.thumbBtnActive : ''}`}
+                onClick={() => setSelected(i)}
+                aria-label={`View image ${i + 1}`}
+              >
+                <MediaItem media={media} alt="" />
+              </button>
+            ))}
+          </div>
+        ) : null}
 
-      {extras.length > 0 ? (
-        <div className={styles.grid}>
-          {extras.map((media, i) => (
-            <button
-              key={`${media.url}-${i}`}
-              type="button"
-              className={styles.thumbBtn}
-              onClick={() => openAt(i + 1)}
-              aria-label={`View gallery image ${i + 1}`}
-            >
-              <MediaItem media={media} alt={`${title} ${i + 1}`} />
-            </button>
-          ))}
-        </div>
-      ) : null}
+        <button
+          type="button"
+          className={styles.hero}
+          onClick={() => setOpen(true)}
+          aria-label={`Zoom in on ${title}`}
+        >
+          <MediaItem media={allMedia[selected]} alt={title} />
+          <span className={styles.zoomHint}>Click to zoom</span>
+        </button>
+      </div>
 
       <Lightbox
         media={allMedia}
-        initialIndex={index}
+        initialIndex={selected}
         isOpen={open}
         onClose={() => setOpen(false)}
       />

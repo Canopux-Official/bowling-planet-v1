@@ -40,7 +40,7 @@ const ProjectFilters: FC<ProjectFiltersProps> = ({ value, availableTags, onChang
         />
       </div>
 
-      <div className={styles.field}>
+      {/* <div className={styles.field}>
         <label className={styles.label} htmlFor="project-sort">
           Sort
         </label>
@@ -54,7 +54,7 @@ const ProjectFilters: FC<ProjectFiltersProps> = ({ value, availableTags, onChang
           <option value="oldest">Oldest</option>
           <option value="title">Title</option>
         </select>
-      </div>
+      </div> */}
 
       {availableTags.length > 0 ? (
         <div className={styles.tags} aria-label="Filter by tags">

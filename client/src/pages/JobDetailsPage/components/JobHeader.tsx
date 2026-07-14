@@ -20,6 +20,11 @@ function formatDeadline(value: string): string {
   })
 }
 
+function isClosingSoon(value: string): boolean {
+  const diff = new Date(value).getTime() - Date.now()
+  return diff > 0 && diff < 1000 * 60 * 60 * 24 * 7
+}
+
 const JobHeader: FC<JobHeaderProps> = ({
   title,
   department,
@@ -31,21 +36,39 @@ const JobHeader: FC<JobHeaderProps> = ({
   applicationDeadline,
 }) => (
   <header className={styles.header}>
+    <div className={styles.grid} aria-hidden="true" />
     <div className={styles.inner}>
-      {department ? <p className={styles.department}>{department}</p> : null}
+      <div className={styles.eyebrow}>
+        <span className={styles.eyebrowLine} />
+        <span className={styles.eyebrowText}>
+          {department ? department : 'Open Position'}
+        </span>
+      </div>
+
       <h1 className={styles.title}>{title}</h1>
-      <ul className={styles.meta}>
-        <li>{location}</li>
-        <li>{jobType}</li>
-        <li>{workMode}</li>
-        <li>{experience}</li>
-        <li>
-          {openings} opening{openings === 1 ? '' : 's'}
-        </li>
+
+      <div className={styles.metaRow}>
+        <ul className={styles.meta}>
+          <li className={styles.metaChip}>{location}</li>
+          <li className={styles.metaChip}>{jobType}</li>
+          <li className={styles.metaChip}>{workMode}</li>
+          <li className={styles.metaChip}>{experience}</li>
+          <li className={styles.metaChip}>
+            {openings} opening{openings === 1 ? '' : 's'}
+          </li>
+        </ul>
+
         {applicationDeadline ? (
-          <li>Deadline: {formatDeadline(applicationDeadline)}</li>
+          <div
+            className={`${styles.deadline} ${
+              isClosingSoon(applicationDeadline) ? styles.deadlineUrgent : ''
+            }`}
+          >
+            <span className={styles.deadlineDot} />
+            Apply by {formatDeadline(applicationDeadline)}
+          </div>
         ) : null}
-      </ul>
+      </div>
     </div>
   </header>
 )

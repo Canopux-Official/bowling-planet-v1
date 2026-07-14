@@ -1,53 +1,178 @@
 .card {
+  position: relative;
   display: grid;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 56px 1fr;
   gap: 24px;
-  padding: 28px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 32px 0;
 }
 
-.number {
-  font-size: 14px;
+.card:last-child {
+  padding-bottom: 4px;
+}
+
+/* ---------- Rail: marker + connecting line ---------- */
+
+.rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.markerRing {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #5FC1D1, #6DBD4E);
+  flex-shrink: 0;
+  transition: box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover .markerRing {
+  box-shadow: 0 0 0 6px rgba(95, 193, 209, 0.14), 0 0 20px rgba(109, 189, 78, 0.18);
+}
+
+.marker {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #0A0A0F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markerNumber {
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #5FC1D1;
+  letter-spacing: 0.04em;
+  color: #F5F5F7;
+}
+
+.connector {
+  flex: 1;
+  width: 2px;
+  margin-top: 4px;
+  background: linear-gradient(180deg, #5FC1D1, rgba(109, 189, 78, 0.5));
+}
+
+.card:last-child .connector {
+  background: linear-gradient(180deg, #5FC1D1, transparent);
+}
+
+/* ---------- Content ---------- */
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.content:has(.image) {
+  grid-template-columns: 1fr 300px;
 }
 
 .title {
   margin: 0 0 10px;
   font-family: "Plus Jakarta Sans", "Sora", sans-serif;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: #F5F5F7;
+  transition: color 0.3s ease;
+}
+
+.card:hover .title {
+  color: #5FC1D1;
 }
 
 .description {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 15px;
   line-height: 1.7;
   color: #86868B;
+  font-family: "Inter", -apple-system, "SF Pro Text", sans-serif;
 }
 
 .points {
-  margin: 0 0 16px;
-  padding-left: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   color: #86868B;
   font-size: 14px;
   line-height: 1.65;
+  font-family: "Inter", -apple-system, "SF Pro Text", sans-serif;
+}
+
+.points li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 6px;
+}
+
+.points li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  background: #5FC1D1;
+  transform: rotate(45deg);
 }
 
 .image {
-  max-width: 360px;
   aspect-ratio: 16 / 10;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
   background: #0A0A0F;
 }
 
+.image > * {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .image > * {
+  transform: scale(1.04);
+}
+
+/* ---------- Responsive ---------- */
+
 @media (max-width: 640px) {
   .card {
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 40px 1fr;
     gap: 16px;
+    padding: 24px 0;
+  }
+
+  .markerRing {
+    width: 36px;
+    height: 36px;
+  }
+
+  .markerNumber {
+    font-size: 11px;
+  }
+
+  .content:has(.image) {
+    grid-template-columns: 1fr;
+  }
+
+  .image {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markerRing,
+  .title,
+  .image > * {
+    transition: none;
   }
 }

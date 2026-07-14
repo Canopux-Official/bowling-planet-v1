@@ -17,22 +17,27 @@ const ProjectGallery: FC<ProjectGalleryProps> = ({ media }) => {
 
   return (
     <>
-      <div className={styles.gallery}>
-        {media.map((item, i) => (
-          <button
-            key={`${item.url}-${i}`}
-            type="button"
-            className={styles.item}
-            onClick={() => {
-              setIndex(i)
-              setOpen(true)
-            }}
-            aria-label={`Open media ${i + 1}`}
-          >
-            <MediaItem media={item} alt="" />
-          </button>
-        ))}
-      </div>
+      <section className={styles.section} aria-labelledby="gallery-heading">
+        <h2 id="gallery-heading" className={styles.heading}>
+          Gallery
+        </h2>
+        <div className={styles.gallery}>
+          {media.map((item, i) => (
+            <button
+              key={`${item.url}-${i}`}
+              type="button"
+              className={styles.item}
+              onClick={() => {
+                setIndex(i)
+                setOpen(true)
+              }}
+              aria-label={`Open media ${i + 1}`}
+            >
+              <MediaItem media={item} alt="" />
+            </button>
+          ))}
+        </div>
+      </section>
       <Lightbox
         media={media}
         initialIndex={index}
