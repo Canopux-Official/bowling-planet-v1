@@ -4,6 +4,7 @@ import { theme } from '../../../../theme';
 import { User, Mail, Shield, Key, LogOut, X as XIcon, Loader2, Check } from 'lucide-react';
 import { authApi } from '../../../Auth/services/authApi';
 import { useToast } from '../../components/Toast';
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export const ProfileView: React.FC = () => {
   const { user, logout, login } = useAuth();
@@ -19,11 +20,12 @@ export const ProfileView: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const handleSaveProfile = async () => {
     if (!name.trim()) return showToast('error', 'Name cannot be empty');
     if (name === user?.name) return; // No changes
-    
+
     setIsSavingName(true);
     try {
       const res = await authApi.updateProfile({ name });
@@ -41,8 +43,11 @@ export const ProfileView: React.FC = () => {
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
     setIsSendingOtp(true);
+    if (!captchaToken) {
+      return showToast('error', 'Please complete the captcha');
+    }
     try {
-      await authApi.forgotPassword({ email: user.email });
+      await authApi.forgotPassword({ email: user.email, captchaToken });
       setPasswordStep('otp');
       showToast('success', 'OTP sent to your email');
     } catch (err: any) {
@@ -86,24 +91,24 @@ export const ProfileView: React.FC = () => {
         <p style={{ color: theme.colors.adminTextMuted, margin: '4px 0 0 0', fontSize: '14px' }}>Manage your personal information and security settings.</p>
       </div>
 
-      <div style={{ 
-        backgroundColor: theme.colors.adminSurface, 
-        borderRadius: '12px', 
-        border: `1px solid ${theme.colors.adminBorder}`, 
-        overflow: 'hidden', 
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)' 
+      <div style={{
+        backgroundColor: theme.colors.adminSurface,
+        borderRadius: '12px',
+        border: `1px solid ${theme.colors.adminBorder}`,
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
       }}>
-        
+
         {/* Profile Header section */}
         <div style={{ padding: '32px 24px', borderBottom: `1px solid ${theme.colors.adminBorder}`, display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div style={{ 
-            width: '80px', 
-            height: '80px', 
-            borderRadius: '50%', 
-            backgroundColor: theme.colors.teal, 
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            backgroundColor: theme.colors.teal,
             color: theme.colors.prussianBlue,
-            display: 'flex', 
-            alignItems: 'center', 
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 700,
             fontSize: '32px'
@@ -122,14 +127,14 @@ export const ProfileView: React.FC = () => {
         {/* Profile Form Details */}
         <div style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: '0 0 16px 0' }}>Personal Information</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: theme.colors.adminTextMuted, marginBottom: '6px' }}>Full Name</label>
               <div style={{ position: 'relative' }}>
                 <User size={16} color="#9CA3AF" style={{ position: 'absolute', left: '12px', top: '10px' }} />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   style={{
@@ -149,8 +154,8 @@ export const ProfileView: React.FC = () => {
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: theme.colors.adminTextMuted, marginBottom: '6px' }}>Email Address</label>
               <div style={{ position: 'relative' }}>
                 <Mail size={16} color="#9CA3AF" style={{ position: 'absolute', left: '12px', top: '10px' }} />
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={user?.email || ''}
                   disabled
                   style={{
@@ -170,7 +175,7 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: '0 0 16px 0' }}>Security Settings</h3>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', border: `1px solid ${theme.colors.adminBorder}`, borderRadius: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -182,7 +187,7 @@ export const ProfileView: React.FC = () => {
                   <div style={{ color: theme.colors.adminTextMuted, fontSize: '12px' }}>Update your password regularly to keep your account secure</div>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsPasswordModalOpen(true)}
                 style={{ padding: '6px 12px', borderRadius: '6px', border: `1px solid ${theme.colors.adminBorder}`, backgroundColor: '#fff', fontSize: '13px', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s' }}>
                 Update
@@ -191,27 +196,27 @@ export const ProfileView: React.FC = () => {
           </div>
 
           <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: `1px solid ${theme.colors.adminBorder}`, display: 'flex', justifyContent: 'space-between' }}>
-            <button 
+            <button
               onClick={() => {
-                if(window.confirm('Are you sure you want to log out?')) {
+                if (window.confirm('Are you sure you want to log out?')) {
                   logout();
                 }
               }}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: '8px', 
-                padding: '8px 16px', borderRadius: '8px', border: '1px solid #FECACA', 
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '8px 16px', borderRadius: '8px', border: '1px solid #FECACA',
                 backgroundColor: '#FEF2F2', color: '#DC2626', cursor: 'pointer',
                 fontSize: '14px', fontWeight: 500
               }}>
               <LogOut size={16} /> Sign Out
             </button>
-            
-            <button 
+
+            <button
               onClick={handleSaveProfile}
               disabled={isSavingName || name === user?.name || !name.trim()}
-              style={{ 
-                padding: '8px 24px', borderRadius: '8px', border: 'none', 
-                backgroundColor: (isSavingName || name === user?.name || !name.trim()) ? '#9CA3AF' : theme.colors.prussianBlue, 
+              style={{
+                padding: '8px 24px', borderRadius: '8px', border: 'none',
+                backgroundColor: (isSavingName || name === user?.name || !name.trim()) ? '#9CA3AF' : theme.colors.prussianBlue,
                 color: '#fff', cursor: (isSavingName || name === user?.name || !name.trim()) ? 'not-allowed' : 'pointer',
                 fontSize: '14px', fontWeight: 600,
                 display: 'flex', alignItems: 'center', gap: '8px'
@@ -219,7 +224,7 @@ export const ProfileView: React.FC = () => {
               {isSavingName ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
             </button>
           </div>
-          
+
         </div>
       </div>
 
@@ -244,14 +249,14 @@ export const ProfileView: React.FC = () => {
               </div>
               <h2 style={{ fontSize: '18px', fontWeight: 700, color: theme.colors.adminText, margin: '0 0 8px 0' }}>Update Password</h2>
               <p style={{ fontSize: '14px', color: theme.colors.adminTextMuted, margin: 0 }}>
-                {passwordStep === 'initial' 
+                {passwordStep === 'initial'
                   ? 'We will send a secure OTP to your registered email address to verify your identity.'
                   : `Enter the OTP sent to ${user?.email} and your new password.`}
               </p>
             </div>
 
             {passwordStep === 'initial' ? (
-              <button 
+              <button
                 onClick={handleRequestPasswordReset}
                 disabled={isSendingOtp}
                 style={{
@@ -266,8 +271,8 @@ export const ProfileView: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: theme.colors.adminTextMuted, marginBottom: '6px' }}>One-Time Password (OTP)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="Enter 6-digit OTP"
@@ -279,8 +284,8 @@ export const ProfileView: React.FC = () => {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: theme.colors.adminTextMuted, marginBottom: '6px' }}>New Password</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 8 characters"
@@ -290,8 +295,8 @@ export const ProfileView: React.FC = () => {
                     }}
                   />
                 </div>
-                
-                <button 
+
+                <button
                   onClick={handleResetPassword}
                   disabled={isResetting || !otp || !newPassword}
                   style={{
