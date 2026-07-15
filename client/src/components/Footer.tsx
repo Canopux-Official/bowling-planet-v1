@@ -8,7 +8,6 @@ const NAV_COLS = [
     heading: 'Company',
     links: [
       { l: 'About',     path: '/about'     },
-      { l: 'Portfolio', path: '/portfolio' },
       { l: 'Careers',   path: '/careers'   },
       { l: 'Contact',   path: '/contact'          },
     ],
@@ -16,7 +15,6 @@ const NAV_COLS = [
   {
     heading: 'Services',
     links: [
-      { l: 'Consulting', path: '/services'  },
       { l: 'Projects',   path: '/projects'  },
       { l: 'Products',   path: '/products'  },
       { l: 'Franchise',  path: '/franchise' },

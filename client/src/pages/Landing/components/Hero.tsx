@@ -3,6 +3,7 @@
  */
 
 import { type FC, Suspense, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import Hero3DScene from './Hero3DScene'
@@ -58,6 +59,7 @@ const RotatingWord: FC<{ activities?: string[] }> = ({ activities = ACTIVITIES }
 
 const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
   const ref = useReveal(0.1)
+  const navigate = useNavigate()
   const { logCTAEvent } = useLeadTracker()
   const activeActivities = data?.rotatingActivities?.length ? data.rotatingActivities : ACTIVITIES;
 
@@ -174,7 +176,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             className="btn btn-primary"
             onClick={() => {
               logCTAEvent('Hero: Start Your Project')
-              console.log('TODO: connect to Start Your Project page')
+              navigate('/contact')
             }}
             aria-label="Start your FEC project"
           >

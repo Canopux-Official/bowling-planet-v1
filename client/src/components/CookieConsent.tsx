@@ -8,7 +8,11 @@ const CookieConsent: FC = () => {
     // Check if the user has already consented or rejected
     const consent = localStorage.getItem('bp_cookie_consent')
     if (!consent) {
-      setShow(true)
+      // Delay to allow splash screen to finish (splash screen takes 3.7s)
+      const timer = setTimeout(() => {
+        setShow(true)
+      }, 4000)
+      return () => clearTimeout(timer)
     }
   }, [])
 
@@ -35,7 +39,8 @@ const CookieConsent: FC = () => {
       justifyContent: 'center',
       pointerEvents: 'none',
     }}>
-      <div className="glass-card" style={{
+      <div style={{
+        background: theme.colors.surface3,
         padding: '24px 32px',
         borderRadius: 16,
         maxWidth: 800,

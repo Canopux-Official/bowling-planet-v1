@@ -10,23 +10,12 @@ import ExitIntentModal from './ExitIntentModal'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 import { useEngagementTracker } from '../hooks/useEngagementTracker'
 
-const ScrollToTop = () => {
-  const { pathname } = useLocation()
-  
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-  
-  return null
-}
-
 const Layout: FC = () => {
   const { logCTAEvent } = useLeadTracker()
   useEngagementTracker({ logEvent: logCTAEvent })
 
   return (
     <>
-      <ScrollToTop />
       <SplashScreen />
       <Nav />
       <main>

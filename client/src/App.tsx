@@ -2,6 +2,10 @@
  * Bowling Planet — App entry point
  * Nested layout, lazy routes, Helmet for SEO.
  */
+/**
+ * Bowling Planet — App entry point
+ * Nested layout, lazy routes, Helmet for SEO.
+ */
 
 import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -10,6 +14,7 @@ import { HelmetProvider } from 'react-helmet-async'
 
 import { GlobalSettingsProvider } from './context/GlobalSettingsContext'
 import Layout from './components/Layout'
+import ScrollToTop from './components/ScrollToTop'
 import { theme } from './theme'
 import { AuthProvider } from './context/AuthContext'
 import { LeadTrackerProvider } from './context/LeadTrackerContext'
@@ -63,6 +68,7 @@ export default function App() {
       <AuthProvider>
         <GlobalSettingsProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <LeadTrackerProvider>
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
