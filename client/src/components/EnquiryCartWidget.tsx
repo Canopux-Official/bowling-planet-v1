@@ -116,7 +116,6 @@ export const EnquiryCartWidget: React.FC = () => {
         window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
       }
       setIsCartOpen(false);
-      clearEnquiryCart();
     }, 1000);
   };
 
@@ -161,7 +160,6 @@ export const EnquiryCartWidget: React.FC = () => {
         window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
       }
       setIsCartOpen(false);
-      clearEnquiryCart();
     }, 800);
   };
 
