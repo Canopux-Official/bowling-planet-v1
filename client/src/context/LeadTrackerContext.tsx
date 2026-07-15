@@ -55,6 +55,7 @@ interface LeadTrackerContextType {
   removeFromEnquiry: (id: string) => void;
   logCTAEvent: (label: string) => void;
   updatePartialLead: (data: Partial<PartialLeadForm>) => void;
+  clearEnquiryCart: () => void;
   clearTrackingData: () => void;
 }
 
@@ -169,7 +170,7 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         eventLog: [
           ...prev.eventLog,
           { label: `Added to Enquiry: ${item.title} (${item.type})`, timestamp: new Date().toISOString(), path: window.location.pathname },
-        ],
+        ].slice(-100),
       }));
     } else {
       setState((prev) => ({
@@ -177,16 +178,30 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         eventLog: [
           ...prev.eventLog,
           { label: `Removed from Enquiry: ${item.title} (${item.type})`, timestamp: new Date().toISOString(), path: window.location.pathname },
-        ],
+        ].slice(-100),
       }));
     }
   }, [state.enquiryCart]);
 
   const removeFromEnquiry = React.useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      enquiryCart: prev.enquiryCart.filter((item) => item.id !== id),
-    }));
+    setState((prev) => {
+      const itemToRemove = prev.enquiryCart.find(item => item.id === id);
+      const newCart = prev.enquiryCart.filter((item) => item.id !== id);
+      
+      let newEventLog = prev.eventLog;
+      if (itemToRemove) {
+        newEventLog = [
+          ...prev.eventLog,
+          { label: `Removed from Enquiry: ${itemToRemove.title} (${itemToRemove.type})`, timestamp: new Date().toISOString(), path: window.location.pathname },
+        ].slice(-100);
+      }
+
+      return {
+        ...prev,
+        enquiryCart: newCart,
+        eventLog: newEventLog,
+      };
+    });
   }, []);
 
   const logCTAEvent = React.useCallback((label: string) => {
@@ -195,7 +210,7 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       eventLog: [
         ...prev.eventLog,
         { label, timestamp: new Date().toISOString(), path: window.location.pathname },
-      ],
+      ].slice(-100),
     }));
   }, []);
 
@@ -217,6 +232,13 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.removeItem('bp_lead_tracker');
   }, []);
 
+  const clearEnquiryCart = React.useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      enquiryCart: [],
+    }));
+  }, []);
+
   return (
     <LeadTrackerContext.Provider
       value={{
@@ -227,6 +249,7 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         removeFromEnquiry,
         logCTAEvent,
         updatePartialLead,
+        clearEnquiryCart,
         clearTrackingData,
       }}
     >

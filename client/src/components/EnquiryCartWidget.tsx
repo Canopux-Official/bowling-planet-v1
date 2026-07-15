@@ -7,7 +7,7 @@ import { theme } from '../theme';
 import { apiClient } from '../services/apiClient';
 
 export const EnquiryCartWidget: React.FC = () => {
-  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent } = useLeadTracker();
+  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent, clearEnquiryCart } = useLeadTracker();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingQuick, setIsProcessingQuick] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -61,9 +61,16 @@ export const EnquiryCartWidget: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone) return;
+    if (!formData.name || !formData.phone) {
+      alert("Please provide your Full Name and Phone Number so our team can assist you better via WhatsApp.");
+      return;
+    }
+
+    // SYNCHRONOUSLY open the popup before any await to prevent browser blockers
+    const whatsappWindow = window.open('about:blank', '_blank');
 
     setIsSubmitting(true);
+    const submitEvent = { label: 'Submit Lead (Enquiry Cart)', timestamp: new Date().toISOString(), path: window.location.pathname }
     logCTAEvent('Submit Lead (Enquiry Cart)');
 
     // 1. Send data to admin dashboard CRM
@@ -81,7 +88,7 @@ export const EnquiryCartWidget: React.FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           },
           enquiryItems: state.enquiryCart,
         }),
@@ -103,13 +110,22 @@ export const EnquiryCartWidget: React.FC = () => {
 
     setTimeout(() => {
       setIsSubmitting(false);
-      window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`, '_blank');
+      if (whatsappWindow) {
+        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+      } else {
+        window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+      }
       setIsCartOpen(false);
+      clearEnquiryCart();
     }, 1000);
   };
 
   const handleQuickWhatsApp = async () => {
+    // SYNCHRONOUSLY open the popup before any await to prevent browser blockers
+    const whatsappWindow = window.open('about:blank', '_blank');
+
     setIsProcessingQuick(true);
+    const submitEvent = { label: 'Quick WhatsApp Clicked (Enquiry Cart)', timestamp: new Date().toISOString(), path: window.location.pathname }
     logCTAEvent('Quick WhatsApp Clicked (Enquiry Cart)');
     // 1. Save an anonymous/quick lead to CRM
     try {
@@ -123,7 +139,7 @@ export const EnquiryCartWidget: React.FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           },
           enquiryItems: state.enquiryCart,
         }),
@@ -139,17 +155,23 @@ export const EnquiryCartWidget: React.FC = () => {
     
     setTimeout(() => {
       setIsProcessingQuick(false);
-      window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`, '_blank');
+      if (whatsappWindow) {
+        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+      } else {
+        window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+      }
       setIsCartOpen(false);
+      clearEnquiryCart();
     }, 800);
   };
 
   const handleSaveForLater = async () => {
     if (!formData.email && !formData.phone) {
-      alert("Please enter at least an email or phone number to save your cart.");
+      alert("Please enter at least an email or phone number so we can securely save your cart for later.");
       return;
     }
     
+    const submitEvent = { label: 'Save Cart For Later Clicked', timestamp: new Date().toISOString(), path: window.location.pathname }
     logCTAEvent('Save Cart For Later Clicked');
     setSaveSuccess(true);
     
@@ -167,7 +189,7 @@ export const EnquiryCartWidget: React.FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           },
           enquiryItems: state.enquiryCart,
         }),

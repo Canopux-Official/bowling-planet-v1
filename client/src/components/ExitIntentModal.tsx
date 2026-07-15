@@ -11,15 +11,18 @@ const ExitIntentModal: FC = () => {
   const { logCTAEvent, state } = useLeadTracker()
 
   useEffect(() => {
-    // Only show once per session
-    if (sessionStorage.getItem('bp_exit_intent_shown')) return
+    // Only show once per session, and never show if they already submitted
+    if (sessionStorage.getItem('bp_exit_intent_shown') || localStorage.getItem('bp_exit_intent_submitted')) return
 
     const handleMouseLeave = (e: MouseEvent) => {
+      if (sessionStorage.getItem('bp_exit_intent_shown') || localStorage.getItem('bp_exit_intent_submitted')) return
+
       // If mouse moves up towards the address bar/close button
       if (e.clientY <= 0) {
         setShow(true)
         sessionStorage.setItem('bp_exit_intent_shown', 'true')
         logCTAEvent('Exit Intent Modal Shown')
+        document.removeEventListener('mouseleave', handleMouseLeave)
       }
     }
 
@@ -31,8 +34,10 @@ const ExitIntentModal: FC = () => {
     e.preventDefault()
     if (!email) return
 
+    const submitEvent = { label: 'Exit Intent Modal Submitted', timestamp: new Date().toISOString(), path: window.location.pathname }
     setSubmitted(true)
     logCTAEvent('Exit Intent Modal Submitted')
+    localStorage.setItem('bp_exit_intent_submitted', 'true')
     
     // Save as partial lead
     try {
@@ -46,7 +51,7 @@ const ExitIntentModal: FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           },
           enquiryItems: state.enquiryCart,
         }),

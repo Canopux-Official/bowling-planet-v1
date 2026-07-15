@@ -30,7 +30,17 @@ const ContactPage: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!form.name || !form.email || !form.message) {
+      alert("Please provide your Name, Email, and a Message so our team knows how best to assist you.")
+      return
+    }
+
     setIsSubmitting(true)
+    
+    const submitEvent = { label: 'Contact Form Submitted', timestamp: new Date().toISOString(), path: window.location.pathname }
+    logCTAEvent('Contact Form Submitted')
+
     try {
       await apiClient('/leads', {
         method: 'POST',
@@ -44,7 +54,7 @@ const ContactPage: FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           },
           enquiryItems: state.enquiryCart,
         }),
@@ -251,7 +261,6 @@ const ContactPage: FC = () => {
                     <label style={labelStyle}>Full Name *</label>
                     <input
                       type="text"
-                      required
                       placeholder="Rahul Sharma"
                       value={form.name}
                       onChange={update('name')}
@@ -266,7 +275,6 @@ const ContactPage: FC = () => {
                       <label style={labelStyle}>Email Address *</label>
                       <input
                         type="email"
-                        required
                         placeholder="rahul@example.com"
                         value={form.email}
                         onChange={update('email')}
@@ -305,7 +313,6 @@ const ContactPage: FC = () => {
                   <div style={{ marginBottom: 32 }}>
                     <label style={labelStyle}>How can we help? *</label>
                     <textarea
-                      required
                       placeholder="Tell us about your project, timeline, or any questions you have..."
                       value={form.message}
                       onChange={update('message')}

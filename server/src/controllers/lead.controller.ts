@@ -43,6 +43,7 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
     // SECURITY: status and isPartial are always set by the server, never the client
     const leadData = {
       name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems,
+      location: { ip },
       status: 'New' as const,
       isPartial: false,
     };
@@ -89,16 +90,28 @@ export const savePartialLead = async (req: Request, res: Response): Promise<void
 
     const leadData = {
       name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems,
+      location: { ip },
       status: 'Abandoned' as const,
       isPartial: true,
     };
 
     if (sessionId) {
-      await Lead.findOneAndUpdate(
-        { sessionId },
-        { ...leadData, sessionId },
-        { new: true, upsert: true }
-      );
+      const existingLead = await Lead.findOne({ sessionId });
+      
+      if (existingLead && !existingLead.isPartial) {
+        // Lead is already a full lead. Do not downgrade status to Abandoned or isPartial to true.
+        await Lead.findOneAndUpdate(
+          { sessionId },
+          { name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems, location: { ip } },
+          { new: true }
+        );
+      } else {
+        await Lead.findOneAndUpdate(
+          { sessionId },
+          { ...leadData, sessionId },
+          { new: true, upsert: true }
+        );
+      }
     } else {
       const lead = new Lead(leadData);
       await lead.save();

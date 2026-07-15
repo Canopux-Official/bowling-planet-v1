@@ -72,7 +72,14 @@ const FranchiseApply: FC = () => {
 
   const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!form.firstName || !form.lastName || !form.email || !form.phone) {
+      alert("Please fill in your complete details (Name, Email, and Phone) so our team can reach out to you properly.")
+      return
+    }
+
     setIsSubmitting(true)
+    const submitEvent = { label: 'Franchise Form Step 1 Completed', timestamp: new Date().toISOString(), path: window.location.pathname }
     logCTAEvent('Franchise Form Step 1 Completed')
 
     try {
@@ -87,7 +94,7 @@ const FranchiseApply: FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           }
         }),
       })
@@ -101,7 +108,14 @@ const FranchiseApply: FC = () => {
 
   const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!form.city || !form.investment) {
+      alert("Please let us know your City and Investment Range so we can tailor the best franchise opportunity for you.")
+      return
+    }
+
     setIsSubmitting(true)
+    const submitEvent = { label: 'Franchise Form Step 2 Completed', timestamp: new Date().toISOString(), path: window.location.pathname }
     logCTAEvent('Franchise Form Step 2 Completed')
 
     try {
@@ -118,7 +132,7 @@ const FranchiseApply: FC = () => {
           sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
-            eventLog: state.eventLog,
+            eventLog: [...state.eventLog, submitEvent],
           }
         }),
       })
@@ -194,7 +208,6 @@ const FranchiseApply: FC = () => {
                     <label style={labelStyle}>First Name *</label>
                     <input
                       type="text"
-                      required
                       placeholder="Rahul"
                       value={form.firstName}
                       onChange={update('firstName')}
@@ -207,7 +220,6 @@ const FranchiseApply: FC = () => {
                     <label style={labelStyle}>Last Name *</label>
                     <input
                       type="text"
-                      required
                       placeholder="Sharma"
                       value={form.lastName}
                       onChange={update('lastName')}
@@ -224,7 +236,6 @@ const FranchiseApply: FC = () => {
                     <label style={labelStyle}>Email *</label>
                     <input
                       type="email"
-                      required
                       placeholder="rahul@example.com"
                       value={form.email}
                       onChange={update('email')}
@@ -237,7 +248,6 @@ const FranchiseApply: FC = () => {
                     <label style={labelStyle}>Phone *</label>
                     <input
                       type="tel"
-                      required
                       placeholder="+91 98765 43210"
                       value={form.phone}
                       onChange={update('phone')}
@@ -271,7 +281,6 @@ const FranchiseApply: FC = () => {
                     <label style={labelStyle}>Your City *</label>
                     <input
                       type="text"
-                      required
                       placeholder="Mumbai, Delhi, Pune..."
                       value={form.city}
                       onChange={update('city')}
@@ -283,7 +292,6 @@ const FranchiseApply: FC = () => {
                   <div>
                     <label style={labelStyle}>Investment Range *</label>
                     <select
-                      required
                       value={form.investment}
                       onChange={update('investment')}
                       onFocus={() => setFocused('investment')}
