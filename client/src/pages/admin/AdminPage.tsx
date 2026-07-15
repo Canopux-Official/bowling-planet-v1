@@ -59,7 +59,6 @@ export default function AdminPage() {
 
         {/* Placeholders for future views */}
         <Route path="media" element={<MediaManagement/>} />
-        <Route path="directory" element={<div style={{ padding: 24 }}>Admin Directory (Coming Soon)</div>} />
 
         {/* Catch-all redirect back to dashboard */}
         <Route path="*" element={<Navigate to="/admin" replace />} />

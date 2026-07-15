@@ -27,6 +27,13 @@ export const authApi = {
     })
   },
 
+  async updateProfile(data: { name: string }) {
+    return apiClient('/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  },
+
   async logout() {
     return apiClient('/auth/logout', {
       method: 'POST'

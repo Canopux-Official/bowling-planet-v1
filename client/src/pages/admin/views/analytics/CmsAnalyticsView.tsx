@@ -1,153 +1,306 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { theme } from '../../../../theme';
 import { leadService } from '../leads/lead.service';
 import { useToast } from '../../components/Toast';
-import { BarChart3, TrendingUp, Users, MousePointerClick, RefreshCcw } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend
+} from 'recharts';
+import { Users, TrendingUp, MousePointerClick, Smartphone } from 'lucide-react';
 
-export const CmsAnalyticsView: React.FC = () => {
-  const [leads, setLeads] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
-
-  const fetchLeads = async () => {
-    setLoading(true);
-    try {
-      const res = await leadService.getAll();
-      setLeads(Array.isArray(res) ? res : res?.data || []);
-    } catch (err) {
-      showToast('error', 'Failed to load analytics data');
-    } finally {
-      setLoading(false);
+// ─── Responsive grid CSS injected once ────────────────────────────────────────
+const ANALYTICS_STYLE = `
+  .analytics-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  .analytics-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 1024px) {
+    .analytics-grid-2 {
+      grid-template-columns: 1fr;
     }
-  };
+    .analytics-grid-4 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .analytics-grid-4 {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .analytics-grid-2 {
+      gap: 16px;
+    }
+  }
+`;
 
-  useEffect(() => {
-    fetchLeads();
-  }, []);
-
-  const stats = useMemo(() => {
-    const totalLeads = leads.length;
-    const closedLeads = leads.filter(l => l.status === 'Closed').length;
-    const abandonedForms = leads.filter(l => l.isPartial).length;
-    const newLeads = leads.filter(l => l.status === 'New').length;
-
-    let totalEvents = 0;
-    let returningVisitors = 0;
-    const ctaCounts: Record<string, number> = {};
-    const sources: Record<string, number> = {};
-
-    leads.forEach(l => {
-      if (l.behavior?.isReturningVisitor) returningVisitors++;
-      
-      // Secondary data: Sources
-      const src = l.utm?.source || 'Direct';
-      sources[src] = (sources[src] || 0) + 1;
-
-      // Secondary data: Event clicks
-      if (l.behavior?.eventLog) {
-        totalEvents += l.behavior.eventLog.length;
-        l.behavior.eventLog.forEach((ev: any) => {
-          ctaCounts[ev.label] = (ctaCounts[ev.label] || 0) + 1;
-        });
-      }
-    });
-
-    const topCTAs = Object.entries(ctaCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    const conversionRate = totalLeads ? ((closedLeads / totalLeads) * 100).toFixed(1) : 0;
-
-    return { totalLeads, closedLeads, newLeads, abandonedForms, totalEvents, returningVisitors, topCTAs, sources, conversionRate };
-  }, [leads]);
-
-  if (loading) return <div style={{ padding: '32px', color: theme.colors.adminTextMuted }}>Loading analytics...</div>;
-
+// ─── Custom Tooltip component with guaranteed contrast ─────────────────────────
+const ChartTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
   return (
-    <div>
-      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 700, color: theme.colors.adminText, margin: 0 }}>Analytics & Reports</h1>
-          <p style={{ color: theme.colors.adminTextMuted, margin: '4px 0 0 0', fontSize: '14px' }}>Track primary leads and secondary interactions across the platform.</p>
+    <div style={{
+      backgroundColor: '#1E293B',
+      border: '1px solid #334155',
+      borderRadius: '10px',
+      padding: '10px 14px',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+      minWidth: '120px',
+    }}>
+      {label && (
+        <div style={{ color: '#94A3B8', fontSize: '11px', marginBottom: '6px', fontWeight: 500 }}>
+          {label}
         </div>
-        <button onClick={fetchLeads} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`, backgroundColor: theme.colors.adminSurface, color: theme.colors.adminText, cursor: 'pointer' }}>
-          <RefreshCcw size={16} /> Refresh
-        </button>
-      </div>
-
-      {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-        <StatCard title="Total Leads" value={stats.totalLeads} icon={<Users size={20} color="#3B82F6" />} bg="#DBEAFE" />
-        <StatCard title="New Inquiries" value={stats.newLeads} icon={<BarChart3 size={20} color="#F59E0B" />} bg="#FEF3C7" />
-        <StatCard title="Closed Won" value={stats.closedLeads} icon={<TrendingUp size={20} color="#10B981" />} bg="#D1FAE5" />
-        <StatCard title="Conversion Rate" value={`${stats.conversionRate}%`} icon={<TrendingUp size={20} color="#8B5CF6" />} bg="#EDE9FE" />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-        
-        {/* Primary Data */}
-        <div style={{ backgroundColor: theme.colors.adminSurface, borderRadius: '12px', border: `1px solid ${theme.colors.adminBorder}`, padding: '24px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: '0 0 20px 0', borderBottom: `1px solid ${theme.colors.adminBorder}`, paddingBottom: '12px' }}>Primary Data Insights</h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: theme.colors.adminTextMuted, fontSize: '14px' }}>Abandoned Carts / Forms</span>
-              <span style={{ fontWeight: 600, color: '#EF4444' }}>{stats.abandonedForms}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: theme.colors.adminTextMuted, fontSize: '14px' }}>Returning Visitors</span>
-              <span style={{ fontWeight: 600, color: theme.colors.adminText }}>{stats.returningVisitors}</span>
-            </div>
-          </div>
-          
-          <h3 style={{ fontSize: '14px', fontWeight: 600, color: theme.colors.adminText, marginTop: '32px', marginBottom: '16px' }}>Traffic Sources</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {Object.entries(stats.sources).map(([src, count], idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ flex: 1, backgroundColor: theme.colors.adminBg, height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${(count as number / stats.totalLeads) * 100}%`, backgroundColor: theme.colors.teal, height: '100%' }} />
-                </div>
-                <div style={{ width: '80px', fontSize: '13px', color: theme.colors.adminText, textAlign: 'right' }}>{src} ({count as number})</div>
-              </div>
-            ))}
-          </div>
+      )}
+      {payload.map((p: any, i: number) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: p.color || p.fill || '#6366F1' }} />
+          <span style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: 600 }}>
+            {p.name ? `${p.name}: ` : ''}{p.value}
+          </span>
         </div>
-
-        {/* Secondary Data */}
-        <div style={{ backgroundColor: theme.colors.adminSurface, borderRadius: '12px', border: `1px solid ${theme.colors.adminBorder}`, padding: '24px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: '0 0 20px 0', borderBottom: `1px solid ${theme.colors.adminBorder}`, paddingBottom: '12px' }}>Secondary Data (CTA Tracking)</h2>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338CA' }}><MousePointerClick size={20} /></div>
-            <div>
-              <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Total Tracked Clicks</div>
-              <div style={{ fontSize: '20px', color: theme.colors.adminText, fontWeight: 700 }}>{stats.totalEvents}</div>
-            </div>
-          </div>
-
-          <h3 style={{ fontSize: '14px', fontWeight: 600, color: theme.colors.adminText, marginBottom: '16px' }}>Top Performing CTAs</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {stats.topCTAs.length > 0 ? stats.topCTAs.map(([label, count], idx) => (
-              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', backgroundColor: theme.colors.adminBg, borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}` }}>
-                <span style={{ fontSize: '13px', fontWeight: 500, color: theme.colors.adminText }}>{label}</span>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: theme.colors.teal }}>{count as number} clicks</span>
-              </div>
-            )) : (
-              <div style={{ fontSize: '13px', color: theme.colors.adminTextMuted }}>No click events tracked yet.</div>
-            )}
-          </div>
-        </div>
-
-      </div>
+      ))}
     </div>
   );
 };
 
-const StatCard = ({ title, value, icon, bg }: any) => (
-  <div style={{ backgroundColor: theme.colors.adminSurface, borderRadius: '12px', border: `1px solid ${theme.colors.adminBorder}`, padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {icon}
+// ─── Stat Card ────────────────────────────────────────────────────────────────
+const StatCard = ({ icon: Icon, label, value, color, bg }: {
+  icon: any; label: string; value: number | string; color: string; bg: string;
+}) => (
+  <div style={{
+    backgroundColor: theme.colors.adminSurface,
+    border: `1px solid ${theme.colors.adminBorder}`,
+    borderRadius: '14px',
+    padding: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+  }}>
+    <div style={{
+      width: '48px', height: '48px', borderRadius: '12px',
+      backgroundColor: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    }}>
+      <Icon size={22} color={color} />
     </div>
     <div>
-      <div style={{ fontSize: '13px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>{title}</div>
-      <div style={{ fontSize: '24px', fontWeight: 700, color: theme.colors.adminText }}>{value}</div>
+      <div style={{ fontSize: '13px', color: theme.colors.adminTextMuted, fontWeight: 500, marginBottom: '4px' }}>{label}</div>
+      <div style={{ fontSize: '26px', fontWeight: 700, color: theme.colors.adminText, lineHeight: 1 }}>{value}</div>
     </div>
   </div>
 );
+
+// ─── Chart Card wrapper ───────────────────────────────────────────────────────
+const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div style={{
+    backgroundColor: theme.colors.adminSurface,
+    borderRadius: '14px',
+    padding: '24px',
+    border: `1px solid ${theme.colors.adminBorder}`,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+    minWidth: 0, // prevents overflow in grid
+  }}>
+    <h3 style={{ fontSize: '15px', fontWeight: 700, color: theme.colors.adminText, margin: '0 0 20px 0', letterSpacing: '-0.01em' }}>
+      {title}
+    </h3>
+    <div style={{ height: '280px' }}>
+      {children}
+    </div>
+  </div>
+);
+
+const COLORS = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#3B82F6'];
+
+export const CmsAnalyticsView: React.FC = () => {
+  const { showToast } = useToast();
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const res = await leadService.getAnalytics();
+        setAnalyticsData(res?.data || null);
+      } catch (error) {
+        showToast('error', 'Failed to load analytics data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, [showToast]);
+
+  const {
+    statusData = [],
+    utmData = [],
+    dailyLeads = [],
+    eventData = [],
+    deviceData = [],
+    enquiryData = [],
+    totalLeads = 0,
+    newLeads = 0,
+    mobileLeads = 0,
+    totalEvents = 0
+  } = analyticsData || {};
+
+  // Axis tick colors — always dark enough to be visible
+  const tickStyle = { fill: '#64748B', fontSize: 11 };
+
+  if (loading) return (
+    <div style={{ padding: '32px', display: 'flex', alignItems: 'center', gap: '12px', color: theme.colors.adminTextMuted }}>
+      <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid #E2E8F0', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite' }} />
+      Loading analytics...
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Inject responsive styles */}
+      <style>{ANALYTICS_STYLE}</style>
+
+      {/* Header */}
+      <div style={{ marginBottom: '28px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 700, color: theme.colors.adminText, margin: 0, letterSpacing: '-0.02em' }}>
+          Analytics &amp; Conversions
+        </h1>
+        <p style={{ color: theme.colors.adminTextMuted, margin: '4px 0 0 0', fontSize: '14px' }}>
+          Lead sources, engagement, and behavioral data.
+        </p>
+      </div>
+
+      {/* KPI Summary Cards */}
+      <div className="analytics-grid-4">
+        <StatCard icon={Users}            label="Total Leads"    value={totalLeads}   color="#6366F1" bg="#EEF2FF" />
+        <StatCard icon={TrendingUp}       label="New Leads"      value={newLeads}     color="#10B981" bg="#ECFDF5" />
+        <StatCard icon={MousePointerClick} label="CTA Events"   value={totalEvents}  color="#F59E0B" bg="#FFFBEB" />
+        <StatCard icon={Smartphone}       label="Mobile Users"  value={mobileLeads}  color="#3B82F6" bg="#EFF6FF" />
+      </div>
+
+      {/* Row 1: Line chart + Pie chart */}
+      <div className="analytics-grid-2">
+        <ChartCard title="Leads Over Time (Last 14 Days)">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={dailyLeads} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+              <XAxis 
+                dataKey="date" 
+                tick={tickStyle} 
+                tickLine={false} 
+                axisLine={false} 
+                interval="preserveStartEnd" 
+                tickFormatter={(val) => {
+                  const d = new Date(val);
+                  return isNaN(d.getTime()) ? val : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                }}
+              />
+              <YAxis allowDecimals={false} tick={tickStyle} tickLine={false} axisLine={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Line type="monotone" dataKey="count" name="Leads" stroke="#6366F1" strokeWidth={2.5} dot={{ r: 3, fill: '#6366F1', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Lead Status Pipeline">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={statusData} cx="50%" cy="45%" innerRadius={65} outerRadius={100} paddingAngle={4} dataKey="value">
+                {statusData.map((_: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip content={<ChartTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                formatter={(value) => <span style={{ color: theme.colors.adminText, fontSize: '12px' }}>{value}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Row 2: Bar charts */}
+      <div className="analytics-grid-2">
+        <ChartCard title="UTM Sources (Traffic)">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={utmData} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+              <XAxis type="number" allowDecimals={false} tick={tickStyle} tickLine={false} axisLine={false} />
+              <YAxis dataKey="name" type="category" tick={tickStyle} tickLine={false} axisLine={false} width={90} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(99,102,241,0.06)' }} />
+              <Bar dataKey="value" name="Leads" fill="#8B5CF6" radius={[0, 5, 5, 0]} maxBarSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Top CTA Engagements">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={eventData} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+              <XAxis type="number" allowDecimals={false} tick={tickStyle} tickLine={false} axisLine={false} />
+              <YAxis 
+                dataKey="name" 
+                type="category" 
+                tick={tickStyle} 
+                tickLine={false} 
+                axisLine={false} 
+                width={140} 
+                tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(99,102,241,0.06)' }} />
+              <Bar dataKey="count" name="Events" fill="#6366F1" radius={[0, 5, 5, 0]} maxBarSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      {/* Row 3: Device + Locations */}
+      <div className="analytics-grid-2">
+        <ChartCard title="Device Split">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={deviceData} cx="50%" cy="45%" innerRadius={65} outerRadius={100} paddingAngle={4} dataKey="value">
+                {deviceData.map((_: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip content={<ChartTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                formatter={(value) => <span style={{ color: theme.colors.adminText, fontSize: '12px' }}>{value}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Top Enquiry Interests">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={enquiryData} layout="vertical" margin={{ top: 0, right: 16, bottom: 0, left: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+              <XAxis type="number" allowDecimals={false} tick={tickStyle} tickLine={false} axisLine={false} />
+              <YAxis 
+                dataKey="name" 
+                type="category" 
+                tick={tickStyle} 
+                tickLine={false} 
+                axisLine={false} 
+                width={140} 
+                tickFormatter={(val) => val.length > 20 ? val.substring(0, 20) + '...' : val}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(16,185,129,0.06)' }} />
+              <Bar dataKey="count" name="Enquiries" fill="#10B981" radius={[0, 5, 5, 0]} maxBarSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+    </div>
+  );
+};

@@ -5,6 +5,8 @@
 import { type FC, useState } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
+import { apiClient } from '../../../services/apiClient'
 
 interface FormData {
   firstName: string
@@ -54,21 +56,79 @@ const labelStyle: React.CSSProperties = {
 const FranchiseApply: FC = () => {
   const headRef = useReveal()
   const formRef = useReveal()
+  const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [focused, setFocused] = useState<string | null>(null)
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', email: '', phone: '',
     city: '', investment: '', message: '',
   })
+  
+  const { state, logCTAEvent } = useLeadTracker()
 
   const update = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleStep1Submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: integrate with backend / email service
-    console.log('Franchise application:', form)
-    setSubmitted(true)
+    setIsSubmitting(true)
+    logCTAEvent('Franchise Form Step 1 Completed')
+
+    try {
+      await apiClient('/leads/partial', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: `${form.firstName} ${form.lastName}`,
+          phone: form.phone,
+          email: form.email,
+          utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
+          behavior: {
+            isReturningVisitor: state.isReturningVisitor,
+            eventLog: state.eventLog,
+          }
+        }),
+      })
+    } catch (err) {
+      console.error('Failed to save partial lead', err)
+    } finally {
+      setIsSubmitting(false)
+      setStep(2)
+    }
+  }
+
+  const handleStep2Submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    logCTAEvent('Franchise Form Step 2 Completed')
+
+    try {
+      await apiClient('/leads', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: `${form.firstName} ${form.lastName}`,
+          phone: form.phone,
+          email: form.email,
+          city: form.city,
+          businessDetails: `Investment: ${form.investment} | Message: ${form.message}`,
+          utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
+          behavior: {
+            isReturningVisitor: state.isReturningVisitor,
+            eventLog: state.eventLog,
+          }
+        }),
+      })
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Failed to submit full lead', err)
+      alert("Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -121,9 +181,13 @@ const FranchiseApply: FC = () => {
                 Thank you for your interest in partnering with Bowling Planet. Our team will contact you within 24 hours.
               </p>
             </div>
-          ) : (
+          ) : step === 1 ? (
             <div className="glass-card apply-card" style={{ padding: '48px', borderRadius: 24 }}>
-              <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: 32, textAlign: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: theme.colors.teal, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Step 1 of 2</span>
+                <h3 style={{ fontSize: 24, fontWeight: 700, color: theme.colors.text1, marginTop: 8, marginBottom: 0 }}>Basic Details</h3>
+              </div>
+              <form onSubmit={handleStep1Submit}>
                 {/* Name row */}
                 <div className="apply-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                   <div>
@@ -184,6 +248,23 @@ const FranchiseApply: FC = () => {
                   </div>
                 </div>
 
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', fontSize: 16, padding: '18px 32px', justifyContent: 'center' }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Next Step →'}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="glass-card apply-card" style={{ padding: '48px', borderRadius: 24, animation: 'fadeIn 0.3s ease' }}>
+              <div style={{ marginBottom: 32, textAlign: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: theme.colors.teal, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Step 2 of 2</span>
+                <h3 style={{ fontSize: 24, fontWeight: 700, color: theme.colors.text1, marginTop: 8, marginBottom: 0 }}>Business Requirements</h3>
+              </div>
+              <form onSubmit={handleStep2Submit}>
                 {/* City + Investment */}
                 <div className="apply-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                   <div>
@@ -231,13 +312,31 @@ const FranchiseApply: FC = () => {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{ width: '100%', fontSize: 16, padding: '18px 32px', justifyContent: 'center' }}
-                >
-                  Submit Application — We'll Reply in 24 Hours →
-                </button>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    style={{
+                      padding: '18px 24px',
+                      borderRadius: 12,
+                      background: 'rgba(255,255,255,0.05)',
+                      color: theme.colors.text1,
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ flex: 1, fontSize: 16, padding: '18px 32px', justifyContent: 'center' }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Submit Application — We\'ll Reply in 24 Hours →'}
+                  </button>
+                </div>
                 <p style={{ textAlign: 'center', color: theme.colors.text3, fontSize: 12, marginTop: 16, fontFamily: theme.typography.fontBody }}>
                   Your information is kept strictly confidential. No spam, ever.
                 </p>

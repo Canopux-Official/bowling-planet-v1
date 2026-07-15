@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import { Link, useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
@@ -76,6 +77,11 @@ const BlogDetailsPage: FC = () => {
 
   return (
     <main className={styles.page}>
+      <SEO 
+        title={blog.title} 
+        description={blog.excerpt || blog.title}
+        ogImage={blog.coverImage?.url}
+      />
       <BlogHeader
         title={blog.title}
         author={blog.author}

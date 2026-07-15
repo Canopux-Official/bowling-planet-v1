@@ -12,7 +12,13 @@ const FloatingWhatsApp: FC = () => {
   return (
     <a
       href={`https://wa.me/${whatsappNumber}`}
-      onClick={() => logCTAEvent('Floating WhatsApp Icon')}
+      onClick={(e) => {
+        e.preventDefault()
+        logCTAEvent('Floating WhatsApp Icon Clicked')
+        setTimeout(() => {
+          window.open(`https://wa.me/${whatsappNumber}`, '_blank')
+        }, 300)
+      }}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"

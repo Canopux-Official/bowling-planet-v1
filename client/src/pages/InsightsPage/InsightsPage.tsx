@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import SEO from '../../components/SEO'
 import BlogsColumn from './components/BlogsColumn'
 import ResourcesColumn from './components/ResourcesColumn'
 import { theme } from '../../theme'
@@ -9,6 +10,10 @@ const InsightsPage: FC = () => {
 
   return (
     <>
+      <SEO 
+        title="Insights & Resources" 
+        description="Practical notes, blogs, and downloadable tools for FEC operators, investors, and destination partners."
+      />
       {/* Hero */}
       <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
         <div className="orb orb-teal" style={{ width: 700, height: 600, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.5 }} />

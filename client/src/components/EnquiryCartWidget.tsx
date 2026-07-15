@@ -7,8 +7,9 @@ import { theme } from '../theme';
 import { apiClient } from '../services/apiClient';
 
 export const EnquiryCartWidget: React.FC = () => {
-  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead } = useLeadTracker();
+  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent } = useLeadTracker();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Sync local component state with context's partial lead
   const [formData, setFormData] = useState({
@@ -19,11 +20,14 @@ export const EnquiryCartWidget: React.FC = () => {
     businessDetails: state.partialLead.businessDetails || '',
   });
 
-  // Debounce saving to context to capture abandoned forms
+  // Keep Context in sync without hitting the backend to save API limits (Vercel Free Tier)
   useEffect(() => {
-    const handler = setTimeout(() => {
-      updatePartialLead(formData);
+    updatePartialLead(formData);
+  }, [formData, updatePartialLead]);
 
+  // ONLY hit the backend for partial saves when the user explicitly closes the cart drawer
+  useEffect(() => {
+    if (!isCartOpen) {
       if (formData.name || formData.phone || formData.email || formData.businessDetails || formData.city) {
         apiClient('/leads/partial', {
           method: 'POST',
@@ -34,6 +38,8 @@ export const EnquiryCartWidget: React.FC = () => {
             city: formData.city,
             businessDetails: formData.businessDetails,
             utm: state.utm,
+            device: state.deviceInfo,
+            sessionId: state.sessionId,
             behavior: {
               isReturningVisitor: state.isReturningVisitor,
               eventLog: state.eventLog,
@@ -44,9 +50,8 @@ export const EnquiryCartWidget: React.FC = () => {
           // ignore error for partials
         });
       }
-    }, 2000);
-    return () => clearTimeout(handler);
-  }, [formData, updatePartialLead, state.utm, state.isReturningVisitor, state.eventLog, state.enquiryCart]);
+    }
+  }, [isCartOpen]); // Intentionally ONLY listening to isCartOpen to prevent API floods
 
   const itemCount = state.enquiryCart.length;
 
@@ -58,6 +63,7 @@ export const EnquiryCartWidget: React.FC = () => {
     if (!formData.name || !formData.phone) return;
 
     setIsSubmitting(true);
+    logCTAEvent('Submit Lead (Enquiry Cart)');
 
     // 1. Send data to admin dashboard CRM
     try {
@@ -70,6 +76,8 @@ export const EnquiryCartWidget: React.FC = () => {
           city: formData.city,
           businessDetails: formData.businessDetails,
           utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
             eventLog: state.eventLog,
@@ -100,6 +108,7 @@ export const EnquiryCartWidget: React.FC = () => {
   };
 
   const handleQuickWhatsApp = async () => {
+    logCTAEvent('Quick WhatsApp Clicked (Enquiry Cart)');
     // 1. Save an anonymous/quick lead to CRM
     try {
       await apiClient('/leads', {
@@ -108,6 +117,8 @@ export const EnquiryCartWidget: React.FC = () => {
           name: 'Quick WhatsApp (No Name)',
           phone: 'Not Provided',
           utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
             eventLog: state.eventLog,
@@ -125,6 +136,44 @@ export const EnquiryCartWidget: React.FC = () => {
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`, '_blank');
     setIsCartOpen(false);
+  };
+
+  const handleSaveForLater = async () => {
+    if (!formData.email && !formData.phone) {
+      alert("Please enter at least an email or phone number to save your cart.");
+      return;
+    }
+    
+    logCTAEvent('Save Cart For Later Clicked');
+    setSaveSuccess(true);
+    
+    try {
+      await apiClient('/leads/partial', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: formData.name || 'Saved Cart Lead',
+          phone: formData.phone,
+          email: formData.email,
+          city: formData.city,
+          businessDetails: formData.businessDetails,
+          utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
+          behavior: {
+            isReturningVisitor: state.isReturningVisitor,
+            eventLog: state.eventLog,
+          },
+          enquiryItems: state.enquiryCart,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to save cart for later:', error);
+    }
+
+    setTimeout(() => {
+      setSaveSuccess(false);
+      setIsCartOpen(false);
+    }, 3000);
   };
 
   return (
@@ -458,6 +507,32 @@ export const EnquiryCartWidget: React.FC = () => {
                 >
                   Skip Details & Direct WhatsApp
                   <Send size={18} />
+                </button>
+
+                <div style={{ textAlign: 'center', color: theme.colors.text2, fontSize: '13px', margin: '4px 0' }}>— OR —</div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveForLater}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    backgroundColor: 'transparent',
+                    color: theme.colors.text1,
+                    fontWeight: 600,
+                    fontSize: '15px',
+                    border: `1px solid ${theme.colors.border}`,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    transition: 'background 0.2s ease',
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)')}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  {saveSuccess ? 'Cart Saved!' : 'Save Cart for Later'}
                 </button>
               </div>
 

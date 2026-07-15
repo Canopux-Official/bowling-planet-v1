@@ -9,7 +9,7 @@ interface AdminHeaderProps {
   sidebarOpen: boolean;
 }
 
-export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
+export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebarOpen }) => {
   const { user } = useAuth();
   const initials = user?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'A';
 
@@ -31,7 +31,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button 
           onClick={toggleSidebar}
-          className="flex lg:hidden"
+          className={`flex ${sidebarOpen ? 'lg:hidden' : ''}`}
           style={{ 
             background: 'none', border: `1px solid ${theme.colors.adminBorder}`, cursor: 'pointer', 
             padding: '7px', color: theme.colors.adminTextMuted,
@@ -41,16 +41,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
           <Menu size={18} />
         </button>
 
-        {/* Mobile Branding */}
-        <div className="flex lg:hidden items-center gap-2">
+        {/* Branding (Always on mobile, or desktop when sidebar is closed) */}
+        <div className={`flex items-center gap-2 ${sidebarOpen ? 'lg:hidden' : ''}`}>
           <img src="/logo.avif" alt="Logo" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
           <span style={{ fontWeight: 700, fontSize: '15px', color: theme.colors.adminText }}>
             {user?.role === 'SuperAdmin' ? 'SuperAdmin' : 'Admin'}
           </span>
         </div>
 
-        {/* Desktop Greeting */}
-        <div className="hidden lg:block">
+        {/* Desktop Greeting (Hidden when sidebar is closed to avoid clutter, or always show?) Let's show if there's space */}
+        <div className={`hidden lg:block ${sidebarOpen ? '' : 'lg:ml-4'}`}>
           <h2 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             Welcome back, {user?.name?.split(' ')[0] || 'Admin'} <span style={{ fontSize: '18px' }}>👋</span>
           </h2>

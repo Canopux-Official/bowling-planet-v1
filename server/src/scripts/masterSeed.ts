@@ -441,9 +441,12 @@ const seedAll = async () => {
             { label: 'Nav: Contact Us', timestamp: new Date(Date.now() - 2 * 60000).toISOString(), path: '/franchise' }
           ] 
         },
+        device: { isMobile: true, os: 'Android', browser: 'Chrome' },
+        location: { ip: '114.143.194.21', country: 'IN', region: 'MH', city: 'Mumbai' },
         enquiryItems: [{ id: 'omni-arena-vr', type: 'product' as const, title: 'Omni Arena VR' }],
         status: 'New' as const,
-        isPartial: false
+        isPartial: false,
+        sessionId: 'dummy-session-1'
       },
       {
         name: 'Aisha Singh',
@@ -459,9 +462,12 @@ const seedAll = async () => {
             { label: 'Landing: WhatsApp Us', timestamp: new Date(Date.now() - 5 * 60000).toISOString(), path: '/products' }
           ] 
         },
+        device: { isMobile: false, os: 'Mac OS', browser: 'Safari' },
+        location: { ip: '49.207.227.132', country: 'IN', region: 'KA', city: 'Bangalore' },
         enquiryItems: [{ id: 'franchise-standard', type: 'franchise' as const, title: 'Standard Franchise Tier' }],
         status: 'Contacted' as const,
-        isPartial: false
+        isPartial: false,
+        sessionId: 'dummy-session-2'
       },
       {
         name: 'David Chen',
@@ -477,9 +483,12 @@ const seedAll = async () => {
             { label: 'Contact Page: Email Sales', timestamp: new Date(Date.now() - 10 * 60000).toISOString(), path: '/contact' }
           ] 
         },
+        device: { isMobile: true, os: 'iOS', browser: 'Safari' },
+        location: { ip: '94.200.221.14', country: 'AE', region: 'DU', city: 'Dubai' },
         enquiryItems: [{ id: 'brunswick-pro-lane', type: 'product' as const, title: 'Brunswick Pro Lane' }],
         status: 'Closed' as const,
-        isPartial: false
+        isPartial: false,
+        sessionId: 'dummy-session-3'
       },
       {
         phone: '+917766554433', // Partial lead
@@ -491,7 +500,10 @@ const seedAll = async () => {
             { label: 'Landing: Start Your Project', timestamp: new Date(Date.now() - 5 * 60000).toISOString(), path: '/' }
           ] 
         },
+        device: { isMobile: false, os: 'Windows', browser: 'Edge' },
+        location: { ip: '122.161.49.2', country: 'IN', region: 'DL', city: 'New Delhi' },
         enquiryItems: [{ id: 'monster-drop', type: 'product' as const, title: 'Monster Drop' }],
+        sessionId: 'dummy-session-4'
       }
     ];
     for (const lead of leadsData) {

@@ -31,12 +31,26 @@ export interface ILead extends Document {
     eventLog: ICTAEvent[];
   };
 
+  device?: {
+    isMobile?: boolean;
+    os?: string;
+    browser?: string;
+  };
+
+  location?: {
+    ip?: string;
+    country?: string;
+    region?: string;
+    city?: string;
+  };
+
   // Enquiry Data
   enquiryItems: IEnquiryItem[];
 
   // CRM State
   status: 'New' | 'Contacted' | 'Closed' | 'Abandoned';
   isPartial: boolean; // True if it's just an abandoned/autosaved form
+  sessionId?: string;
   
   createdAt: Date;
   updatedAt: Date;
@@ -67,6 +81,19 @@ const LeadSchema: Schema = new Schema(
       ],
     },
 
+    device: {
+      isMobile: { type: Boolean },
+      os: { type: String },
+      browser: { type: String },
+    },
+
+    location: {
+      ip: { type: String },
+      country: { type: String },
+      region: { type: String },
+      city: { type: String },
+    },
+
     enquiryItems: [
       {
         id: { type: String },
@@ -82,6 +109,8 @@ const LeadSchema: Schema = new Schema(
     },
     
     isPartial: { type: Boolean, default: false },
+    // SECURITY: unique prevents race-condition duplicates; sparse allows multiple null values
+    sessionId: { type: String, required: false, index: true, unique: true, sparse: true },
   },
   {
     timestamps: true, // Automatically manages createdAt and updatedAt

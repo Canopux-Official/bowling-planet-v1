@@ -5,8 +5,7 @@ import {
   LayoutDashboard, 
   Users, 
   LayoutTemplate, 
-  Image, 
-  ShieldCheck,
+  Image,
   User,
   X,
   ChevronRight,
@@ -25,7 +24,6 @@ const navItems = [
   { label: 'CRM & Leads', path: '/admin/leads', icon: Users, exact: false },
   { label: 'Content (CMS)', path: '/admin/cms', icon: LayoutTemplate, exact: false },
   { label: 'Media Library', path: '/admin/media', icon: Image, exact: false },
-  { label: 'Admin Directory', path: '/admin/directory', icon: ShieldCheck, exact: false },
   { label: 'Profile Settings', path: '/admin/profile', icon: User, exact: false },
 ];
 

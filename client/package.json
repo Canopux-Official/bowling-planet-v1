@@ -26,10 +26,12 @@
     "libphonenumber-js": "^1.13.8",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^19.2.7",
     "react-helmet-async": "^3.0.0",
     "react-phone-number-input": "^3.4.17",
     "react-router-dom": "^7.18.1",
+    "recharts": "^3.9.2",
     "three": "^0.185.1"
   },
   "devDependencies": {

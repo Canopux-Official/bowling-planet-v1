@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Filter, Eye, Trash2, Smartphone, Monitor, Loader2, ChevronDown, MessageCircle } from 'lucide-react';
 import { theme } from '../../../../theme';
 import { useNavigate } from 'react-router-dom';
 import { leadService } from './lead.service';
 import { useToast } from '../../components/Toast';
-
 
 const getStatusColor = (status: string) => {
   switch(status) {
@@ -18,25 +17,71 @@ const getStatusColor = (status: string) => {
 
 export const LeadsView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
   const [leads, setLeads] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const filterRef = useRef<HTMLDivElement>(null);
 
-  const fetchLeads = async () => {
-    setLoading(true);
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const fetchLeads = useCallback(async (pageNum: number, isAppending: boolean) => {
+    if (!isAppending) setLoading(true);
+    else setLoadingMore(true);
+
     try {
-      const res = await leadService.getAll();
-      setLeads(Array.isArray(res) ? res : res?.data || []);
+      const res = await leadService.getAll({ 
+        page: pageNum, 
+        limit: 20, 
+        status: statusFilter, 
+        search: debouncedSearch 
+      });
+      
+      const newLeads = res.data || [];
+      const pagination = res.pagination || { pages: 1 };
+      
+      if (isAppending) {
+        setLeads(prev => [...prev, ...newLeads]);
+      } else {
+        setLeads(newLeads);
+      }
+      
+      setHasMore(pageNum < pagination.pages);
+      setPage(pageNum);
     } catch (err) {
       showToast('error', 'Failed to load leads');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [statusFilter, debouncedSearch, showToast]);
 
+  // Initial fetch or filter/search change
   useEffect(() => {
-    fetchLeads();
+    fetchLeads(1, false);
+  }, [fetchLeads]);
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -45,17 +90,17 @@ export const LeadsView: React.FC = () => {
     try {
       await leadService.delete(id);
       showToast('success', 'Lead deleted');
-      fetchLeads();
+      fetchLeads(1, false);
     } catch (err) {
       showToast('error', 'Failed to delete lead');
     }
   };
 
-  const filteredLeads = leads.filter(l => 
-    (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (l.phone || '').includes(searchTerm) ||
-    (l.city || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchLeads(page + 1, true);
+    }
+  };
 
   return (
     <div>
@@ -85,14 +130,49 @@ export const LeadsView: React.FC = () => {
               }}
             />
           </div>
-          <button style={{ 
-            display: 'flex', alignItems: 'center', gap: '8px', 
-            padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`, 
-            backgroundColor: theme.colors.adminSurface, color: '#4B5563', cursor: 'pointer',
-            fontSize: '14px', fontWeight: 500
-          }}>
-            <Filter size={16} /> Filter
-          </button>
+          
+          <div style={{ position: 'relative' }} ref={filterRef}>
+            <button 
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px', 
+                padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`, 
+                backgroundColor: theme.colors.adminSurface, color: '#4B5563', cursor: 'pointer',
+                fontSize: '14px', fontWeight: 500
+              }}>
+              <Filter size={16} /> 
+              {statusFilter === 'All' ? 'Filter' : statusFilter}
+              <ChevronDown size={14} style={{ opacity: 0.6 }} />
+            </button>
+            
+            {isFilterOpen && (
+              <div style={{ 
+                position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                backgroundColor: theme.colors.adminSurface, border: `1px solid ${theme.colors.adminBorder}`,
+                borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                width: '180px', zIndex: 10
+              }}>
+                <div style={{ padding: '8px 12px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', borderBottom: `1px solid ${theme.colors.adminBorder}` }}>
+                  Filter by Status
+                </div>
+                {['All', 'New', 'Contacted', 'Closed', 'Abandoned'].map(status => (
+                  <div 
+                    key={status}
+                    onClick={() => { setStatusFilter(status); setIsFilterOpen(false); }}
+                    style={{ 
+                      padding: '10px 16px', fontSize: '14px', color: theme.colors.adminText,
+                      cursor: 'pointer', backgroundColor: statusFilter === status ? '#F3F4F6' : 'transparent',
+                      fontWeight: statusFilter === status ? 600 : 400
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = statusFilter === status ? '#F3F4F6' : 'transparent'}
+                  >
+                    {status}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -111,13 +191,14 @@ export const LeadsView: React.FC = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>Loading leads...</td></tr>
-              ) : filteredLeads.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>No leads found.</td></tr>
+                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}><Loader2 size={24} className="animate-spin" style={{ margin: '0 auto' }} /></td></tr>
+              ) : leads.length === 0 ? (
+                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>No leads found matching your criteria.</td></tr>
               ) : (
-                filteredLeads.map((lead) => {
+                leads.map((lead) => {
                   const statusColors = getStatusColor(lead.status);
                   const isReturning = lead.behavior?.isReturningVisitor;
+                  const locString = lead.city ? lead.city : '-';
                   return (
                     <tr 
                       key={lead._id} 
@@ -134,15 +215,36 @@ export const LeadsView: React.FC = () => {
                       <td style={{ padding: '16px 24px' }}>
                         <div style={{ fontWeight: 600, color: theme.colors.adminText, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           {lead.name || 'Unknown'} 
+                          {lead.device?.isMobile === true ? <Smartphone size={14} color="#6B7280" /> : <Monitor size={14} color="#6B7280" />}
                           {isReturning && <span style={{ fontSize: '10px', backgroundColor: '#F3F4F6', padding: '2px 6px', borderRadius: '4px', color: '#4B5563' }}>Returning</span>}
                         </div>
                       </td>
                       <td style={{ padding: '16px 24px' }}>
-                        <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.phone || '-'}</div>
+                        {lead.phone ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.phone}</div>
+                            <a 
+                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              style={{ 
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
+                                textDecoration: 'none'
+                              }}
+                              title="Chat on WhatsApp"
+                            >
+                              <MessageCircle size={14} />
+                            </a>
+                          </div>
+                        ) : (
+                          <div style={{ color: '#4B5563', fontSize: '14px' }}>-</div>
+                        )}
                         {lead.email && <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>{lead.email}</div>}
                       </td>
                       <td style={{ padding: '16px 24px' }}>
-                        <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.city || '-'}</div>
+                        <div style={{ color: '#4B5563', fontSize: '14px' }}>{locString}</div>
                         <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>
                           {lead.utm?.source ? `${lead.utm.source} / ${lead.utm.medium || ''}` : 'Direct'}
                         </div>
@@ -184,6 +286,29 @@ export const LeadsView: React.FC = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Load More Section */}
+        {hasMore && !loading && (
+          <div style={{ padding: '16px', display: 'flex', justifyContent: 'center', borderTop: `1px solid ${theme.colors.adminBorder}` }}>
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '8px 24px', borderRadius: '9999px',
+                border: `1px solid ${theme.colors.adminBorder}`,
+                backgroundColor: theme.colors.adminBg,
+                color: theme.colors.adminText,
+                fontSize: '13px', fontWeight: 600,
+                cursor: loadingMore ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              {loadingMore ? <Loader2 size={16} className="animate-spin" /> : null}
+              {loadingMore ? 'Loading...' : 'Load More Leads'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,10 @@ import Footer from './Footer'
 import SplashScreen from './SplashScreen'
 import FloatingWhatsApp from './FloatingWhatsApp'
 import { EnquiryCartWidget } from './EnquiryCartWidget'
+import CookieConsent from './CookieConsent'
+import ExitIntentModal from './ExitIntentModal'
+import { useLeadTracker } from '../context/LeadTrackerContext'
+import { useEngagementTracker } from '../hooks/useEngagementTracker'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -17,6 +21,9 @@ const ScrollToTop = () => {
 }
 
 const Layout: FC = () => {
+  const { logCTAEvent } = useLeadTracker()
+  useEngagementTracker({ logEvent: logCTAEvent })
+
   return (
     <>
       <ScrollToTop />
@@ -28,6 +35,8 @@ const Layout: FC = () => {
       <Footer />
       <FloatingWhatsApp />
       <EnquiryCartWidget />
+      <CookieConsent />
+      <ExitIntentModal />
     </>
   )
 }

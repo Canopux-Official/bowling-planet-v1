@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Check } from 'lucide-react';
 
+import { isMobile, osName, browserName } from 'react-device-detect';
+
 export interface EnquiryItem {
   id: string;
   type: 'product' | 'franchise' | 'project' | 'general';
@@ -29,12 +31,20 @@ export interface PartialLeadForm {
   businessDetails?: string;
 }
 
+export interface DeviceInfo {
+  isMobile: boolean;
+  os: string;
+  browser: string;
+}
+
 interface LeadTrackerState {
   isReturningVisitor: boolean;
   utm: UTMParams;
   enquiryCart: EnquiryItem[];
   eventLog: CTAEvent[];
   partialLead: PartialLeadForm;
+  deviceInfo: DeviceInfo;
+  sessionId: string;
 }
 
 interface LeadTrackerContextType {
@@ -54,6 +64,13 @@ const initialState: LeadTrackerState = {
   enquiryCart: [],
   eventLog: [],
   partialLead: {},
+  deviceInfo: {
+    isMobile,
+    os: osName,
+    browser: browserName,
+  },
+  // SECURITY: crypto.randomUUID() — 122 bits of entropy, not predictable like Math.random()
+  sessionId: crypto.randomUUID(),
 };
 
 const LeadTrackerContext = createContext<LeadTrackerContextType | undefined>(undefined);
@@ -78,10 +95,25 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Persist state to local storage whenever it changes
+  // PERFORMANCE: Debounce localStorage writes — prevents synchronous blocking on every state change
+  // which causes measurable CLS/INP jank on mobile CPUs when eventLog grows large.
+  const persistTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    localStorage.setItem('bp_lead_tracker', JSON.stringify(state));
+    if (persistTimer.current) clearTimeout(persistTimer.current);
+    persistTimer.current = setTimeout(() => {
+      localStorage.setItem('bp_lead_tracker', JSON.stringify(state));
+    }, 800);
+    return () => {
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+    };
   }, [state]);
+
+  // Cleanup animation timer on unmount to prevent state updates on unmounted component
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   // Capture UTM parameters from URL on initial load or route change
   useEffect(() => {
@@ -102,21 +134,17 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [location.search]);
 
-  const addToEnquiry = (item: EnquiryItem) => {
+  const addToEnquiry = React.useCallback((item: EnquiryItem) => {
     const isExisting = state.enquiryCart.some((i) => i.id === item.id);
     const wasAdded = !isExisting;
 
     setState((prev) => {
       if (isExisting) {
-        // Toggle behavior: remove if it exists
         return {
           ...prev,
           enquiryCart: prev.enquiryCart.filter((i) => i.id !== item.id),
         };
       } else {
-        // Add if it doesn't exist
-        // Use prev to ensure no race conditions if multiple items added rapidly
-        // (Though isExisting check above might be slightly stale if rapid clicked, it's fine for UI)
         if (prev.enquiryCart.some((i) => i.id === item.id)) return prev;
         return {
           ...prev,
@@ -126,30 +154,42 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
 
     if (wasAdded) {
-      // Trigger animation only when added
       const newId = Date.now();
       setAnimationData({ item, id: newId });
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         setAnimationData((prev) => (prev.id === newId ? { item: null, id: 0 } : prev));
-        // Automatically open the cart drawer once the animation finishes
         setIsCartOpen(true);
       }, 2500);
 
-      logCTAEvent(`Added to Enquiry: ${item.title} (${item.type})`);
+      // We cannot call logCTAEvent here easily if they are both useCallbacks without deps, 
+      // but logCTAEvent uses setState(prev), so it's fine to just define it above or inline.
+      setState((prev) => ({
+        ...prev,
+        eventLog: [
+          ...prev.eventLog,
+          { label: `Added to Enquiry: ${item.title} (${item.type})`, timestamp: new Date().toISOString(), path: window.location.pathname },
+        ],
+      }));
     } else {
-      logCTAEvent(`Removed from Enquiry: ${item.title} (${item.type})`);
+      setState((prev) => ({
+        ...prev,
+        eventLog: [
+          ...prev.eventLog,
+          { label: `Removed from Enquiry: ${item.title} (${item.type})`, timestamp: new Date().toISOString(), path: window.location.pathname },
+        ],
+      }));
     }
-  };
+  }, [state.enquiryCart]);
 
-  const removeFromEnquiry = (id: string) => {
+  const removeFromEnquiry = React.useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
       enquiryCart: prev.enquiryCart.filter((item) => item.id !== id),
     }));
-  };
+  }, []);
 
-  const logCTAEvent = (label: string) => {
+  const logCTAEvent = React.useCallback((label: string) => {
     setState((prev) => ({
       ...prev,
       eventLog: [
@@ -157,19 +197,25 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         { label, timestamp: new Date().toISOString(), path: window.location.pathname },
       ],
     }));
-  };
+  }, []);
 
-  const updatePartialLead = (data: Partial<PartialLeadForm>) => {
-    setState((prev) => ({
-      ...prev,
-      partialLead: { ...prev.partialLead, ...data },
-    }));
-  };
+  const updatePartialLead = React.useCallback((data: Partial<PartialLeadForm>) => {
+    setState((prev) => {
+      // Only update if something actually changed to prevent unnecessary re-renders
+      const hasChanges = Object.keys(data).some(key => prev.partialLead[key as keyof PartialLeadForm] !== data[key as keyof PartialLeadForm]);
+      if (!hasChanges) return prev;
+      
+      return {
+        ...prev,
+        partialLead: { ...prev.partialLead, ...data },
+      };
+    });
+  }, []);
 
-  const clearTrackingData = () => {
+  const clearTrackingData = React.useCallback(() => {
     setState(initialState);
     localStorage.removeItem('bp_lead_tracker');
-  };
+  }, []);
 
   return (
     <LeadTrackerContext.Provider

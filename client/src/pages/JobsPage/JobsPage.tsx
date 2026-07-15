@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import ErrorState from '../../components/common/ErrorState'
 import JobFilters, { type JobFilterState } from './components/JobFilters'
 import JobGrid from './components/JobGrid'
@@ -72,6 +73,10 @@ const JobsPage: FC = () => {
 
   return (
     <>
+      <SEO 
+        title="Careers & Jobs" 
+        description="Join Bowling Planet and build India's best entertainment destinations. Explore our open roles."
+      />
       {/* Hero */}
       <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
         <div className="orb orb-teal" style={{ width: 700, height: 600, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.5 }} />

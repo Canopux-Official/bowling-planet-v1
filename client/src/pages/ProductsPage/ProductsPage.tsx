@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import ProductsFilters, { type ProductsFilterState } from './components/ProductsFilters'
 import BaseProductGrid from './components/BaseProductGrid'
 import Pagination from './components/Pagination'
@@ -37,6 +38,10 @@ const ProductsPage: FC = () => {
 
   return (
     <>
+      <SEO 
+        title="Products & Equipment" 
+        description="Explore our world-class entertainment products and equipment for your FEC."
+      />
       {/* Hero */}
       <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
         <div className="orb orb-teal" style={{ width: 700, height: 600, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.5 }} />

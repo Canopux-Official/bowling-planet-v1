@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import { Link, useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
@@ -75,6 +76,10 @@ const ProjectDetailsPage: FC = () => {
 
   return (
     <main className={styles.page}>
+      <SEO 
+        title={project.title} 
+        description={project.description || `Read about the ${project.title} project`}
+      />
       <ProjectHero
         title={project.title}
         description={project.description}

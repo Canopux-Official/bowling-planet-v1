@@ -4,7 +4,14 @@ dotenv.config();
 // ------------------------------------------------------------------
 // 1. ENV VALIDATION — fail fast before anything else loads
 // ------------------------------------------------------------------
-const REQUIRED_ENV = ["MONGO_URI", "ALLOWED_ORIGINS"];
+const REQUIRED_ENV = [
+  'MONGO_URI',
+  'ALLOWED_ORIGINS',
+  'JWT_SECRET',
+  'JWT_REFRESH_SECRET',
+  'ADMIN_SECRET',
+  'API_SECRET',
+];
 const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missingEnv.length) {
   console.error(`[App] ❌ Missing required env vars: ${missingEnv.join(", ")}`);
@@ -32,6 +39,8 @@ import franchisePageRoutes from './routes/franchisePage.routes';
 import leadRoutes from './routes/lead.routes';
 import { apiSecretMiddleware } from './middleware/apiSecretMiddleware';
 
+import seoRoutes from './routes/seo.routes';
+
 const app = express();
 
 // ------------------------------------------------------------------
@@ -45,6 +54,9 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
+
+// Mount SEO routes before CORS and API Secret so crawlers can access it directly
+app.use('/', seoRoutes);
 
 // ------------------------------------------------------------------
 // 3. CORS — only allow your own front-end origins.

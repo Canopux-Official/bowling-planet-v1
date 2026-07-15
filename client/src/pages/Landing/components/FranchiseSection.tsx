@@ -38,7 +38,7 @@ const HIGHLIGHTS = [
 
 const FranchiseSection: FC = () => {
   const ref = useReveal()
-  const { state, addToEnquiry } = useLeadTracker()
+  const { state, addToEnquiry, logCTAEvent } = useLeadTracker()
   const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
 
   return (

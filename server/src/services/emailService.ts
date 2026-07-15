@@ -85,3 +85,80 @@ export const sendOtpEmail = async (email: string, otp: string, purpose: 'signup'
     throw new Error('Failed to send OTP email');
   }
 };
+
+export const sendLeadNotification = async (leadData: any) => {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.SUPERADMIN_EMAIL;
+    const user = process.env.MAIL_USER || process.env.SMTP_USER;
+
+    if (!adminEmail || !user) {
+      console.warn('[EmailService] SMTP credentials or ADMIN_EMAIL not configured, skipping email notification.');
+      return;
+    }
+
+    const { name, phone, email, city, businessDetails, enquiryItems, utm } = leadData;
+
+    let enquiryDetails = '';
+    if (enquiryItems && enquiryItems.length > 0) {
+      enquiryDetails = `
+      <h3>Enquiry Interests:</h3>
+      <ul>
+        ${enquiryItems.map((item: any) => `<li>${item.title}</li>`).join('')}
+      </ul>`;
+    }
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h2 style="color: #0d9488;">New Lead Received!</h2>
+        <p>A new lead has just submitted their details.</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tr style="background: #f0fdfa;">
+            <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold; width: 30%;">Name</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${name || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Phone</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${phone || 'N/A'}</td>
+          </tr>
+          <tr style="background: #f0fdfa;">
+            <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Email</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${email || 'N/A'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">City</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${city || 'N/A'}</td>
+          </tr>
+          ${businessDetails ? `
+          <tr style="background: #f0fdfa;">
+            <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Business Details</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${businessDetails}</td>
+          </tr>
+          ` : ''}
+        </table>
+
+        ${enquiryDetails}
+
+        <p style="margin-top: 30px; font-size: 12px; color: #9CA3AF;">
+          Source: ${utm?.source || 'Direct/Organic'} | Medium: ${utm?.medium || 'N/A'} <br/>
+          <em>You can view the full lead details in the Admin Dashboard CRM.</em>
+        </p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: {
+        name: 'Bowling Planet Admin',
+        address: user as string
+      },
+      to: adminEmail,
+      subject: `🚨 New Lead: ${name || 'Someone'} (${city || 'Unknown Location'})`,
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`[EmailService] Admin notification sent successfully to ${adminEmail}`);
+  } catch (error) {
+    console.error('[EmailService] Failed to send admin email notification:', error);
+  }
+};

@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import ErrorState from '../../components/common/ErrorState'
 import ProjectFilters, { type ProjectFilterState } from './components/ProjectFilters'
 import ProjectGrid from './components/ProjectGrid'
@@ -55,6 +56,10 @@ const ProjectsPage: FC = () => {
 
   return (
     <>
+      <SEO 
+        title="Our Projects" 
+        description="Explore the entertainment destinations and family entertainment centers we have built across India."
+      />
       {/* Hero */}
       <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
         <div className="orb orb-teal" style={{ width: 700, height: 600, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.5 }} />

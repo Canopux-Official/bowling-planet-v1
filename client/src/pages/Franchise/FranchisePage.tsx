@@ -3,6 +3,7 @@
  * Composed from modular franchise/ components
  */
 import { type FC, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import { franchisePageApi, type FranchisePageData } from '../../services/franchisePageApi'
 import FranchiseHero          from './components/FranchiseHero'
 import FranchiseTrustBar      from './components/FranchiseTrustBar'
@@ -33,6 +34,22 @@ const FranchisePage: FC = () => {
 
   return (
     <>
+      <SEO 
+        title="Franchise Opportunities" 
+        description="Partner with Bowling Planet and start your own world-class family entertainment center."
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": data?.faqs?.map(faq => ({
+            "@type": "Question",
+            "name": faq.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.a
+            }
+          })) || []
+        }}
+      />
       {/* 1. Hero + value props grid */}
       <FranchiseHero valueProps={data?.valueProps || []} />
 

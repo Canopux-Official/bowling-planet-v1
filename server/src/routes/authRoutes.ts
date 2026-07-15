@@ -9,8 +9,9 @@ import {
   forgotPassword,
   resetPassword,
   getMe,
+  updateProfile,
 } from '../controllers/authController';
-import { authLimiter, otpLimiter } from '../middleware/rateLimiter';
+import { authLimiter, otpLimiter, refreshLimiter } from '../middleware/rateLimiter';
 import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -26,8 +27,9 @@ router.post('/forgot-password', otpLimiter, forgotPassword);
 router.post('/reset-password', otpLimiter, resetPassword);
 
 // Token management
-router.post('/refresh-token', refreshAuthToken);
+router.post('/refresh-token', refreshLimiter, refreshAuthToken);
 router.post('/logout', logout); // In a real scenario, might also use authenticateJWT here, but refresh token is in body
 router.get('/me', authenticateJWT, getMe);
+router.put('/me', authenticateJWT, updateProfile);
 
 export default router;

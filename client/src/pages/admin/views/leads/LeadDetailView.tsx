@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, MapPin, Phone, Mail, Building } from 'lucide-react';
+import { ArrowLeft, Trash2, MapPin, Phone, Mail, Building, MessageCircle } from 'lucide-react';
 import { theme } from '../../../../theme';
 import { leadService } from './lead.service';
 import { useToast } from '../../components/Toast';
@@ -13,6 +13,7 @@ export const LeadDetailView: React.FC = () => {
   const [lead, setLead] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string>('');
+  const [visibleEvents, setVisibleEvents] = useState(5);
 
   const fetchLead = async () => {
     setLoading(true);
@@ -104,7 +105,26 @@ export const LeadDetailView: React.FC = () => {
                 <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}><Phone size={20} /></div>
                 <div>
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Phone</div>
-                  <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{lead.phone || '-'}</div>
+                  {lead.phone ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{lead.phone}</div>
+                      <a 
+                        href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        style={{ 
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
+                          textDecoration: 'none'
+                        }}
+                        title="Chat on WhatsApp"
+                      >
+                        <MessageCircle size={14} />
+                      </a>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>-</div>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -186,10 +206,12 @@ export const LeadDetailView: React.FC = () => {
             <h2 style={{ fontSize: '16px', fontWeight: 600, color: theme.colors.adminText, margin: '0 0 20px 0', borderBottom: `1px solid ${theme.colors.adminBorder}`, paddingBottom: '12px' }}>User Journey (CTA Tracking)</h2>
             {lead.behavior?.eventLog && lead.behavior.eventLog.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '12px' }}>
-                {lead.behavior.eventLog.map((ev: any, idx: number) => (
-                  <div key={idx} style={{ position: 'relative', paddingBottom: idx === lead.behavior.eventLog.length - 1 ? '0' : '24px' }}>
+                {lead.behavior.eventLog.slice(0, visibleEvents).map((ev: any, idx: number) => {
+                  const isLastVisible = idx === Math.min(visibleEvents, lead.behavior.eventLog.length) - 1;
+                  return (
+                  <div key={idx} style={{ position: 'relative', paddingBottom: isLastVisible ? '0' : '24px' }}>
                     {/* Timeline Line */}
-                    {idx !== lead.behavior.eventLog.length - 1 && (
+                    {!isLastVisible && (
                       <div style={{ position: 'absolute', left: '-1px', top: '24px', bottom: '0', width: '2px', backgroundColor: '#E2E8F0' }} />
                     )}
                     {/* Timeline Dot */}
@@ -202,7 +224,17 @@ export const LeadDetailView: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                )})}
+                {visibleEvents < lead.behavior.eventLog.length && (
+                  <button 
+                    onClick={() => setVisibleEvents(prev => prev + 5)}
+                    style={{ marginTop: '20px', padding: '8px 16px', backgroundColor: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 500, alignSelf: 'flex-start', transition: 'background-color 0.2s' }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#E5E7EB'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+                  >
+                    See More Events ({lead.behavior.eventLog.length - visibleEvents} remaining)
+                  </button>
+                )}
               </div>
             ) : (
               <div style={{ color: theme.colors.adminTextMuted, fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>No interaction events tracked for this user.</div>

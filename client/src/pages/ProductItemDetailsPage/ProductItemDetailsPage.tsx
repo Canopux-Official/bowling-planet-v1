@@ -1,4 +1,5 @@
 import { type FC, useCallback, useEffect, useState } from 'react'
+import SEO from '../../components/SEO'
 import { useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
@@ -67,6 +68,25 @@ const ProductItemDetailsPage: FC = () => {
 
   return (
     <main className={styles.page}>
+      <SEO 
+        title={item.title} 
+        description={item.description || `Details about ${item.title}`}
+        ogImage={item.thumbnail?.url}
+        schemaMarkup={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": item.title,
+          "description": item.description,
+          "image": item.thumbnail?.url,
+          ...(item.price && {
+            "offers": {
+              "@type": "Offer",
+              "price": item.price,
+              "priceCurrency": "INR"
+            }
+          })
+        }}
+      />
       <div className={styles.inner}>
         <ItemParentLink baseProduct={item.baseProduct} />
         <ItemHeader

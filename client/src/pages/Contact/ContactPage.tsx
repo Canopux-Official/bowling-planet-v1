@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react'
+import SEO from '../../components/SEO'
 import { theme } from '../../theme'
 import { useReveal } from '../../hooks/useReveal'
 import { apiClient } from '../../services/apiClient'
@@ -38,6 +39,8 @@ const ContactPage: FC = () => {
           phone: form.phone,
           businessDetails: form.company ? `Company: ${form.company}\nMessage: ${form.message}` : form.message,
           utm: state.utm,
+          device: state.deviceInfo,
+          sessionId: state.sessionId,
           behavior: {
             isReturningVisitor: state.isReturningVisitor,
             eventLog: state.eventLog,
@@ -80,6 +83,10 @@ const ContactPage: FC = () => {
 
   return (
     <div style={{ background: theme.colors.void, minHeight: '100vh', paddingTop: 80, paddingBottom: 120 }}>
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with Bowling Planet for franchise inquiries, turnkey FEC solutions, and equipment purchases."
+      />
       {/* Background Elements */}
       <div className="orb orb-teal" style={{ width: 600, height: 600, top: '10%', left: '-10%', opacity: 0.5 }} />
       <div className="orb orb-purple" style={{ width: 800, height: 800, top: '40%', right: '-20%', opacity: 0.3 }} />

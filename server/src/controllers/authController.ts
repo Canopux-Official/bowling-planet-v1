@@ -7,7 +7,9 @@ import { createOrUpdateOtp, verifyOtp } from '../services/otpService';
 import { sendOtpEmail } from '../services/emailService';
 import crypto from 'crypto';
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'fallback_admin_secret_do_not_use';
+// SECURITY: No fallback — process.exit(1) in server.ts REQUIRED_ENV check fires before this loads.
+const ADMIN_SECRET = process.env.ADMIN_SECRET!;
+
 
 const sendTokenResponse = async (user: any, res: Response, message: string) => {
   const accessToken = generateAccessToken(user._id as any, user.role);
@@ -98,8 +100,9 @@ export const signupAdmin = async (req: Request, res: Response): Promise<void> =>
     await sendOtpEmail(user.email, otp, 'signup');
 
     res.status(201).json({ message: 'Signup successful. Please verify your email with the OTP sent.' });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] signupAdmin error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -132,8 +135,11 @@ export const verifyUserOtp = async (req: Request, res: Response): Promise<void> 
 
       await sendTokenResponse(user, res, 'Login successful');
     }
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] verifyUserOtp error:', error);
+    // Surface OTP-specific errors (e.g. 'Invalid OTP', 'Maximum attempts reached') to the user
+    const msg = error instanceof Error ? error.message : 'Verification failed';
+    res.status(400).json({ message: msg });
   }
 };
 
@@ -156,8 +162,9 @@ export const resendOtp = async (req: Request, res: Response): Promise<void> => {
     await sendOtpEmail(user.email, otp, purpose as 'signup' | 'reset-password', true);
 
     res.status(200).json({ message: 'A new OTP has been sent to your email.' });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] resendOtp error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -205,8 +212,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: 'Login OTP sent',
       step: 'OTP'
     });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] login error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -269,8 +277,9 @@ export const refreshAuthToken = async (req: Request, res: Response): Promise<voi
     }
 
     await sendTokenResponse(user, res, 'Tokens refreshed');
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] refreshAuthToken error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -289,8 +298,9 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.status(200).json({ message: 'Logged out successfully' });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] logout error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -314,8 +324,9 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     await sendOtpEmail(user.email, otp, 'reset-password');
 
     res.status(200).json({ message: 'If that email address is in our database, we will send you an email to reset your password.' });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] forgotPassword error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -347,8 +358,10 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     );
 
     res.status(200).json({ message: 'Password reset successfully. You can now login with your new password.' });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] resetPassword error:', error);
+    const msg = error instanceof Error ? error.message : 'Reset failed';
+    res.status(400).json({ message: msg });
   }
 };
 
@@ -374,7 +387,43 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
         role: fullUser.role
       }
     });
-  } catch (error: any) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } catch (error: unknown) {
+    console.error('[Auth] getMe error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = req.user as any;
+    if (!user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const { name } = req.body;
+    if (!name) {
+      res.status(400).json({ message: 'Name is required' });
+      return;
+    }
+
+    const fullUser = await User.findByIdAndUpdate(user.userId, { name }, { new: true });
+    if (!fullUser) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        id: fullUser._id,
+        name: fullUser.name,
+        email: fullUser.email,
+        role: fullUser.role
+      }
+    });
+  } catch (error: unknown) {
+    console.error('[Auth] updateProfile error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
