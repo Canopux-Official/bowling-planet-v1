@@ -180,6 +180,7 @@ export const EnquiryCartWidget: React.FC = () => {
     <>
       {/* Floating Action Button */}
       <button
+        className="floating-widget"
         onClick={() => setIsCartOpen(true)}
         style={{
           position: 'fixed',

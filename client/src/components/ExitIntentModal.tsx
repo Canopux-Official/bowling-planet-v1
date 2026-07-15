@@ -75,14 +75,15 @@ const ExitIntentModal: FC = () => {
       animation: 'fadeIn 0.3s ease',
       padding: '24px'
     }}>
-      <div className="glass-card" style={{
+      <div className="exit-intent-card" style={{
         position: 'relative',
         maxWidth: 500,
         width: '100%',
-        padding: '40px',
         borderRadius: 24,
         textAlign: 'center',
-        boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px ${theme.colors.teal}30`,
+        backgroundColor: theme.colors.surface,
+        border: `1px solid ${theme.colors.border}`,
+        boxShadow: `0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px ${theme.colors.teal}30`,
       }}>
         <button
           onClick={() => {
@@ -105,50 +106,33 @@ const ExitIntentModal: FC = () => {
 
         {submitted ? (
           <div>
-            <h3 className="font-display" style={{ color: theme.colors.text1, fontSize: 24, marginBottom: 12 }}>
+            <h3 className="font-display exit-intent-title">
               Check your inbox!
             </h3>
-            <p style={{ color: theme.colors.text2, fontSize: 16 }}>
+            <p className="exit-intent-desc" style={{ marginBottom: 0 }}>
               We'll send you our expert guide on starting a successful Bowling Center shortly.
             </p>
           </div>
         ) : (
           <div>
-            <h3 className="font-display" style={{ color: theme.colors.text1, fontSize: 28, marginBottom: 16, lineHeight: 1.2 }}>
+            <h3 className="font-display exit-intent-title">
               Wait! Don't leave without our <span className="text-gradient">Free Guide</span>
             </h3>
-            <p style={{ color: theme.colors.text2, fontSize: 16, marginBottom: 32 }}>
+            <p className="exit-intent-desc">
               Enter your email to receive our comprehensive guide on setting up a highly profitable Bowling & FEC Center.
             </p>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12 }}>
+            <form onSubmit={handleSubmit} className="exit-intent-form">
               <input
                 type="email"
                 required
                 placeholder="Your email address"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '14px 20px',
-                  borderRadius: 12,
-                  border: `1px solid ${theme.colors.border}`,
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  color: theme.colors.text1,
-                  fontSize: 16,
-                  outline: 'none',
-                }}
+                className="exit-intent-input"
               />
               <button
                 type="submit"
-                className="btn btn-primary"
-                style={{
-                  padding: '14px 24px',
-                  borderRadius: 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontSize: 16,
-                }}
+                className="btn btn-primary exit-intent-submit"
               >
                 Get Guide <ArrowRight size={18} />
               </button>
@@ -156,6 +140,72 @@ const ExitIntentModal: FC = () => {
           </div>
         )}
       </div>
+
+      <style>{`
+        .exit-intent-card {
+          padding: 40px;
+        }
+        .exit-intent-title {
+          color: ${theme.colors.text1};
+          font-size: 28px;
+          margin-bottom: 16px;
+          line-height: 1.2;
+        }
+        .exit-intent-desc {
+          color: ${theme.colors.text2};
+          font-size: 16px;
+          margin-bottom: 32px;
+        }
+        .exit-intent-form {
+          display: flex;
+          gap: 12px;
+          flex-direction: row;
+        }
+        .exit-intent-input {
+          flex: 1;
+          padding: 14px 20px;
+          border-radius: 12px;
+          border: 1px solid ${theme.colors.border};
+          background-color: rgba(255,255,255,0.05);
+          color: ${theme.colors.text1};
+          font-size: 16px;
+          outline: none;
+        }
+        .exit-intent-input:focus {
+          border-color: ${theme.colors.teal};
+        }
+        .exit-intent-submit {
+          padding: 14px 24px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-size: 16px;
+        }
+        
+        @media (max-width: 600px) {
+          .exit-intent-card {
+            padding: 32px 24px;
+          }
+          .exit-intent-title {
+            font-size: 24px;
+            margin-bottom: 12px;
+          }
+          .exit-intent-desc {
+            font-size: 15px;
+            margin-bottom: 24px;
+          }
+          .exit-intent-form {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .exit-intent-submit {
+            width: 100%;
+            padding: 16px;
+          }
+        }
+      `}</style>
     </div>
   )
 }

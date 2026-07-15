@@ -52,7 +52,8 @@ const SplashScreen: FC = () => {
       {/* ── Outer ring ─────────────────────────────────── */}
       <div style={{
         position: 'absolute',
-        width: 480, height: 480,
+        width: 'clamp(280px, 80vw, 480px)',
+        height: 'clamp(280px, 80vw, 480px)',
         borderRadius: '50%',
         border: '1px solid rgba(95,193,209,0.12)',
         animation: 'ringRotate 12s linear infinite',
@@ -69,7 +70,8 @@ const SplashScreen: FC = () => {
       {/* ── Inner ring (reversed) ─────────────────────── */}
       <div style={{
         position: 'absolute',
-        width: 340, height: 340,
+        width: 'clamp(200px, 58vw, 340px)',
+        height: 'clamp(200px, 58vw, 340px)',
         borderRadius: '50%',
         border: '1px solid rgba(109,189,78,0.10)',
         animation: 'ringRotateReverse 18s linear infinite',
@@ -90,13 +92,14 @@ const SplashScreen: FC = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 24,
+        gap: 'clamp(16px, 4vw, 24px)',
         animation: 'logoFloat 4s ease-in-out infinite',
       }}>
         {/* Glow halo behind logo */}
         <div style={{
           position: 'absolute',
-          width: 220, height: 220,
+          width: 'clamp(140px, 38vw, 220px)',
+          height: 'clamp(140px, 38vw, 220px)',
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(95,193,209,0.18) 0%, transparent 70%)',
           top: '50%', left: '50%', transform: 'translate(-50%, -60%)',
@@ -108,7 +111,7 @@ const SplashScreen: FC = () => {
           src="/logo.avif"
           alt="Bowling Planet"
           style={{
-            height: 140,
+            height: 'clamp(90px, 24vw, 140px)',
             width: 'auto',
             position: 'relative',
             zIndex: 1,
@@ -119,12 +122,13 @@ const SplashScreen: FC = () => {
         {/* Tagline */}
         <p style={{
           fontFamily: '"Sora", sans-serif',
-          fontSize: 12,
+          fontSize: 'clamp(9px, 2.2vw, 12px)',
           fontWeight: 500,
           letterSpacing: '0.28em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.3)',
           margin: 0,
+          textAlign: 'center',
           animation: 'fadeInUp 0.9s 0.5s both',
         }}>
           Family Entertainment Consultants
@@ -134,10 +138,10 @@ const SplashScreen: FC = () => {
       {/* ── Progress bar ──────────────────────────────── */}
       <div style={{
         position: 'absolute',
-        bottom: 52,
+        bottom: 'clamp(32px, 8vh, 52px)',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: 140,
+        width: 'clamp(100px, 30vw, 140px)',
         height: 2,
         borderRadius: 2,
         background: 'rgba(255,255,255,0.07)',

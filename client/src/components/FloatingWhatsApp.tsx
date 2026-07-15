@@ -38,6 +38,7 @@ const FloatingWhatsApp: FC = () => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
+      className="floating-widget"
       style={{
         position: 'fixed',
         bottom: 24,

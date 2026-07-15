@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 
@@ -19,12 +19,34 @@ const Nav: FC = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const { isAuthenticated } = useAuth()
   const { logCTAEvent } = useLeadTracker()
+  const location = useLocation()
 
+  /* ── Scroll solid ─────────────────────── */
   useEffect(() => {
     const fn = () => setSolid(window.scrollY > 56)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
+
+  /* ── Body scroll lock when drawer is open ─ */
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+      document.body.classList.add('nav-drawer-open')
+    } else {
+      document.body.style.overflow = ''
+      document.body.classList.remove('nav-drawer-open')
+    }
+    return () => { 
+      document.body.style.overflow = ''
+      document.body.classList.remove('nav-drawer-open')
+    }
+  }, [menuOpen])
+
+  /* ── Close drawer on route change ──────── */
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     if (path.startsWith('/#') && window.location.pathname === '/') {
@@ -38,6 +60,9 @@ const Nav: FC = () => {
     logCTAEvent(`Navigated to ${path}`)
   }
 
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
+
   return (
     <>
       {/* ── Main nav bar ─────────────────────────────────── */}
@@ -45,7 +70,7 @@ const Nav: FC = () => {
         role="navigation"
         aria-label="Main navigation"
         className={`nav-wrap ${solid ? 'solid' : ''}`}
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200 }}
       >
         <div style={{
           maxWidth: 1320, margin: '0 auto', padding: '0 28px',
@@ -92,11 +117,12 @@ const Nav: FC = () => {
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
                     fontFamily: '"Inter", sans-serif', fontSize: 14, fontWeight: 500,
-                    color: 'rgba(245,245,247,0.65)', letterSpacing: '0.01em',
-                    padding: '4px 0', transition: 'color 0.2s ease', textDecoration: 'none'
+                    color: isActive(path) ? '#5FC1D1' : 'rgba(245,245,247,0.65)',
+                    letterSpacing: '0.01em',
+                    padding: '4px 0', transition: 'color 0.2s ease', textDecoration: 'none',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.color = '#F5F5F7' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,245,247,0.65)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = isActive(path) ? '#5FC1D1' : 'rgba(245,245,247,0.65)' }}
                 >
                   {label}
                 </Link>
@@ -132,20 +158,30 @@ const Nav: FC = () => {
 
             {/* Hamburger */}
             <button
+              id="nav-hamburger-btn"
               className="nav-hamburger"
               onClick={() => setMenuOpen(o => !o)}
               aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={menuOpen}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, display: 'flex', flexDirection: 'column', gap: 5 }}
+              aria-controls="mobile-nav-drawer"
+              style={{
+                background: menuOpen ? 'rgba(95,193,209,0.1)' : 'none',
+                border: menuOpen ? '1px solid rgba(95,193,209,0.2)' : '1px solid transparent',
+                borderRadius: 8,
+                cursor: 'pointer', padding: '8px 10px',
+                display: 'flex', flexDirection: 'column', gap: 5,
+                transition: 'background 0.25s ease, border-color 0.25s ease',
+              }}
             >
               {[0, 1, 2].map(i => (
                 <span key={i} style={{
-                  display: 'block', width: 22, height: 1.5,
-                  background: '#F5F5F7', borderRadius: 1,
-                  transition: 'transform 0.3s ease, opacity 0.3s ease',
+                  display: 'block', width: 22, height: 2,
+                  background: menuOpen ? '#5FC1D1' : '#F5F5F7',
+                  borderRadius: 2,
+                  transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease, background 0.25s ease',
                   transform: menuOpen
-                    ? i === 0 ? 'rotate(45deg) translate(4.5px, 4.5px)'
-                    : i === 2 ? 'rotate(-45deg) translate(4.5px,-4.5px)'
+                    ? i === 0 ? 'rotate(45deg) translate(5px, 5px)'
+                    : i === 2 ? 'rotate(-45deg) translate(5px,-5px)'
                     : 'none'
                     : 'none',
                   opacity: menuOpen && i === 1 ? 0 : 1,
@@ -156,62 +192,195 @@ const Nav: FC = () => {
         </div>
       </nav>
 
+      {/* ── Overlay backdrop ──────────────────────────────── */}
+      <div
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 149,
+          background: 'rgba(0,0,0,0.55)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
+          opacity: menuOpen ? 1 : 0,
+          pointerEvents: menuOpen ? 'auto' : 'none',
+          transition: 'opacity 0.35s ease',
+        }}
+      />
+
       {/* ── Mobile drawer ────────────────────────────────── */}
       <div
-        className={`mobile-drawer ${menuOpen ? 'open' : ''}`}
+        id="mobile-nav-drawer"
+        role="dialog"
+        aria-label="Mobile navigation"
+        aria-modal="true"
         aria-hidden={!menuOpen}
+        className={`mobile-drawer ${menuOpen ? 'open' : ''}`}
         style={{
-          position: 'fixed', top: 64, right: 0, bottom: 0,
-          width: 'min(300px, 88vw)', zIndex: 99,
-          background: 'rgba(0,0,0,0.97)',
-          backdropFilter: 'blur(24px)',
-          borderLeft: '1px solid rgba(255,255,255,0.07)',
-          padding: '28px 24px',
-          display: 'flex', flexDirection: 'column', gap: 4,
+          position: 'fixed', top: 0, right: 0, bottom: 0,
+          width: 'min(320px, 90vw)', zIndex: 150,
+          background: 'linear-gradient(160deg, #070B14 0%, #0A0A0F 60%, #050810 100%)',
+          backdropFilter: 'blur(32px)',
+          WebkitBackdropFilter: 'blur(32px)',
+          borderLeft: '1px solid rgba(95,193,209,0.12)',
+          boxShadow: '-20px 0 80px rgba(0,0,0,0.6), -1px 0 0 rgba(95,193,209,0.05)',
+          display: 'flex', flexDirection: 'column',
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
         }}
       >
-        {NAV_LINKS.map(({ label, path }) => (
+        {/* Drawer header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 20px', height: 64,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          flexShrink: 0,
+        }}>
+          {/* Brand inside drawer */}
           <Link
-            key={label}
-            to={path}
-            onClick={(e) => handleLinkClick(e, path)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: '"Sora", sans-serif', fontWeight: 700, fontSize: 22,
-              letterSpacing: '-0.02em', color: '#F5F5F7', padding: '14px 0',
-              textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.05)',
-              transition: 'color 0.2s ease', textDecoration: 'none', display: 'block'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#5FC1D1' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#F5F5F7' }}
+            to="/"
+            onClick={() => setMenuOpen(false)}
+            style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}
           >
-            {label}
+            <img src="/logo.avif" alt="Bowling Planet" style={{ height: 38, width: 'auto' }} />
+            <span style={{
+              fontFamily: '"Sora", sans-serif', fontWeight: 700,
+              fontSize: 17, letterSpacing: '-0.02em', color: '#F5F5F7',
+            }}>
+              Bowling Planet
+            </span>
           </Link>
-        ))}
-        {/* Mobile CTA */}
-        <Link
-          to="/contact"
-          className="btn btn-primary"
-          style={{ marginTop: 28, justifyContent: 'center', textDecoration: 'none' }}
-          onClick={() => {
-            setMenuOpen(false)
-            logCTAEvent('Mobile Nav: Get in Touch')
-          }}
-        >
-          Get in Touch
-        </Link>
-        <Link
-          to={isAuthenticated ? "/admin" : "/login"}
-          style={{
-            display: 'block', padding: '16px', marginTop: 14, background: 'rgba(255,255,255,0.05)',
-            color: '#fff', textAlign: 'center', borderRadius: 8,
-            textDecoration: 'none', fontWeight: 600, fontSize: 16,
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}
-          onClick={() => setMenuOpen(false)}
-        >
-          {isAuthenticated ? "Admin Portal" : "Login"}
-        </Link>
+          {/* Close button */}
+          <button
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close navigation"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 36, height: 36, borderRadius: 8,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(245,245,247,0.7)', cursor: 'pointer',
+              fontSize: 18, transition: 'all 0.2s ease', flexShrink: 0,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(95,193,209,0.12)'
+              e.currentTarget.style.borderColor = 'rgba(95,193,209,0.3)'
+              e.currentTarget.style.color = '#5FC1D1'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+              e.currentTarget.style.color = 'rgba(245,245,247,0.7)'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <nav aria-label="Mobile navigation links" style={{ padding: '12px 0', flex: 1 }}>
+          {NAV_LINKS.map(({ label, path }, idx) => {
+            const active = isActive(path)
+            return (
+              <Link
+                key={label}
+                to={path}
+                onClick={(e) => handleLinkClick(e, path)}
+                className={menuOpen ? `mobile-nav-link mobile-nav-link--in` : 'mobile-nav-link'}
+                style={{
+                  '--delay': `${idx * 40}ms`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '14px 24px',
+                  fontFamily: '"Inter", sans-serif', fontWeight: active ? 600 : 500,
+                  fontSize: 16, letterSpacing: '-0.01em',
+                  color: active ? '#5FC1D1' : 'rgba(245,245,247,0.82)',
+                  textDecoration: 'none',
+                  background: active ? 'rgba(95,193,209,0.07)' : 'transparent',
+                  borderLeft: active ? '2px solid #5FC1D1' : '2px solid transparent',
+                  transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+                  position: 'relative',
+                } as React.CSSProperties}
+                onMouseEnter={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+                    e.currentTarget.style.color = '#F5F5F7'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = 'rgba(245,245,247,0.82)'
+                  }
+                }}
+              >
+                <span>{label}</span>
+                {active && (
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: '#5FC1D1',
+                    boxShadow: '0 0 8px rgba(95,193,209,0.8)',
+                    flexShrink: 0,
+                  }} />
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Divider */}
+        <div style={{ height: 1, margin: '0 24px', background: 'rgba(255,255,255,0.06)' }} />
+
+        {/* CTA section */}
+        <div style={{ padding: '20px 20px 32px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Link
+            to="/contact"
+            className="btn btn-primary"
+            style={{
+              justifyContent: 'center', textDecoration: 'none',
+              fontSize: 15, fontWeight: 600, letterSpacing: '0.01em',
+              padding: '14px 24px', borderRadius: 12,
+            }}
+            onClick={() => {
+              setMenuOpen(false)
+              logCTAEvent('Mobile Nav: Get in Touch')
+            }}
+          >
+            <span style={{ marginRight: 6 }}>✉</span>
+            Get in Touch
+          </Link>
+          <Link
+            to={isAuthenticated ? "/admin" : "/login"}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '13px 24px',
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(245,245,247,0.75)',
+              textAlign: 'center', borderRadius: 12,
+              textDecoration: 'none', fontWeight: 500, fontSize: 15,
+              border: '1px solid rgba(255,255,255,0.08)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+              e.currentTarget.style.color = '#F5F5F7'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+              e.currentTarget.style.color = 'rgba(245,245,247,0.75)'
+            }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <span style={{ fontSize: 14 }}>⚙</span>
+            {isAuthenticated ? "Admin Portal" : "Login"}
+          </Link>
+        </div>
+
+        {/* Teal glow orb for visual polish */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: '30%', right: '-60px',
+          width: 200, height: 200, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(95,193,209,0.08) 0%, transparent 70%)',
+          pointerEvents: 'none', zIndex: 0,
+        }} />
       </div>
     </>
   )

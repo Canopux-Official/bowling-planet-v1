@@ -82,7 +82,7 @@ const ContactPage: FC = () => {
   })
 
   return (
-    <div style={{ background: theme.colors.void, minHeight: '100vh', paddingTop: 80, paddingBottom: 120 }}>
+    <div style={{ background: theme.colors.void, minHeight: '100vh', paddingTop: 80, paddingBottom: 120, position: 'relative', overflow: 'hidden' }}>
       <SEO 
         title="Contact Us" 
         description="Get in touch with Bowling Planet for franchise inquiries, turnkey FEC solutions, and equipment purchases."
