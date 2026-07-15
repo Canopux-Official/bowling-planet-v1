@@ -7,7 +7,7 @@ import { theme } from '../theme';
 import { apiClient } from '../services/apiClient';
 
 export const EnquiryCartWidget: React.FC = () => {
-  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent, clearEnquiryCart } = useLeadTracker();
+  const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent } = useLeadTracker();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingQuick, setIsProcessingQuick] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
