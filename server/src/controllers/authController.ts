@@ -6,6 +6,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 import { createOrUpdateOtp, verifyOtp } from '../services/otpService';
 import { sendOtpEmail } from '../services/emailService';
 import crypto from 'crypto';
+import { verifyTurnstile } from '../utils/verifyCaptcha';
 
 // SECURITY: No fallback — process.exit(1) in server.ts REQUIRED_ENV check fires before this loads.
 const ADMIN_SECRET = process.env.ADMIN_SECRET!;
@@ -62,10 +63,15 @@ const sendTokenResponse = async (user: any, res: Response, message: string) => {
 
 export const signupAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, adminSecret } = req.body;
+    const { name, email, password, adminSecret,captchaToken } = req.body;
 
     if (!name || !email || !password || !adminSecret) {
       res.status(400).json({ message: 'All fields are required' });
+      return;
+    }
+    const isHuman = await verifyTurnstile(captchaToken, req.ip);
+    if (!isHuman) {
+      res.status(400).json({ message: 'Captcha verification failed' });
       return;
     }
 
@@ -171,10 +177,16 @@ export const resendOtp = async (req: Request, res: Response): Promise<void> => {
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role ,captchaToken} = req.body;
 
     if (!email || !password) {
       res.status(400).json({ message: 'Email and password are required' });
+      return;
+    }
+
+    const isHuman = await verifyTurnstile(captchaToken, req.ip);
+    if (!isHuman) {
+      res.status(400).json({ message: 'Captcha verification failed' });
       return;
     }
 
@@ -238,7 +250,7 @@ export const refreshAuthToken = async (req: Request, res: Response): Promise<voi
     }
 
     const tokenHash = hashToken(refreshToken);
-    
+
     // Atomically find and mark the token as revoked
     const tokenRecord = await RefreshToken.findOneAndUpdate(
       { userId: decoded.userId, tokenHash, revoked: false },
@@ -266,7 +278,7 @@ export const refreshAuthToken = async (req: Request, res: Response): Promise<voi
         res.status(401).json({ message: 'Security alert: Token reuse detected. All sessions have been terminated.' });
         return;
       }
-      
+
       // If recentlyRevoked is true, this is a legitimate concurrent request from another tab.
       // We allow it to proceed and fork the session natively.
     }
@@ -307,10 +319,15 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 
 export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email } = req.body;
+    const { email,captchaToken } = req.body;
 
     if (!email) {
       res.status(400).json({ message: 'Email is required' });
+      return;
+    }
+    const isHuman = await verifyTurnstile(captchaToken, req.ip);
+    if (!isHuman) {
+      res.status(400).json({ message: 'Captcha verification failed' });
       return;
     }
 

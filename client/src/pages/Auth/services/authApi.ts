@@ -40,7 +40,7 @@ export const authApi = {
     })
   },
 
-  async forgotPassword(data: { email: string }) {
+  async forgotPassword(data: { email: string,captchaToken: string }) {
     return apiClient('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify(data)
