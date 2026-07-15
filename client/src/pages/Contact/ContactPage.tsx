@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react'
+import { Send } from 'lucide-react'
 import SEO from '../../components/SEO'
 import { theme } from '../../theme'
 import { useReveal } from '../../hooks/useReveal'
@@ -112,6 +113,37 @@ const ContactPage: FC = () => {
           <p style={{ color: theme.colors.text2, fontSize: 18, maxWidth: 540, margin: '0 auto', lineHeight: 1.6 }}>
             Whether you're looking to launch a turnkey FEC, upgrade your existing venue, or inquire about franchise opportunities—our team is ready.
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
+            <button
+              type="button"
+              onClick={() => {
+                logCTAEvent('Contact Page: Direct WhatsApp');
+                const customMessage = `Hi Bowling Planet,\nI'd like to get in touch to discuss a project.`;
+                window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodeURIComponent(customMessage)}`, '_blank');
+              }}
+              style={{
+                padding: '16px 32px',
+                borderRadius: '12px',
+                backgroundColor: '#25D366',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: '16px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
+                transition: 'transform 0.2s ease',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+              onMouseOut={(e) => (e.currentTarget.style.transform = 'none')}
+            >
+              Direct WhatsApp Us
+              <Send size={18} />
+            </button>
+          </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 40, alignItems: 'start' }}>
@@ -287,7 +319,7 @@ const ContactPage: FC = () => {
                     />
                   </div>
                   
-                  <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '16px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}>
+                  <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '16px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer', borderRadius: '12px' }}>
                     {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>

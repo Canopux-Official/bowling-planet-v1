@@ -1,5 +1,5 @@
-import { type FC } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useEffect, type FC } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Nav from './Nav'
 import Footer from './Footer'
 import SplashScreen from './SplashScreen'
@@ -13,6 +13,11 @@ import { useEngagementTracker } from '../hooks/useEngagementTracker'
 const Layout: FC = () => {
   const { logCTAEvent } = useLeadTracker()
   useEngagementTracker({ logEvent: logCTAEvent })
+  const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
   return (
     <>

@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { label: 'Franchise', path: '/franchise' },
   { label: 'Careers',   path: '/careers'   },
   { label: 'Blog',      path: '/blog'      },
-  { label: 'Contact',   path: '/contact'   },
 ]
 
 const Nav: FC = () => {
@@ -228,56 +227,8 @@ const Nav: FC = () => {
           overscrollBehavior: 'contain',
         }}
       >
-        {/* Drawer header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 20px', height: 64,
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          flexShrink: 0,
-        }}>
-          {/* Brand inside drawer */}
-          <Link
-            to="/"
-            onClick={() => setMenuOpen(false)}
-            style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}
-          >
-            <img src="/logo.avif" alt="Bowling Planet" style={{ height: 38, width: 'auto' }} />
-            <span style={{
-              fontFamily: '"Sora", sans-serif', fontWeight: 700,
-              fontSize: 17, letterSpacing: '-0.02em', color: '#F5F5F7',
-            }}>
-              Bowling Planet
-            </span>
-          </Link>
-          {/* Close button */}
-          <button
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close navigation"
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 36, height: 36, borderRadius: 8,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(245,245,247,0.7)', cursor: 'pointer',
-              fontSize: 18, transition: 'all 0.2s ease', flexShrink: 0,
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(95,193,209,0.12)'
-              e.currentTarget.style.borderColor = 'rgba(95,193,209,0.3)'
-              e.currentTarget.style.color = '#5FC1D1'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-              e.currentTarget.style.color = 'rgba(245,245,247,0.7)'
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
         {/* Nav links */}
-        <nav aria-label="Mobile navigation links" style={{ padding: '12px 0', flex: 1 }}>
+        <nav aria-label="Mobile navigation links" style={{ padding: '12px 0', paddingTop: '76px', flex: 1 }}>
           {NAV_LINKS.map(({ label, path }, idx) => {
             const active = isActive(path)
             return (
