@@ -9,6 +9,7 @@ import { apiClient } from '../services/apiClient';
 export const EnquiryCartWidget: React.FC = () => {
   const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent } = useLeadTracker();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingQuick, setIsProcessingQuick] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Sync local component state with context's partial lead
@@ -108,6 +109,7 @@ export const EnquiryCartWidget: React.FC = () => {
   };
 
   const handleQuickWhatsApp = async () => {
+    setIsProcessingQuick(true);
     logCTAEvent('Quick WhatsApp Clicked (Enquiry Cart)');
     // 1. Save an anonymous/quick lead to CRM
     try {
@@ -134,8 +136,12 @@ export const EnquiryCartWidget: React.FC = () => {
     const cartText = state.enquiryCart.map(item => `- ${item.title} (${item.type})`).join('\n');
     const message = `Hi Bowling Planet,\nI am interested in the following:\n${cartText}\n\nPlease get back to me.`;
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`, '_blank');
-    setIsCartOpen(false);
+    
+    setTimeout(() => {
+      setIsProcessingQuick(false);
+      window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`, '_blank');
+      setIsCartOpen(false);
+    }, 800);
   };
 
   const handleSaveForLater = async () => {
@@ -548,6 +554,35 @@ export const EnquiryCartWidget: React.FC = () => {
         </div>
       </div>
 
+      {/* Processing Overlay */}
+      {(isSubmitting || isProcessingQuick) && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: theme.colors.surface,
+          animation: 'fadeIn 0.2s ease'
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: `4px solid rgba(255,255,255,0.2)`,
+            borderTopColor: '#fff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginBottom: '20px'
+          }} />
+          <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 600, color: '#fff' }}>Connecting to WhatsApp...</h3>
+          <p style={{ margin: '8px 0 0', fontSize: '15px', color: 'rgba(255,255,255,0.7)' }}>Please wait a moment</p>
+        </div>
+      )}
+
       {/* Global Style for PhoneInput to override its default white text color issue in dark mode */}
       <style>{`
         .custom-phone-input input {
@@ -561,6 +596,9 @@ export const EnquiryCartWidget: React.FC = () => {
         }
         .custom-phone-input .PhoneInputCountry {
           margin-right: 12px;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </>
