@@ -42,10 +42,12 @@ export const ProfileView: React.FC = () => {
 
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
-    setIsSendingOtp(true);
     if (!captchaToken) {
       return showToast('error', 'Please complete the captcha');
     }
+
+    setIsSendingOtp(true);
+
     try {
       await authApi.forgotPassword({ email: user.email, captchaToken });
       setPasswordStep('otp');
@@ -256,17 +258,27 @@ export const ProfileView: React.FC = () => {
             </div>
 
             {passwordStep === 'initial' ? (
-              <button
-                onClick={handleRequestPasswordReset}
-                disabled={isSendingOtp}
-                style={{
-                  width: '100%', padding: '12px', borderRadius: '8px', border: 'none',
-                  backgroundColor: theme.colors.prussianBlue, color: '#fff', fontSize: '14px', fontWeight: 600,
-                  cursor: isSendingOtp ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                }}
-              >
-                {isSendingOtp ? <><Loader2 size={16} className="animate-spin" /> Sending OTP...</> : 'Send OTP to Email'}
-              </button>
+              <>
+                <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                  <Turnstile
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken(null)}
+                    onError={() => setCaptchaToken(null)}
+                  />
+                </div>
+                <button
+                  onClick={handleRequestPasswordReset}
+                  disabled={isSendingOtp}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: '8px', border: 'none',
+                    backgroundColor: theme.colors.prussianBlue, color: '#fff', fontSize: '14px', fontWeight: 600,
+                    cursor: isSendingOtp ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                  }}
+                >
+                  {isSendingOtp ? <><Loader2 size={16} className="animate-spin" /> Sending OTP...</> : 'Send OTP to Email'}
+                </button>
+              </>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
