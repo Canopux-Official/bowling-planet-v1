@@ -14,7 +14,6 @@ import { HelmetProvider } from 'react-helmet-async'
 
 import { GlobalSettingsProvider } from './context/GlobalSettingsContext'
 import Layout from './components/Layout'
-import ScrollToTop from './components/ScrollToTop'
 import { theme } from './theme'
 import { AuthProvider } from './context/AuthContext'
 import { LeadTrackerProvider } from './context/LeadTrackerContext'
@@ -68,7 +67,6 @@ export default function App() {
       <AuthProvider>
         <GlobalSettingsProvider>
           <BrowserRouter>
-            <ScrollToTop />
             <LeadTrackerProvider>
               <Suspense fallback={<RouteFallback />}>
                 <Routes>

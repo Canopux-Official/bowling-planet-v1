@@ -28,7 +28,7 @@ const SignupPage: FC = () => {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, login } = useAuth()
 
   const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [field]: e.target.value }))
@@ -79,9 +79,13 @@ const SignupPage: FC = () => {
     setLoading(true)
     const otp = otpDigits.join('')
     try {
-      await authApi.verifyOtp({ email: form.email, otp, purpose: 'signup' })
-      setSuccess('Account verified! Redirecting to login...')
-      setTimeout(() => { window.location.href = '/login' }, 2000)
+      const res = await authApi.verifyOtp({ email: form.email, otp, purpose: 'signup' })
+      setSuccess('Account verified! Redirecting to dashboard...')
+      if (res.user) {
+        // Log the user in context. Since they are authenticated, 
+        // the Navigate to="/admin" check below will instantly redirect them.
+        login(res.user)
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {

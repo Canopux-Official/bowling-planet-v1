@@ -43,14 +43,14 @@ const sendTokenResponse = async (user: any, res: Response, message: string) => {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     maxAge: 15 * 60 * 1000 // 15 minutes
   });
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
   });
 
@@ -125,8 +125,9 @@ export const verifyUserOtp = async (req: Request, res: Response): Promise<void> 
 
     if (purpose === 'signup') {
       user.isVerified = true;
+      user.lastLoginAt = new Date();
       await user.save();
-      res.status(200).json({ message: 'OTP verified successfully' });
+      await sendTokenResponse(user, res, 'Account verified and logged in successfully');
     } else if (purpose === 'reset-password') {
       res.status(200).json({ message: 'OTP verified successfully' });
     } else if (purpose === 'login') {

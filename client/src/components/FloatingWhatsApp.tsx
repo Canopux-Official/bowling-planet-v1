@@ -1,13 +1,29 @@
-import { type FC } from 'react'
+import { type FC, useEffect, useState } from 'react'
 import { useGlobalSettings } from '../context/GlobalSettingsContext'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 
 const FloatingWhatsApp: FC = () => {
   const { settings } = useGlobalSettings()
   const { logCTAEvent } = useLeadTracker()
+  const [isVisible, setIsVisible] = useState(false)
+  
+  useEffect(() => {
+    // Check if splash screen is running this session
+    const hasSeenSplash = sessionStorage.getItem('bp_splash_seen')
+    
+    if (hasSeenSplash) {
+      setIsVisible(true)
+    } else {
+      // Delay to allow splash screen to finish (3700ms in SplashScreen.tsx)
+      const timer = setTimeout(() => setIsVisible(true), 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
   
   // Default to placeholder if not loaded yet
   const whatsappNumber = settings?.socials?.whatsappNumber || '919876543210'
+
+  if (!isVisible) return null
   
   return (
     <a

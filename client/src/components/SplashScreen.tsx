@@ -2,13 +2,24 @@ import { useState, useEffect, type FC } from 'react'
 
 const SplashScreen: FC = () => {
   const [phase, setPhase] = useState<'in' | 'hold' | 'out'>('in')
-  const [isVisible, setIsVisible] = useState(true)
+  // If splash was already seen this session, start as invisible
+  const [isVisible, setIsVisible] = useState(() => !sessionStorage.getItem('bp_splash_seen'))
 
   useEffect(() => {
+    // Check if splash screen has been shown this session
+    const hasSeenSplash = sessionStorage.getItem('bp_splash_seen')
+    if (hasSeenSplash) {
+      setIsVisible(false)
+      return
+    }
+
     // Phase: fade in (0-800ms) → hold (800-2600ms) → fade out (2600-3700ms)
     const t1 = setTimeout(() => setPhase('hold'), 800)
     const t2 = setTimeout(() => setPhase('out'), 2600)
-    const t3 = setTimeout(() => setIsVisible(false), 3700)
+    const t3 = setTimeout(() => {
+      setIsVisible(false)
+      sessionStorage.setItem('bp_splash_seen', 'true')
+    }, 3700)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [])
 
