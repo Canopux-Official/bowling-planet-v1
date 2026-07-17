@@ -14,6 +14,7 @@ import FranchiseOfferings     from './components/FranchiseOfferings'
 import FranchiseQualifications from './components/FranchiseQualifications'
 import FranchiseFAQ           from './components/FranchiseFAQ'
 import FranchiseApply         from './components/FranchiseApply'
+import RoiCalculatorSection from '../Landing/components/roi-calculator/RoiCalculatorSection'
 
 const FranchisePage: FC = () => {
   const [data, setData] = useState<FranchisePageData | null>(null)
@@ -76,6 +77,8 @@ const FranchisePage: FC = () => {
 
       {/* 9. Application Form — the conversion point */}
       <FranchiseApply />
+
+      <RoiCalculatorSection/>
     </>
   )
 }

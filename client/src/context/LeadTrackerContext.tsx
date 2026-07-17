@@ -7,8 +7,9 @@ import { isMobile, osName, browserName } from 'react-device-detect';
 
 export interface EnquiryItem {
   id: string;
-  type: 'product' | 'franchise' | 'project' | 'general';
+  type: 'product' | 'franchise' | 'project' | 'general' | 'roi-report';
   title: string;
+  metadata?: Record<string, any>;
 }
 
 export interface UTMParams {

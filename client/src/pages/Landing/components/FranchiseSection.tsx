@@ -80,7 +80,7 @@ const FranchiseSection: FC = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
             gap: 80, alignItems: 'start',
           }}>
-          
+
           {/* ── Left: CTAs ──────────────────────── */}
           <div>
             <p style={{ fontSize: 16, lineHeight: 1.75, color: '#86868B', maxWidth: 460, marginBottom: 40, fontFamily: theme.typography.fontBody }}>
@@ -93,9 +93,9 @@ const FranchiseSection: FC = () => {
               <Link to="/franchise" onClick={() => logCTAEvent('Landing: Explore Franchise')} className="btn btn-primary btn-primary-green" style={{ textDecoration: 'none' }}>
                 Explore Franchise
               </Link>
-              <button 
+              <button
                 onClick={() => addToEnquiry({ id: 'franchise-general', type: 'franchise', title: 'Franchise Opportunity' })}
-                className={`btn-enquiry ${isAdded('franchise-general') ? 'added' : ''}`} 
+                className={`btn-enquiry ${isAdded('franchise-general') ? 'added' : ''}`}
                 style={{ width: 'auto', marginTop: 0 }}
               >
                 {isAdded('franchise-general') ? (
@@ -194,7 +194,10 @@ const FranchiseSection: FC = () => {
         </div>
       </div>
 
+
+
       <div className="divider" style={{ marginTop: 80 }} />
+
     </section>
   )
 }

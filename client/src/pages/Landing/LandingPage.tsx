@@ -8,8 +8,6 @@ import ProductsSection from './components/ProductsSection'
 import FranchiseSection from './components/FranchiseSection'
 import PortfolioSection from './components/PortfolioSection'
 import WhySection      from './components/WhySection'
-import CareersSection  from './components/CareersSection'
-import ContactSection  from './components/ContactSection'
 import { homePageApi, type HomePageData } from '../../services/homePageApi'
 import SEO from '../../components/SEO'
 
@@ -29,14 +27,13 @@ const LandingPage: FC = () => {
       <Hero data={data?.hero} />
       <StatsBar data={data?.stats} />
       <TrustedBrands data={data?.trustedBrands} />
+      <ServicesSection />
+      <ProductsSection data={data?.productInventory} />
       <AboutSection />
       <PortfolioSection data={data?.featuredProjects} />
-      <ServicesSection />
       <ProductsSection data={data?.productInventory} />
       <FranchiseSection />
       <WhySection />
-      <CareersSection />
-      <ContactSection />
     </>
   )
 }
