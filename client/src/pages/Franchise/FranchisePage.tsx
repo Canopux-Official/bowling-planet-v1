@@ -60,6 +60,8 @@ const FranchisePage: FC = () => {
       {/* 3. Why Partner with Us — 12 reasons */}
       <FranchiseWhyUs />
 
+      <RoiCalculatorSection/>
+
       {/* 4. Investment Models — interactive tier selector */}
       <FranchiseInvestment tiers={data?.investmentTiers || []} />
 
@@ -78,7 +80,7 @@ const FranchisePage: FC = () => {
       {/* 9. Application Form — the conversion point */}
       <FranchiseApply />
 
-      <RoiCalculatorSection/>
+      
     </>
   )
 }
