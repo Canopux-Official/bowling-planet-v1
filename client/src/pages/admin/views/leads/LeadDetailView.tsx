@@ -106,21 +106,28 @@ export const LeadDetailView: React.FC = () => {
                 <div>
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Phone</div>
                   {lead.phone ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{lead.phone}</div>
-                      <a 
-                        href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        style={{ 
-                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
-                          textDecoration: 'none'
-                        }}
-                        title="Chat on WhatsApp"
-                      >
-                        <MessageCircle size={14} />
-                      </a>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {lead.phone.split(',').map((phoneStr, idx) => {
+                        const trimmedPhone = phoneStr.trim();
+                        return (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{trimmedPhone}</div>
+                            <a 
+                              href={`https://wa.me/${trimmedPhone.replace(/[^0-9]/g, '')}`} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              style={{ 
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
+                                textDecoration: 'none'
+                              }}
+                              title="Chat on WhatsApp"
+                            >
+                              <MessageCircle size={14} />
+                            </a>
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>-</div>
@@ -131,7 +138,15 @@ export const LeadDetailView: React.FC = () => {
                 <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}><Mail size={20} /></div>
                 <div>
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Email</div>
-                  <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{lead.email || '-'}</div>
+                  {lead.email ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {lead.email.split(',').map((eStr, idx) => (
+                        <div key={idx} style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{eStr.trim()}</div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>-</div>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -145,7 +160,17 @@ export const LeadDetailView: React.FC = () => {
                 <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}><Building size={20} /></div>
                 <div>
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Business Details</div>
-                  <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{lead.businessDetails || '-'}</div>
+                  {lead.businessDetails ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {lead.businessDetails.split('|').map((detail, idx) => (
+                        <div key={idx} style={{ fontSize: '14px', color: theme.colors.adminText, fontWeight: 500, backgroundColor: theme.colors.adminBg, padding: '8px', borderRadius: '6px' }}>
+                          {detail.trim()}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>-</div>
+                  )}
                 </div>
               </div>
             </div>

@@ -100,6 +100,12 @@ export const sendLeadNotification = async (leadData: any) => {
 
     const { name, phone, email, city, businessDetails, enquiryItems, utm } = leadData;
 
+    // SECURITY / SPAM PREVENTION: Never send an email if there are absolutely no contact details.
+    if (!email && !phone) {
+      console.log('[EmailService] Ignoring notification for lead without contact details (email or phone).');
+      return;
+    }
+
     let enquiryDetails = '';
     if (enquiryItems && enquiryItems.length > 0) {
       enquiryDetails = `

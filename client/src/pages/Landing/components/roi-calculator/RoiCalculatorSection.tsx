@@ -240,6 +240,7 @@ import { useReveal } from '../../../../hooks/useReveal'
 import { useLeadTracker } from '../../../../context/LeadTrackerContext'
 import { theme } from '../../../../theme'
 import RoiResultsDisplay from './RoiResultDisplay'
+import { apiClient } from '../../../../services/apiClient'
 
 interface CalculatorState {
     inputs: RoiInputs
@@ -249,7 +250,7 @@ interface CalculatorState {
 
 const RoiCalculatorSection: FC = () => {
     const ref = useReveal()
-    const { state, addToEnquiry, logCTAEvent } = useLeadTracker()
+    const { state, logCTAEvent } = useLeadTracker()
 
     const [calc, setCalc] = useState<CalculatorState>({
         inputs: {
@@ -288,61 +289,77 @@ const RoiCalculatorSection: FC = () => {
         setCalc((prev) => ({ ...prev, tier }))
     }
 
-    const handleCalculate = () => {
-        logCTAEvent(`ROI: ${matched.name} — Tier ${calc.tier}`)
-        setCalc((prev) => ({ ...prev, showResults: true }))
+    const submitRoiReport = async (includeContact: boolean) => {
+        const locationTier = calc.tier === 1 ? 'Metro'
+            : calc.tier === 2 ? 'State Capital'
+                : calc.tier === 3 ? 'Emerging'
+                    : calc.tier === 4 ? 'Growing'
+                        : 'Small';
+
+        const roiEnquiryItem = {
+            id: `roi-${matched.key}-tier${calc.tier}-${Date.now()}`, // Unique ID for each calculation
+            type: 'roi-report',
+            title: `ROI Report — ${matched.name} Format (${locationTier} City)`,
+            metadata: {
+                format: matched.key,
+                tier: calc.tier,
+                budget: calc.inputs.budgetLakhs,
+                sizeSqft: calc.inputs.sizeSqft,
+                games: calc.inputs.games,
+                attractions: calc.inputs.attractions,
+            }
+        };
+
+        const submitEvent = { label: `Calculated ROI Report: ${matched.name} (Tier ${calc.tier})`, timestamp: new Date().toISOString(), path: window.location.pathname }
+        logCTAEvent(submitEvent.label);
+
+        try {
+            await apiClient('/leads', {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...(includeContact && {
+                        name: 'ROI Calculator User',
+                        phone: mobile,
+                        email: email,
+                    }),
+                    utm: state.utm,
+                    device: state.deviceInfo,
+                    sessionId: state.sessionId,
+                    behavior: {
+                        isReturningVisitor: state.isReturningVisitor,
+                        eventLog: [...state.eventLog, submitEvent],
+                    },
+                    enquiryItems: [...state.enquiryCart, roiEnquiryItem],
+                }),
+            });
+            console.log('ROI calculation saved to backend journey.');
+        } catch (error) {
+            console.error('Failed to save ROI lead to CRM:', error);
+        }
     }
 
-    const handleLeadSubmit = (e: React.FormEvent) => {
+    const handleCalculate = async () => {
+        setCalc((prev) => ({ ...prev, showResults: true }))
+        if (isUnlocked) {
+            // Already unlocked, send calculation to backend silently
+            await submitRoiReport(false)
+        }
+    }
+
+    const handleLeadSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!email || !mobile) return
 
-        // 1. Generate fake userId for front-end persistence bypass
-        const mockUserId = `usr_${Math.random().toString(36).substr(2, 9)}`
-        localStorage.setItem('userId', mockUserId)
+        await submitRoiReport(true)
 
-        // 2. Log all information to the console for your future backend implementation
-        console.log('--- LEAD CAPTURE & ROI CALCULATION DATA ---')
-        console.log('User Contact Info:', { email, mobile, generatedUserId: mockUserId })
-        console.log('Calculator Inputs Configuration:', calc.inputs)
-        console.log('Matched Model Projections:', {
-            name: matched.name,
-            key: matched.key,
-            tier: calc.tier,
-            matchScore: matchScorePct
-        })
-        console.log('-------------------------------------------')
+        // Generate fake userId for front-end persistence bypass if needed
+        if (!localStorage.getItem('userId')) {
+            const mockUserId = `usr_${Math.random().toString(36).substr(2, 9)}`
+            localStorage.setItem('userId', mockUserId)
+        }
 
-        // 3. Reveal the results UI
         setIsUnlocked(true)
     }
-
-    const isInEnquiry = (id: string) => state.enquiryCart.some((item) => item.id === id)
-    const roiReportId = `roi-${matched.key}-tier${calc.tier}`
-    const isAdded = isInEnquiry(roiReportId)
-
-    const handleAddToEnquiry = () => {
-        if (!isAdded) {
-            const locationTier = calc.tier === 1 ? 'Metro'
-                : calc.tier === 2 ? 'State Capital'
-                    : calc.tier === 3 ? 'Emerging'
-                        : calc.tier === 4 ? 'Growing'
-                            : 'Small';
-
-            addToEnquiry({
-                id: roiReportId,
-                type: 'roi-report',
-                title: `ROI Report — ${matched.name} Format (${locationTier} City)`,
-                metadata: {
-                    format: matched.key,
-                    tier: calc.tier,
-                    budget: calc.inputs.budgetLakhs,
-                },
-            });
-
-            logCTAEvent(`ROI Report Added: ${matched.name}`);
-        }
-    };
 
     return (
         <section
@@ -496,8 +513,6 @@ const RoiCalculatorSection: FC = () => {
                                     matched={matched}
                                     inputs={calc.inputs}
                                     tier={calc.tier}
-                                    onAddToEnquiry={handleAddToEnquiry}
-                                    isAdded={isAdded}
                                 />
                             </div>
                         </div>

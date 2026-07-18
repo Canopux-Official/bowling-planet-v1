@@ -221,27 +221,40 @@ export const LeadsView: React.FC = () => {
                       </td>
                       <td style={{ padding: '16px 24px' }}>
                         {lead.phone ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{ color: '#4B5563', fontSize: '14px' }}>{lead.phone}</div>
-                            <a 
-                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`} 
-                              target="_blank" 
-                              rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              style={{ 
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
-                                textDecoration: 'none'
-                              }}
-                              title="Chat on WhatsApp"
-                            >
-                              <MessageCircle size={14} />
-                            </a>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {lead.phone.split(',').map((phoneStr, idx) => {
+                              const trimmedPhone = phoneStr.trim();
+                              return (
+                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <div style={{ color: '#4B5563', fontSize: '14px' }}>{trimmedPhone}</div>
+                                  <a 
+                                    href={`https://wa.me/${trimmedPhone.replace(/[^0-9]/g, '')}`} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ 
+                                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                      backgroundColor: '#25D366', color: 'white', padding: '4px', borderRadius: '4px',
+                                      textDecoration: 'none'
+                                    }}
+                                    title="Chat on WhatsApp"
+                                  >
+                                    <MessageCircle size={14} />
+                                  </a>
+                                </div>
+                              );
+                            })}
                           </div>
                         ) : (
                           <div style={{ color: '#4B5563', fontSize: '14px' }}>-</div>
                         )}
-                        {lead.email && <div style={{ color: '#9CA3AF', fontSize: '12px', marginTop: '2px' }}>{lead.email}</div>}
+                        {lead.email && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
+                            {lead.email.split(',').map((eStr, idx) => (
+                              <div key={idx} style={{ color: '#9CA3AF', fontSize: '12px' }}>{eStr.trim()}</div>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td style={{ padding: '16px 24px' }}>
                         <div style={{ color: '#4B5563', fontSize: '14px' }}>{locString}</div>

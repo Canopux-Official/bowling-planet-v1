@@ -71,8 +71,10 @@ const initialState: LeadTrackerState = {
     os: osName,
     browser: browserName,
   },
-  // SECURITY: crypto.randomUUID() — 122 bits of entropy, not predictable like Math.random()
-  sessionId: crypto.randomUUID(),
+  // SECURITY: crypto.randomUUID() is preferred, but we need a fallback for older browsers or HTTP
+  sessionId: (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') 
+    ? crypto.randomUUID() 
+    : 'sess_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
 };
 
 const LeadTrackerContext = createContext<LeadTrackerContextType | undefined>(undefined);

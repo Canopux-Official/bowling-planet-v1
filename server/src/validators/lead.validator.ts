@@ -22,13 +22,14 @@ const CtaEventSchema = z.object({
 
 const BehaviorSchema = z.object({
   isReturningVisitor: z.boolean().optional(),
-  eventLog:           z.array(CtaEventSchema).max(50).optional(),
+  eventLog:           z.array(CtaEventSchema).max(150).optional(),
 }).optional();
 
 const EnquiryItemSchema = z.object({
-  id:    z.string().max(100),
-  type:  z.enum(['product', 'franchise', 'project', 'general']),
-  title: z.string().max(200),
+  id:       z.string().max(100),
+  type:     z.enum(['product', 'franchise', 'project', 'general', 'roi-report']),
+  title:    z.string().max(200),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 // --- Full Lead Schema (POST /leads) ------------------------------------------

@@ -8,8 +8,6 @@ interface RoiResultsDisplayProps {
   matched: FranchiseType
   inputs: RoiInputs
   tier: number
-  onAddToEnquiry: () => void
-  isAdded: boolean
 }
 
 /**

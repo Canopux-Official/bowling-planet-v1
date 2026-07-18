@@ -2,8 +2,9 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IEnquiryItem {
   id: string;
-  type: 'product' | 'franchise' | 'project' | 'general';
+  type: 'product' | 'franchise' | 'project' | 'general' | 'roi-report';
   title: string;
+  metadata?: Record<string, any>;
 }
 
 export interface ICTAEvent {
@@ -97,8 +98,9 @@ const LeadSchema: Schema = new Schema(
     enquiryItems: [
       {
         id: { type: String },
-        type: { type: String, enum: ['product', 'franchise', 'project', 'general'] },
+        type: { type: String, enum: ['product', 'franchise', 'project', 'general', 'roi-report'] },
         title: { type: String },
+        metadata: { type: Schema.Types.Mixed },
       },
     ],
 

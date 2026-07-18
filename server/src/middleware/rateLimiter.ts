@@ -19,7 +19,7 @@ export const otpLimiter = rateLimit({
 // Limiter for public lead submission endpoints (Vercel free tier protection)
 export const leadLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute window
-  limit: 5,            // max 5 lead writes per minute per IP
+  limit: 30,           // max 30 lead writes per minute per IP to accommodate ROI calculator interactions
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { success: false, message: 'Too many requests. Please slow down.' },

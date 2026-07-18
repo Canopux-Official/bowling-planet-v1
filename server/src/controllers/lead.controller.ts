@@ -41,28 +41,111 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
     const ip = getClientIp(req);
 
     // SECURITY: status and isPartial are always set by the server, never the client
-    const leadData = {
+    const leadData: any = {
       name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems,
       location: { ip },
       status: 'New' as const,
       isPartial: false,
     };
 
-    // If a sessionId is present, upgrade the existing partial lead to a full one
+    // Remove undefined and empty string fields to prevent overwriting existing data
+    Object.keys(leadData).forEach(key => {
+      if (leadData[key] === undefined || leadData[key] === '') {
+        delete leadData[key];
+      }
+    });
+
+    // 1. Cross-Device Deduplication: Find existing lead by Session OR Email OR Phone
+    let existingLead = null;
+    const searchConditions = [];
+    if (sessionId) searchConditions.push({ sessionId });
+    if (email) searchConditions.push({ email });
+    if (phone) searchConditions.push({ phone });
+
+    if (searchConditions.length > 0) {
+      // Find the most recently active lead that matches ANY of these criteria
+      existingLead = await Lead.findOne({ $or: searchConditions }).sort({ updatedAt: -1 });
+    }
+
     let savedLead;
-    if (sessionId) {
-      savedLead = await Lead.findOneAndUpdate(
-        { sessionId },
-        { ...leadData, sessionId },
-        { new: true, upsert: true }
+    let isNewFullLead = false;
+
+    if (existingLead) {
+      if (existingLead.isPartial) {
+        isNewFullLead = true;
+      }
+      
+      // Preserve and merge contact fields to prevent data loss
+      const mergeContactField = (existingVal?: string, newVal?: string) => {
+        if (!newVal) return existingVal;
+        if (!existingVal) return newVal;
+        const normExisting = existingVal.replace(/[\s-]/g, '').toLowerCase();
+        const normNew = newVal.replace(/[\s-]/g, '').toLowerCase();
+        if (normExisting.includes(normNew)) return existingVal;
+        return `${existingVal}, ${newVal}`;
+      };
+
+      const mergeText = (existingVal?: string, newVal?: string) => {
+        if (!newVal) return existingVal;
+        if (!existingVal) return newVal;
+        if (existingVal.toLowerCase().includes(newVal.toLowerCase())) return existingVal;
+        return `${existingVal} | ${newVal}`;
+      };
+
+      leadData.email = mergeContactField(existingLead.email, leadData.email);
+      leadData.phone = mergeContactField(existingLead.phone, leadData.phone);
+      leadData.city = mergeContactField(existingLead.city, leadData.city);
+      leadData.businessDetails = mergeText(existingLead.businessDetails, leadData.businessDetails);
+
+      // Handle names intelligently (filter out placeholders)
+      const isPlaceholder = (n?: string) => !n || ['ROI Calculator User', 'Quick WhatsApp (No Name)', 'Exit Intent Lead'].includes(n);
+      const cleanExistingName = isPlaceholder(existingLead.name) ? undefined : existingLead.name;
+      const cleanNewName = isPlaceholder(leadData.name) ? undefined : leadData.name;
+      
+      leadData.name = mergeContactField(cleanExistingName, cleanNewName) || existingLead.name || leadData.name;
+      
+      // Preserve existing roi-report items that might not be in the frontend's cart payload
+      const existingRoiReports = (existingLead.enquiryItems || []).filter((i: any) => i.type === 'roi-report');
+      const mergedEnquiryItems = new Map();
+      
+      existingRoiReports.forEach((i: any) => mergedEnquiryItems.set(i.id, i));
+      
+      if (leadData.enquiryItems) {
+        leadData.enquiryItems.forEach((i: any) => mergedEnquiryItems.set(i.id, i));
+      }
+      
+      leadData.enquiryItems = Array.from(mergedEnquiryItems.values());
+
+      // Do not downgrade a Contacted or Closed lead back to New just because they are browsing the site again
+      if (existingLead.status === 'Contacted' || existingLead.status === 'Closed') {
+        delete leadData.status;
+      }
+
+      // Update by _id to guarantee we merge into the deduplicated lead, and bind it to their current active browser session
+      savedLead = await Lead.findByIdAndUpdate(
+        existingLead._id,
+        { $set: { ...leadData, sessionId } },
+        { new: true }
       );
     } else {
-      const lead = new Lead(leadData);
+      isNewFullLead = true;
+      const lead = new Lead({ ...leadData, sessionId });
       savedLead = await lead.save();
     }
 
     // Send admin email notification via Nodemailer asynchronously
-    sendLeadNotification(savedLead).catch(console.error);
+    // Only send an email if:
+    // 1. This is a brand new lead in the CRM (isNewFullLead)
+    // 2. OR the user manually submitted a real form (Contact, Franchise, Cart), which always includes a real name.
+    // Background ROI syncs do not include a name, and Quick WhatsApp/ROI initial submits use specific placeholder names.
+    const isManualFormSubmission = 
+      leadData.name !== undefined && 
+      leadData.name !== 'ROI Calculator User' && 
+      leadData.name !== 'Quick WhatsApp (No Name)';
+
+    if (isNewFullLead || isManualFormSubmission) {
+      sendLeadNotification(savedLead).catch(console.error);
+    }
 
     res.status(201).json({ success: true, data: savedLead });
   } catch (error: unknown) {
@@ -88,33 +171,96 @@ export const savePartialLead = async (req: Request, res: Response): Promise<void
     const { name, phone, email, city, businessDetails, utm, behavior, enquiryItems, device, sessionId } = parsed.data;
     const ip = getClientIp(req);
 
-    const leadData = {
+    const leadData: any = {
       name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems,
       location: { ip },
       status: 'Abandoned' as const,
       isPartial: true,
     };
 
-    if (sessionId) {
-      const existingLead = await Lead.findOne({ sessionId });
+    // Remove undefined and empty string fields to prevent overwriting existing data
+    Object.keys(leadData).forEach(key => {
+      if (leadData[key] === undefined || leadData[key] === '') {
+        delete leadData[key];
+      }
+    });
+
+    // 1. Cross-Device Deduplication: Find existing lead by Session OR Email OR Phone
+    let existingLead = null;
+    const searchConditions = [];
+    if (sessionId) searchConditions.push({ sessionId });
+    if (email) searchConditions.push({ email });
+    if (phone) searchConditions.push({ phone });
+
+    if (searchConditions.length > 0) {
+      existingLead = await Lead.findOne({ $or: searchConditions }).sort({ updatedAt: -1 });
+    }
+
+    if (existingLead) {
+      // Preserve existing roi-report items that might not be in the frontend's cart payload
+      const existingRoiReports = (existingLead.enquiryItems || []).filter((i: any) => i.type === 'roi-report');
+      const mergedEnquiryItems = new Map();
       
-      if (existingLead && !existingLead.isPartial) {
+      existingRoiReports.forEach((i: any) => mergedEnquiryItems.set(i.id, i));
+      
+      if (leadData.enquiryItems) {
+        leadData.enquiryItems.forEach((i: any) => mergedEnquiryItems.set(i.id, i));
+      }
+      
+      leadData.enquiryItems = Array.from(mergedEnquiryItems.values());
+    }
+
+    let savedLead;
+
+    if (existingLead) {
+      // Preserve and merge contact fields to prevent data loss
+      const mergeContactField = (existingVal?: string, newVal?: string) => {
+        if (!newVal) return existingVal;
+        if (!existingVal) return newVal;
+        const normExisting = existingVal.replace(/[\s-]/g, '').toLowerCase();
+        const normNew = newVal.replace(/[\s-]/g, '').toLowerCase();
+        if (normExisting.includes(normNew)) return existingVal;
+        return `${existingVal}, ${newVal}`;
+      };
+
+      const mergeText = (existingVal?: string, newVal?: string) => {
+        if (!newVal) return existingVal;
+        if (!existingVal) return newVal;
+        if (existingVal.toLowerCase().includes(newVal.toLowerCase())) return existingVal;
+        return `${existingVal} | ${newVal}`;
+      };
+
+      leadData.email = mergeContactField(existingLead.email, leadData.email);
+      leadData.phone = mergeContactField(existingLead.phone, leadData.phone);
+      leadData.city = mergeContactField(existingLead.city, leadData.city);
+      leadData.businessDetails = mergeText(existingLead.businessDetails, leadData.businessDetails);
+
+      // Handle names intelligently (filter out placeholders)
+      const isPlaceholder = (n?: string) => !n || ['ROI Calculator User', 'Quick WhatsApp (No Name)', 'Exit Intent Lead'].includes(n);
+      const cleanExistingName = isPlaceholder(existingLead.name) ? undefined : existingLead.name;
+      const cleanNewName = isPlaceholder(leadData.name) ? undefined : leadData.name;
+      
+      leadData.name = mergeContactField(cleanExistingName, cleanNewName) || existingLead.name || leadData.name;
+
+      if (!existingLead.isPartial) {
         // Lead is already a full lead. Do not downgrade status to Abandoned or isPartial to true.
-        await Lead.findOneAndUpdate(
-          { sessionId },
-          { name, phone, email, city, businessDetails, utm, behavior, device, enquiryItems, location: { ip } },
+        const { status, isPartial, ...safeUpdateData } = leadData;
+        savedLead = await Lead.findByIdAndUpdate(
+          existingLead._id,
+          { $set: { ...safeUpdateData, sessionId } },
           { new: true }
         );
       } else {
-        await Lead.findOneAndUpdate(
-          { sessionId },
-          { ...leadData, sessionId },
-          { new: true, upsert: true }
+        // Safe to update partial lead
+        savedLead = await Lead.findByIdAndUpdate(
+          existingLead._id,
+          { $set: { ...leadData, sessionId } },
+          { new: true }
         );
       }
     } else {
-      const lead = new Lead(leadData);
-      await lead.save();
+      const lead = new Lead({ ...leadData, sessionId });
+      savedLead = await lead.save();
     }
 
     res.status(201).json({ success: true, message: 'Partial lead saved' });
