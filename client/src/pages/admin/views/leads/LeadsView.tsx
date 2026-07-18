@@ -222,7 +222,7 @@ export const LeadsView: React.FC = () => {
                       <td style={{ padding: '16px 24px' }}>
                         {lead.phone ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {lead.phone.split(',').map((phoneStr, idx) => {
+                            {lead.phone.split(',').map((phoneStr: any, idx: any) => {
                               const trimmedPhone = phoneStr.trim();
                               return (
                                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -250,7 +250,7 @@ export const LeadsView: React.FC = () => {
                         )}
                         {lead.email && (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
-                            {lead.email.split(',').map((eStr, idx) => (
+                            {lead.email.split(',').map((eStr:any, idx:any) => (
                               <div key={idx} style={{ color: '#9CA3AF', fontSize: '12px' }}>{eStr.trim()}</div>
                             ))}
                           </div>
