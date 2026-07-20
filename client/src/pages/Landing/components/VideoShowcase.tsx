@@ -1,15 +1,15 @@
-import { type FC, useRef, useEffect, useState } from 'react'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { type FC, useRef } from 'react'
+import { motion } from 'framer-motion'
 
 const VideoShowcase: FC = () => {
   const containerRef = useRef<HTMLElement>(null)
 
   // Parallax effect for the overlay content
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start']
-  })
-  const y = useTransform(scrollYProgress, [0, 1], [50, -50])
+  // const { scrollYProgress } = useScroll({
+  //   target: containerRef,
+  //   offset: ['start end', 'end start']
+  // })
+  // const y = useTransform(scrollYProgress, [0, 1], [50, -50])
 
   return (
     <section

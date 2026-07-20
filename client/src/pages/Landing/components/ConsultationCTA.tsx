@@ -5,7 +5,6 @@
 
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { ArrowRight, Calendar } from 'lucide-react'

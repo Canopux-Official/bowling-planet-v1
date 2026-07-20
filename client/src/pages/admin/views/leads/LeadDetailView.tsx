@@ -107,7 +107,7 @@ export const LeadDetailView: React.FC = () => {
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Phone</div>
                   {lead.phone ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {lead.phone.split(',').map((phoneStr, idx) => {
+                      {lead.phone.split(',').map((phoneStr:any, idx:any) => {
                         const trimmedPhone = phoneStr.trim();
                         return (
                           <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -140,7 +140,7 @@ export const LeadDetailView: React.FC = () => {
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Email</div>
                   {lead.email ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {lead.email.split(',').map((eStr, idx) => (
+                      {lead.email.split(',').map((eStr:any, idx:any) => (
                         <div key={idx} style={{ fontSize: '15px', color: theme.colors.adminText, fontWeight: 500 }}>{eStr.trim()}</div>
                       ))}
                     </div>
@@ -162,7 +162,7 @@ export const LeadDetailView: React.FC = () => {
                   <div style={{ fontSize: '12px', color: theme.colors.adminTextMuted, marginBottom: '4px' }}>Business Details</div>
                   {lead.businessDetails ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {lead.businessDetails.split('|').map((detail, idx) => (
+                      {lead.businessDetails.split('|').map((detail:any, idx:any) => (
                         <div key={idx} style={{ fontSize: '14px', color: theme.colors.adminText, fontWeight: 500, backgroundColor: theme.colors.adminBg, padding: '8px', borderRadius: '6px' }}>
                           {detail.trim()}
                         </div>

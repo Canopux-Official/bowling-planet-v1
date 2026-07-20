@@ -4,8 +4,8 @@
  * testimonial carousel, leaning heavily into the consulting narrative.
  */
 
-import { type FC, useState, useRef, useEffect } from 'react'
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
+import { type FC, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '../../../hooks/useReducedMotion'
 
 interface CaseStudy {
@@ -131,7 +131,7 @@ const TestimonialCarousel: FC = () => {
 /* ── CaseStudiesSection ───────────────────────────────────────── */
 const CaseStudiesSection: FC = () => {
   const [activeIdx, setActiveIdx] = useState(0)
-  const activeStudy = CASE_STUDIES[activeIdx]
+  // const activeStudy = CASE_STUDIES[activeIdx]
   const reduced = useReducedMotion()
 
   // Auto-play for Case Studies

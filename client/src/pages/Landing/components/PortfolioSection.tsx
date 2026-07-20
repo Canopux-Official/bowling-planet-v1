@@ -3,12 +3,12 @@
  * cursor-tracked spotlight on large card, and lightbox on click.
  */
 
-import { type FC, useState, useRef, useEffect } from 'react'
+import { type FC, useState, useEffect } from 'react'
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
-import { useReducedMotion } from '../../../hooks/useReducedMotion'
+// import { useReducedMotion } from '../../../hooks/useReducedMotion'
 import { X, ArrowRight } from 'lucide-react'
 import { MOCK_PROJECTS } from '../../ProjectsPage/services/mockdata'
 
@@ -66,7 +66,7 @@ const ProjectCard: FC<{
   index: number
   isActive?: boolean
 }> = ({ project, large, onOpenLightbox, index, isActive }) => {
-  const reduced = useReducedMotion()
+  // const reduced = useReducedMotion()
   const [hover, setHover] = useState(false)
   const activeState = isActive || hover
 

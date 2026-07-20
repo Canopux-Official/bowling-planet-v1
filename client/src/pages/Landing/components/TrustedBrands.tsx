@@ -5,7 +5,7 @@
 
 import { type FC, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useScrollDirection } from '../../../hooks/useScrollDirection'
+// import { useScrollDirection } from '../../../hooks/useScrollDirection'
 import { useReveal } from '../../../hooks/useReveal'
 import { X } from 'lucide-react'
 
@@ -167,14 +167,14 @@ const BrandCard: FC<{ brand: BrandInfo; i: number; onClick: () => void }> = ({ b
 
 const TrustedBrands: FC<{ data?: string[] }> = ({ data }) => {
   const ref = useReveal()
-  const scrollDir = useScrollDirection()
+  // const scrollDir = useScrollDirection()
   const [selected, setSelected] = useState<BrandInfo | null>(null)
 
   const activeBrands: BrandInfo[] = data && data.length > 0
     ? data.map(name => BRANDS.find(b => b.name === name) || { name, note: 'Trusted partner.', year: '', category: 'FEC' })
     : BRANDS
 
-  const marqueeDir = scrollDir === 'up' ? 'reverse' : 'normal'
+  // const marqueeDir = scrollDir === 'up' ? 'reverse' : 'normal'
 
   return (
     <>

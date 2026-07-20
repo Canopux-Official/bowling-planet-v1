@@ -167,7 +167,7 @@ const BlogPreviewSection: FC = () => {
         <div ref={titleRef} className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24, marginBottom: 56 }}>
           <div>
             <div className="label" style={{ marginBottom: 16 }}>Insights</div>
-            <h2 className="font-display" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: 'var(--text-1)', lineHeight: 1.1, letterSpacing: '-0.02em', m: 0 }}>
+            <h2 className="font-display" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: 'var(--text-1)', lineHeight: 1.1, letterSpacing: '-0.02em', margin: 0 }}>
               The Playbook.
             </h2>
           </div>
