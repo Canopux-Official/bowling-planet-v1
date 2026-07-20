@@ -114,8 +114,8 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
   // Cursor parallax
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
-  const bg1X = useTransform(mouseX, [-1, 1], reduced ? [0, 0] : [-18, 18])
-  const bg1Y = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [-10, 10])
+  // const bg1X = useTransform(mouseX, [-1, 1], reduced ? [0, 0] : [-18, 18])
+  // const bg1Y = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [-10, 10])
   const bg2X = useTransform(mouseX, [-1, 1], reduced ? [0, 0] : [-8, 8])
   const bg2Y = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [-5, 5])
   

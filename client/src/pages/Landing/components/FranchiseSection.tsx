@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
-import { Plus, Check, IndianRupee, ArrowRight } from 'lucide-react'
+import { Plus, Check, IndianRupee } from 'lucide-react'
 
 const HIGHLIGHTS = [
   {
@@ -48,8 +48,8 @@ const ROITeaser: FC = () => {
   
   // Map drag x (0 to 100%) to values
   // Let's assume max drag is ~300px
-  const sqft = useTransform(dragX, [0, 300], [5000, 20000])
-  const revenue = useTransform(dragX, [0, 300], [15, 60]) // in Lakhs/mo
+  // const sqft = useTransform(dragX, [0, 300], [5000, 20000])
+  // const revenue = useTransform(dragX, [0, 300], [15, 60]) // in Lakhs/mo
   
   const [currentSqft, setSqft] = useState(5000)
   const [currentRev, setRev] = useState(15)

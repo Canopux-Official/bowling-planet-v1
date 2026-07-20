@@ -106,97 +106,97 @@ const StatChip: FC<{
 }
 
 /* ── Badge chip with tooltip ──────────────────────────────────── */
-const BadgeChip: FC<{
-  label: string
-  tooltip: string
-  color: string
-  delay: number
-  isVisible: boolean
-}> = ({ label, tooltip, color, delay, isVisible }) => {
-  const [open, setOpen] = useState(false)
+// const BadgeChip: FC<{
+//   label: string
+//   tooltip: string
+//   color: string
+//   delay: number
+//   isVisible: boolean
+// }> = ({ label, tooltip, color, delay, isVisible }) => {
+//   const [open, setOpen] = useState(false)
 
-  return (
-    <div style={{ background: '#000', position: 'relative', display: 'inline-block' }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.5, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        role="button"
-        tabIndex={0}
-        aria-label={`${label}: ${tooltip}`}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '8px 16px',
-          borderRadius: 100,
-          border: `1.5px solid ${color}30`,
-          background: `${color}10`,
-          cursor: 'default',
-          transition: 'all 0.25s ease',
-          ...(open ? {
-            background: `${color}18`,
-            border: `1.5px solid ${color}60`,
-            transform: 'translateY(-2px)',
-            boxShadow: `0 8px 24px ${color}18`,
-          } : {}),
-        }}
-      >
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, flexShrink: 0 }} />
-        <span style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 12,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: '#F5F5F7',
-        }}>
-          {label}
-        </span>
-      </motion.div>
-      {/* Tooltip */}
-      {open && (
-        <div
-          role="tooltip"
-          style={{
-            position: 'absolute',
-            bottom: '110%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            whiteSpace: 'nowrap',
-            background: '#F5F5F7',
-            color: '#F5F5F7',
-            fontSize: 11,
-            fontFamily: 'var(--font-sans)',
-            fontWeight: 500,
-            lineHeight: 1.5,
-            padding: '7px 12px',
-            borderRadius: 8,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            zIndex: 10,
-            maxWidth: 240,
-            textAlign: 'center',
-            whiteSpace: 'normal',
-          } as React.CSSProperties}
-        >
-          {tooltip}
-          <div style={{
-            position: 'absolute',
-            top: '100%', left: '50%',
-            transform: 'translateX(-50%)',
-            borderWidth: '5px 5px 0',
-            borderStyle: 'solid',
-            borderColor: '#F5F5F7 transparent transparent',
-          }} />
-        </div>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div style={{ background: '#000', position: 'relative', display: 'inline-block' }}>
+//       <motion.div
+//         initial={{ opacity: 0, scale: 0.9 }}
+//         animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+//         transition={{ duration: 0.5, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+//         onMouseEnter={() => setOpen(true)}
+//         onMouseLeave={() => setOpen(false)}
+//         onFocus={() => setOpen(true)}
+//         onBlur={() => setOpen(false)}
+//         role="button"
+//         tabIndex={0}
+//         aria-label={`${label}: ${tooltip}`}
+//         style={{
+//           display: 'inline-flex',
+//           alignItems: 'center',
+//           gap: 6,
+//           padding: '8px 16px',
+//           borderRadius: 100,
+//           border: `1.5px solid ${color}30`,
+//           background: `${color}10`,
+//           cursor: 'default',
+//           transition: 'all 0.25s ease',
+//           ...(open ? {
+//             background: `${color}18`,
+//             border: `1.5px solid ${color}60`,
+//             transform: 'translateY(-2px)',
+//             boxShadow: `0 8px 24px ${color}18`,
+//           } : {}),
+//         }}
+//       >
+//         <span style={{ width: 7, height: 7, borderRadius: '50%', background: color, flexShrink: 0 }} />
+//         <span style={{
+//           fontFamily: 'var(--font-sans)',
+//           fontSize: 12,
+//           fontWeight: 700,
+//           letterSpacing: '0.06em',
+//           textTransform: 'uppercase',
+//           color: '#F5F5F7',
+//         }}>
+//           {label}
+//         </span>
+//       </motion.div>
+//       {/* Tooltip */}
+//       {open && (
+//         <div
+//           role="tooltip"
+//           style={{
+//             position: 'absolute',
+//             bottom: '110%',
+//             left: '50%',
+//             transform: 'translateX(-50%)',
+//             whiteSpace: 'nowrap',
+//             background: '#F5F5F7',
+//             color: '#F5F5F7',
+//             fontSize: 11,
+//             fontFamily: 'var(--font-sans)',
+//             fontWeight: 500,
+//             lineHeight: 1.5,
+//             padding: '7px 12px',
+//             borderRadius: 8,
+//             boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+//             zIndex: 10,
+//             maxWidth: 240,
+//             textAlign: 'center',
+//             whiteSpace: 'normal',
+//           } as React.CSSProperties}
+//         >
+//           {tooltip}
+//           <div style={{
+//             position: 'absolute',
+//             top: '100%', left: '50%',
+//             transform: 'translateX(-50%)',
+//             borderWidth: '5px 5px 0',
+//             borderStyle: 'solid',
+//             borderColor: '#F5F5F7 transparent transparent',
+//           }} />
+//         </div>
+//       )}
+//     </div>
+//   )
+// }
 
 /* ── CredibilityStrip ─────────────────────────────────────────── */
 const CredibilityStrip: FC<{ data?: any }> = ({ data }) => {
