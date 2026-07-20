@@ -78,6 +78,7 @@ const PILLARS: Pillar[] = [
 
 const ServicesSection: FC = () => {
   const titleRef = useReveal()
+  const { logCTAEvent } = useLeadTracker()
   const [active, setActive] = useState('pre-opening')
   useEffect(() => {
     const interval = setInterval(() => {
