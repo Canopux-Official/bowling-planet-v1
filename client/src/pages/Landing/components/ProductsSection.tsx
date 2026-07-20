@@ -147,7 +147,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
                   <h3 style={{ 
                     margin: 0, 
                     fontFamily: 'var(--font-display)', 
-                    fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', 
+                    fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', 
                     fontWeight: 400, 
                     letterSpacing: '-0.02em', 
                     color: isHovered ? '#fff' : 'rgba(255,255,255,0.8)',
