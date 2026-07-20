@@ -8,6 +8,7 @@ import { type FC } from 'react'
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useReveal } from '../../../hooks/useReveal'
+import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { useNavigate } from 'react-router-dom'
 
 interface Pillar {
