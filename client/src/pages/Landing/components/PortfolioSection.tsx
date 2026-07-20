@@ -3,7 +3,7 @@
  * cursor-tracked spotlight on large card, and lightbox on click.
  */
 
-import { type FC, useState, useRef } from 'react'
+import { type FC, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
@@ -64,9 +64,11 @@ const ProjectCard: FC<{
   large?: boolean
   onOpenLightbox: (src: string, alt: string) => void
   index: number
-}> = ({ project, large, onOpenLightbox, index }) => {
+  isActive?: boolean
+}> = ({ project, large, onOpenLightbox, index, isActive }) => {
   const reduced = useReducedMotion()
   const [hover, setHover] = useState(false)
+  const activeState = isActive || hover
 
   return (
     <motion.div
@@ -85,17 +87,17 @@ const ProjectCard: FC<{
         position: 'relative',
         background: '#0A0A0F',
         height: large ? 480 : 320,
-        boxShadow: hover ? `0 20px 50px rgba(168, 85, 247, 0.25)` : '0 10px 30px rgba(0,0,0,0.5)',
+        boxShadow: activeState ? `0 20px 50px rgba(168, 85, 247, 0.25)` : '0 10px 30px rgba(0,0,0,0.5)',
       }}
-      whileHover={{ y: -5 }}
+      whileHover={{ scale: 1.015 }}
       transition={{ layout: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }, scale: { duration: 0.3 } }}
     >
       {/* Image */}
       <motion.img
         src={project.image}
         alt={project.name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: hover ? 'grayscale(0%)' : 'grayscale(30%)' }}
-        animate={{ scale: hover ? 1.08 : 1 }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: activeState ? 'grayscale(0%)' : 'grayscale(30%)' }}
+        animate={{ scale: activeState ? 1.08 : 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       />
 
@@ -110,10 +112,10 @@ const ProjectCard: FC<{
         style={{ 
           position: 'absolute', bottom: 0, left: 0, right: 0, 
           padding: large ? '36px' : '24px',
-          background: hover ? 'linear-gradient(to top, rgba(168,85,247,0.2) 0%, rgba(20,10,25,0.85) 60%, transparent 100%)' : 'transparent',
-          backdropFilter: hover ? 'blur(8px)' : 'none',
+          background: activeState ? 'linear-gradient(to top, rgba(168,85,247,0.2) 0%, rgba(20,10,25,0.85) 60%, transparent 100%)' : 'transparent',
+          backdropFilter: activeState ? 'blur(8px)' : 'none',
         }}
-        animate={{ y: hover ? 0 : 10 }}
+        animate={{ y: activeState ? 0 : 10 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <div style={{ display: 'flex', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -127,7 +129,7 @@ const ProjectCard: FC<{
             {project.category}
           </span>
           <motion.span 
-            animate={{ opacity: hover ? 1 : 0.6 }}
+            animate={{ opacity: activeState ? 1 : 0.6 }}
             style={{
               fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
               color: 'rgba(255,255,255,0.9)', background: 'rgba(255,255,255,0.05)',
@@ -144,7 +146,7 @@ const ProjectCard: FC<{
           </h3>
           <motion.div 
             initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: hover ? 1 : 0, x: hover ? 0 : -10 }}
+            animate={{ opacity: activeState ? 1 : 0, x: activeState ? 0 : -10 }}
             style={{
               width: 40, height: 40, borderRadius: '50%', background: '#5FC1D1', color: '#000',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -164,6 +166,7 @@ const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
   const { logCTAEvent } = useLeadTracker()
   const [activeFilter, setActiveFilter] = useState('All')
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   const projects = data?.projectIds?.length
     ? data.projectIds.map((p, i) => ({
@@ -178,6 +181,18 @@ const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
   const filtered = activeFilter === 'All'
     ? projects
     : projects.filter(p => p.category === activeFilter)
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [activeFilter])
+
+  useEffect(() => {
+    if (!filtered.length) return
+    const cycle = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % Math.min(filtered.length, 5))
+    }, 2500)
+    return () => clearInterval(cycle)
+  }, [filtered.length])
 
   return (
     <>
@@ -254,6 +269,7 @@ const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
                       project={project}
                       large={i === 0}
                       index={i}
+                      isActive={activeIndex === i}
                       onOpenLightbox={(src, alt) => setLightbox({ src, alt })}
                     />
                   </div>

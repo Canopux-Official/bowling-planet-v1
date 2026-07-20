@@ -118,6 +118,11 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
   const bg1Y = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [-10, 10])
   const bg2X = useTransform(mouseX, [-1, 1], reduced ? [0, 0] : [-8, 8])
   const bg2Y = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [-5, 5])
+  
+  const rawCardRotateX = useTransform(mouseY, [-1, 1], reduced ? [0, 0] : [12, -12])
+  const rawCardRotateY = useTransform(mouseX, [-1, 1], reduced ? [0, 0] : [-12, 12])
+  const cardRotateX = useSpring(rawCardRotateX, { stiffness: 80, damping: 25 })
+  const cardRotateY = useSpring(rawCardRotateY, { stiffness: 80, damping: 25 })
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (reduced) return
@@ -217,7 +222,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
           zIndex: 1,
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 500px), 1fr))',
-          gap: 60,
+          gap: 120,
           alignItems: 'center'
         }}
       >
@@ -439,37 +444,51 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', perspective: 1000 }}
         >
-          <div style={{
-            background: 'rgba(255,255,255,0.03)',
-            backdropFilter: 'blur(24px)',
-            border: '1px solid rgba(255,255,255,0.08)',
+          <motion.div 
+            animate={reduced ? {} : { y: [-12, 12, -12] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+            rotateX: cardRotateX,
+            rotateY: cardRotateY,
+            background: 'rgba(20,20,30,0.4)',
+            backdropFilter: 'blur(40px)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderTop: '1px solid rgba(255,255,255,0.15)',
             borderRadius: 32,
-            padding: '40px',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.4), inset 0 0 32px rgba(255,255,255,0.02)',
+            padding: '48px 40px',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)',
             width: '100%',
             maxWidth: 480,
+            position: 'relative',
+            overflow: 'hidden'
           }}>
+            {/* Subtle top corner glow */}
+            <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: '#5FC1D1', filter: 'blur(80px)', opacity: 0.15, pointerEvents: 'none' }} />
+
             <h3 style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 14,
-              fontWeight: 700,
+              fontSize: 12,
+              fontWeight: 800,
               color: '#5FC1D1',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              marginBottom: 32,
+              letterSpacing: '0.15em',
+              marginBottom: 48,
               display: 'flex',
               alignItems: 'center',
               gap: 12
             }}>
-              <span style={{ width: 24, height: 1, background: '#5FC1D1' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#5FC1D1', boxShadow: '0 0 12px #5FC1D1' }} />
               End-to-End Solutions
             </h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 36, position: 'relative' }}>
+              {/* Vertical timeline line */}
+              <div style={{ position: 'absolute', left: 15, top: 24, bottom: 24, width: 2, background: 'linear-gradient(to bottom, rgba(95,193,209,0.3) 0%, rgba(109,189,78,0.3) 50%, rgba(155,81,224,0.3) 100%)', zIndex: 0 }} />
+
               {[
-                { title: 'Pre-Opening Consulting', desc: 'Data-driven location analysis, ROI modeling, and 3D architectural design.', color: '#5FC1D1', highlight: true },
+                { title: 'Pre-Opening Consulting', desc: 'Data-driven location analysis, ROI modeling, and 3D architectural design.', color: '#5FC1D1' },
                 { title: 'Operations Management', desc: 'Staff training, operational SOPs, and full facility management.', color: '#6DBD4E' },
                 { title: 'Equipment Supply', desc: 'Procurement of premium arcade games, bowling lanes, and global sourcing.', color: '#9B51E0' },
               ].map((item, i) => (
@@ -478,44 +497,51 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.8 + (i * 0.15) }}
-                  style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}
+                  whileHover={{ x: 8 }}
+                  style={{ display: 'flex', gap: 24, alignItems: 'flex-start', position: 'relative', zIndex: 1, cursor: 'default' }}
                 >
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%',
-                    background: `rgba(${item.color === '#5FC1D1' ? '95,193,209' : item.color === '#6DBD4E' ? '109,189,78' : '155,81,224'}, 0.1)`,
-                    border: `1px solid ${item.color}`,
+                    background: '#0B0B0F',
+                    border: `2px solid ${item.color}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: item.color, fontSize: 14, fontWeight: 800,
+                    color: item.color, fontSize: 13, fontWeight: 900,
                     flexShrink: 0,
-                    boxShadow: item.highlight ? `0 0 16px rgba(95,193,209,0.4)` : 'none'
+                    boxShadow: `0 0 24px ${item.color}40`,
+                    marginTop: 2
                   }}>
                     {i + 1}
                   </div>
                   <div>
                     <h4 style={{ 
                       fontFamily: 'var(--font-sans)', 
-                      color: item.highlight ? '#fff' : 'rgba(255,255,255,0.9)', 
-                      fontSize: 16, 
-                      fontWeight: item.highlight ? 700 : 600, 
-                      margin: '0 0 4px 0',
-                      textShadow: item.highlight ? `0 0 12px rgba(95,193,209,0.3)` : 'none'
+                      color: '#fff', 
+                      fontSize: 18, 
+                      fontWeight: 700, 
+                      margin: '0 0 8px 0',
+                      letterSpacing: '-0.01em'
                     }}>
                       {item.title}
                     </h4>
-                    <p style={{ 
-                      fontFamily: 'var(--font-sans)', 
-                      color: item.highlight ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.5)', 
-                      fontSize: 14, 
-                      margin: 0, 
-                      lineHeight: 1.5 
-                    }}>
+                    <p 
+                      style={{ 
+                        fontFamily: 'var(--font-sans)', 
+                        color: 'rgba(255,255,255,0.5)', 
+                        fontSize: 15, 
+                        margin: 0, 
+                        lineHeight: 1.6,
+                        transition: 'color 0.3s ease'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.9)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.5)'}
+                    >
                       {item.desc}
                     </p>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </motion.div>
 
