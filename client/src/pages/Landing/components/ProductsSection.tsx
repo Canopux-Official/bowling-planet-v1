@@ -1,36 +1,50 @@
-import { type FC } from 'react'
+/**
+ * ProductsSection — Cinematic Hover-to-Reveal Design
+ */
+
+import { type FC, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
-import { Plus, Check } from 'lucide-react'
+import { Plus, Check, ArrowRight, BarChart } from 'lucide-react'
 
 const CATEGORIES = [
   {
     id: 'arcade', num: '01',
-    title: 'Arcade & Video Games',
-    desc: 'Latest-generation skill, racing, and video arcade machines. From classic redemption to immersive 4D experiences — every style of player covered.',
+    title: 'Arcade & Video',
+    desc: 'Latest-generation skill, racing, and video arcade machines. From classic redemption to immersive 4D experiences.',
     icon: '🕹',
     count: '200+ Titles',
     color: '#5FC1D1',
-    glow: 'rgba(95,193,209,0.08)',
+    image: '/products/Arcade_Games_Calicut.avif'
   },
   {
     id: 'major', num: '02',
     title: 'Major Attractions',
-    desc: 'Headline centrepieces — bowling lanes, VR arenas, trampoline parks, mini golf, go-kart tracks, cricket simulators, ziplines & rope courses.',
+    desc: 'Headline centrepieces — bowling lanes, VR arenas, trampoline parks, mini golf, go-kart tracks, cricket simulators, and rope courses.',
     icon: '🎳',
     count: '30+ Categories',
     color: '#6DBD4E',
-    glow: 'rgba(109,189,78,0.08)',
+    image: '/products/Bowling_Lane_Dubai.avif'
   },
   {
     id: 'redemption', num: '03',
     title: 'Redemption Games',
-    desc: 'High-engagement ticket-based games with proven repeat-visit ROI. Data-backed selection to maximise in-venue spend and dwell time.',
+    desc: 'High-engagement ticket-based games with proven repeat-visit ROI. Data-backed selection to maximise in-venue spend.',
     icon: '🎫',
     count: '500+ SKUs',
-    color: '#5FC1D1',
-    glow: 'rgba(95,193,209,0.08)',
+    color: '#FFAA33',
+    image: '/products/Softplay_Ahemdabad.avif'
+  },
+  {
+    id: 'outdoor', num: '04',
+    title: 'Outdoor & Adventure',
+    desc: 'Large scale outdoor equipment, ziplines, and adventure park structural builds designed for high-throughput and safety.',
+    icon: '🧗',
+    count: '15+ Types',
+    color: '#C084FC',
+    image: '/products/Softplay_New_Delhi.avif'
   },
 ]
 
@@ -42,151 +56,243 @@ const ATTRACTION_TAGS = [
 
 const ProductsSection: FC<{ data?: any }> = ({ data }) => {
   const titleRef = useReveal()
-  const cardsRef = useReveal()
   const tagsRef  = useReveal()
   const { state, addToEnquiry, logCTAEvent } = useLeadTracker()
-  const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  
+  const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id)
 
   const activeCategories = [
     { ...CATEGORIES[0], count: data?.arcadeGamesCount || CATEGORIES[0].count },
     { ...CATEGORIES[1], count: data?.majorAttractionsCount || CATEGORIES[1].count },
     { ...CATEGORIES[2], count: data?.redemptionGamesCount || CATEGORIES[2].count },
-  ];
+    CATEGORIES[3]
+  ]
 
   return (
-    <section id="products" style={{ background: '#000000', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-      {/* Subtle center glow */}
-      <div className="orb orb-teal" style={{ width: 700, height: 500, top: '10%', left: '50%', transform: 'translateX(-50%)' }} />
+    <section id="products" style={{ background: '#0B0B0F', position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+      
+      {/* ── Dynamic Cinematic Backgrounds ── */}
+      <AnimatePresence>
+        {activeCategories.map((cat, i) => (
+          hoveredIdx === i && (
+            <motion.div
+              key={cat.id}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              style={{ position: 'absolute', inset: 0, zIndex: 0 }}
+            >
+              <img 
+                src={cat.image} 
+                alt={cat.title} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }} 
+              />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(11,11,15,1) 0%, rgba(11,11,15,0.7) 40%, rgba(11,11,15,0.2) 100%)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(11,11,15,1) 0%, transparent 20%, transparent 80%, rgba(11,11,15,1) 100%)' }} />
+            </motion.div>
+          )
+        ))}
+      </AnimatePresence>
 
-      <div style={{ maxWidth: 1320, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 1320, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1, padding: '120px 28px', display: 'flex', flexDirection: 'column', gap: 80 }}>
 
         {/* ── Title ──────────────────────────────────────── */}
-        <div ref={titleRef} className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
-          <h2 className="font-display text-metallic" style={{
-            fontWeight: 800, fontSize: 'clamp(3rem, 6vw, 5rem)',
-            letterSpacing: '-0.04em', lineHeight: 1.05,
-          }}>
-            Our Products.
+        <div ref={titleRef} className="reveal" style={{ maxWidth: 600 }}>
+          <div className="label" style={{ marginBottom: 20 }}>Distribution</div>
+          <h2 className="font-display text-metallic" style={{ fontWeight: 400, fontSize: 'clamp(3rem, 6vw, 5.5rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+            Equipment &<br />Attractions.
           </h2>
-          <div className="text-gradient-brand" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', fontWeight: 600, marginTop: 16 }}>
-            Curated attractions that drive engagement.
-          </div>
-          <p style={{ fontSize: 16, color: '#86868B', maxWidth: 540, margin: '20px auto 0', lineHeight: 1.7 }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 17, color: 'var(--text-2)', margin: '24px 0 0', lineHeight: 1.7 }}>
             We source and distribute world-class FEC equipment globally — from a single arcade cabinet
-            to a complete multi-zone entertainment destination turnkey.
+            to a complete multi-zone entertainment destination.
           </p>
         </div>
 
-        {/* ── Cards ──────────────────────────────────────── */}
-        <div
-          ref={cardsRef}
-          className="stagger"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-            gap: 20, marginBottom: 60,
-          }}
-        >
-          {activeCategories.map(cat => (
-            <div
-              key={cat.id}
-              className="glass-card"
-              style={{ padding: '36px 32px', position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
-            >
-              {/* Top gradient accent line */}
-              <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-                background: `linear-gradient(90deg, transparent, ${cat.color}, transparent)`,
-                boxShadow: `0 0 12px ${cat.color}80`,
-              }} />
-              {/* Corner glow */}
-              <div aria-hidden="true" style={{
-                position: 'absolute', top: 0, right: 0, width: 160, height: 160,
-                background: `radial-gradient(circle at top right, ${cat.glow}, transparent 70%)`,
-                pointerEvents: 'none',
-              }} />
+        {/* ── Interactive List ──────────────────────────────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }} onMouseLeave={() => setHoveredIdx(null)}>
+          {activeCategories.map((cat, i) => {
+            const isHovered = hoveredIdx === i
+            const isFaded = hoveredIdx !== null && hoveredIdx !== i
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-                <span style={{ fontSize: 36 }} aria-hidden="true">{cat.icon}</span>
-                <span style={{
-                  fontFamily: '"Sora", sans-serif', fontWeight: 700, fontSize: 11,
-                  letterSpacing: '0.1em', textTransform: 'uppercase',
-                  color: cat.color, background: `${cat.color}14`,
-                  padding: '5px 12px', borderRadius: 6,
-                  border: `1px solid ${cat.color}30`,
+            return (
+              <div
+                key={cat.id}
+                onMouseEnter={() => setHoveredIdx(i)}
+                style={{
+                  position: 'relative',
+                  padding: '40px 0',
+                  borderTop: i === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                  borderBottom: '1px solid rgba(255,255,255,0.1)',
+                  cursor: 'crosshair',
+                  opacity: isFaded ? 0.3 : 1,
+                  transition: 'opacity 0.4s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '24px 40px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 32, flex: '1 1 auto' }}>
+                  <span style={{ 
+                    fontFamily: 'var(--font-data)', 
+                    fontSize: 'clamp(1rem, 2vw, 1.5rem)', 
+                    fontWeight: 700, 
+                    color: isHovered ? cat.color : 'rgba(255,255,255,0.3)', 
+                    transition: 'color 0.4s ease' 
+                  }}>
+                    {cat.num}
+                  </span>
+                  <h3 style={{ 
+                    margin: 0, 
+                    fontFamily: 'var(--font-display)', 
+                    fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', 
+                    fontWeight: 400, 
+                    letterSpacing: '-0.02em', 
+                    color: isHovered ? '#fff' : 'rgba(255,255,255,0.8)',
+                    transition: 'color 0.4s ease, transform 0.4s ease',
+                    transform: isHovered ? 'translateX(10px)' : 'translateX(0px)',
+                  }}>
+                    {cat.title}
+                  </h3>
+                </div>
+
+                {/* Expanding Content */}
+                <div style={{ 
+                  flex: '1 1 300px', 
+                  maxWidth: 480, 
+                  display: 'grid', 
+                  gridTemplateRows: isHovered ? '1fr' : '0fr',
+                  transition: 'grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                  overflow: 'hidden'
                 }}>
-                  {cat.count}
+                  <div style={{ minHeight: 0 }}>
+                    <div style={{ 
+                      padding: '24px 32px', 
+                      margin: '12px 0 24px 0',
+                      background: 'rgba(0,0,0,0.7)', 
+                      backdropFilter: 'blur(20px)', 
+                      borderRadius: 20, 
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                      opacity: isHovered ? 1 : 0, 
+                      transition: 'opacity 0.3s ease 0.1s' 
+                    }}>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 16, color: '#fff', lineHeight: 1.6, marginBottom: 24, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                        {cat.desc}
+                      </p>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                        <span style={{ 
+                          fontFamily: 'var(--font-data)', 
+                          fontSize: 12, 
+                          fontWeight: 700, 
+                          color: cat.color, 
+                          letterSpacing: '0.1em', 
+                          textTransform: 'uppercase',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8
+                        }}>
+                          <span style={{ fontSize: 18 }}>{cat.icon}</span> {cat.count}
+                        </span>
+
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            addToEnquiry({ id: cat.id, type: 'product', title: cat.title })
+                          }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            padding: '10px 24px', borderRadius: 100,
+                            border: 'none',
+                            background: isAdded(cat.id) ? 'rgba(255,255,255,0.15)' : cat.color,
+                            color: isAdded(cat.id) ? '#fff' : '#000',
+                            fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 700,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            boxShadow: isAdded(cat.id) ? 'none' : `0 4px 14px ${cat.color}60`
+                          }}
+                          onMouseEnter={e => {
+                            if (!isAdded(cat.id)) {
+                              e.currentTarget.style.transform = 'translateY(-2px)'
+                              e.currentTarget.style.boxShadow = `0 6px 20px ${cat.color}80`
+                            }
+                          }}
+                          onMouseLeave={e => {
+                            if (!isAdded(cat.id)) {
+                              e.currentTarget.style.transform = 'translateY(0)'
+                              e.currentTarget.style.boxShadow = `0 4px 14px ${cat.color}60`
+                            }
+                          }}
+                        >
+                          {isAdded(cat.id) ? (
+                            <><Check size={16} /> Added</>
+                          ) : (
+                            <><Plus size={16} /> Add to Enquiry</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* ── Bottom Section (Tags & ROI) ──────────────────────────────────────── */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          
+          <div ref={tagsRef} className="reveal" style={{ flex: '1 1 400px', maxWidth: 600 }}>
+            <p style={{ fontFamily: 'var(--font-data)', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 20 }}>
+              Equipment Types We Cover
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {ATTRACTION_TAGS.map(tag => (
+                <span key={tag} style={{
+                  padding: '8px 16px', borderRadius: 100,
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  color: 'var(--text-2)', fontSize: 13, fontWeight: 500,
+                  fontFamily: 'var(--font-sans)',
+                  background: 'rgba(255,255,255,0.02)',
+                }}>
+                  {tag}
                 </span>
-              </div>
-
-              <div style={{ fontFamily: '"Sora",sans-serif', fontWeight: 800, fontSize: 10, color: '#48484A', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>
-                {cat.num}
-              </div>
-              <h3 className="font-display text-metallic" style={{ fontWeight: 700, fontSize: 20, letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: 12 }}>
-                {cat.title}
-              </h3>
-              <p style={{ fontSize: 14, color: '#86868B', lineHeight: 1.65, marginBottom: 24, flex: 1 }}>{cat.desc}</p>
-              
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToEnquiry({ id: cat.id, type: 'product', title: cat.title });
-                }}
-                className={`btn-enquiry ${isAdded(cat.id) ? 'added' : ''}`}
-              >
-                {isAdded(cat.id) ? (
-                  <><Check size={14} /> Remove from Enquiry</>
-                ) : (
-                  <><Plus size={14} /> Add to Enquiry</>
-                )}
-              </button>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {/* ── Tags ───────────────────────────────────────── */}
-        <div ref={tagsRef} className="reveal" style={{ marginBottom: 52 }}>
-          <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#48484A', marginBottom: 16, textAlign: 'center' }}>
-            Attraction types we cover
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
-            {ATTRACTION_TAGS.map(tag => (
-              <span key={tag} style={{
-                padding: '7px 16px', borderRadius: 980,
-                border: '1px solid rgba(255,255,255,0.07)',
-                color: '#86868B', fontSize: 13, fontWeight: 500,
-                fontFamily: 'Inter, sans-serif',
-                background: 'rgba(255,255,255,0.02)',
-                transition: 'all 0.2s ease', cursor: 'default',
-              }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = 'rgba(95,193,209,0.4)'
-                  el.style.color = '#5FC1D1'
-                  el.style.background = 'rgba(95,193,209,0.05)'
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.borderColor = 'rgba(255,255,255,0.07)'
-                  el.style.color = '#86868B'
-                  el.style.background = 'rgba(255,255,255,0.02)'
-                }}
-              >
-                {tag}
-              </span>
-            ))}
           </div>
-        </div>
 
-        <div style={{ textAlign: 'center' }}>
-          <Link
-            to="/projects"
-            onClick={() => logCTAEvent('Landing: View Projects')}
-            className="btn btn-primary"
-            aria-label="Browse projects"
-          >
-            View Projects
-          </Link>
+          <div style={{ flex: '0 0 auto' }}>
+            <Link
+              to="/products#roi"
+              onClick={() => logCTAEvent('Landing: View ROI Models')}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '16px 32px', borderRadius: 100,
+                background: 'linear-gradient(135deg, rgba(255,170,51,0.1) 0%, rgba(255,170,51,0.02) 100%)',
+                border: '1px solid rgba(255,170,51,0.3)',
+                color: 'var(--amber)', textDecoration: 'none',
+                fontFamily: 'var(--font-sans)', fontSize: 15, fontWeight: 700,
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(10px)'
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,170,51,0.2)';
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = 'linear-gradient(135deg, rgba(255,170,51,0.1) 0%, rgba(255,170,51,0.02) 100%)';
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0px)';
+              }}
+            >
+              <BarChart size={18} />
+              View Game ROI Models
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+
         </div>
       </div>
     </section>
@@ -194,5 +300,3 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
 }
 
 export default ProductsSection
-
-

@@ -9,6 +9,13 @@
   --surface-2: #111118;
   --surface-3: #1A1A24;
 
+  /* ── Light Surfaces (consulting sections) */
+  --chalk: #F7F7F5;
+  --chalk-2: #EEEEEC;
+  --ink: #0D0D10;
+  --ink-2: #3A3A40;
+  --ink-3: #7A7A82;
+
   /* ── Brand Colors ─────────────────────── */
   --teal: #5FC1D1;
   /* logo teal  */
@@ -16,6 +23,7 @@
   /* logo green */
   --teal-mid: #4AAFBF;
   --green-mid: #58A83E;
+  --amber: #FFAA33;  /* consulting authority accent */
 
   /* ── Radiant Glows (for orbs) ─────────── */
   --glow-teal: rgba(95, 193, 209, 0.14);
@@ -32,10 +40,19 @@
   /* ── Borders ──────────────────────────── */
   --border: rgba(255, 255, 255, 0.08);
   --border-md: rgba(255, 255, 255, 0.14);
+  --border-chalk: rgba(0, 0, 0, 0.08);
+
+  /* ── Typography ───────────────────────── */
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', 'Inter', -apple-system, sans-serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', 'Inter', -apple-system, sans-serif;
+  --font-data: 'Sora', 'Plus Jakarta Sans', sans-serif;
 
   /* ── Easing ───────────────────────────── */
   --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* ── Reset ─────────────────────────────── */
@@ -55,10 +72,12 @@ html {
 }
 
 body {
-  font-family: "Inter", -apple-system, "SF Pro Text", sans-serif;
+  font-family: var(--font-body);
   background: var(--void);
   color: var(--text-1);
   overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.65;
 }
 
 #root {
@@ -88,7 +107,15 @@ body {
    ═══════════════════════════════════════════ */
 
 .font-display {
-  font-family: "Plus Jakarta Sans", "Sora", "SF Pro Display", -apple-system, sans-serif;
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-data {
+  font-family: var(--font-data);
 }
 
 /* Metallic headline gradient — Apple's signature look on dark */
@@ -131,18 +158,19 @@ body {
   align-items: center;
   gap: 10px;
   font-family: "Inter", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--teal);
+  text-shadow: 0 0 12px rgba(95, 193, 209, 0.4);
 }
 
 .label::before {
   content: '';
   display: block;
-  width: 20px;
-  height: 1.5px;
+  width: 24px;
+  height: 2px;
   background: var(--teal);
   border-radius: 1px;
   box-shadow: 0 0 6px rgba(95, 193, 209, 0.8);
@@ -161,13 +189,33 @@ body {
    BACKGROUNDS & PATTERNS
    ═══════════════════════════════════════════ */
 
-/* Subtle Apple-style grid */
+/* Subtle dark grid */
 .grid-bg {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 72px 72px;
   background-position: -1px -1px;
+}
+
+/* Light section grid */
+.grid-bg-light {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: -1px -1px;
+}
+
+/* Noise texture overlay (CSS-only, performant) */
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 /* Section surface alternation */
@@ -177,6 +225,25 @@ body {
 
 .bg-surface {
   background: var(--surface);
+}
+
+/* ── Light section (chalk bg, dark text) ── */
+.bg-chalk {
+  background: var(--chalk);
+}
+
+.section-light {
+  background: var(--chalk);
+  color: var(--ink);
+}
+
+.section-light .text-muted {
+  color: var(--ink-3);
+}
+
+.section-light .card-surface {
+  background: #FFFFFF;
+  border: 1px solid var(--chalk-2);
 }
 
 /* ═══════════════════════════════════════════
@@ -507,6 +574,67 @@ body {
   transition-delay: 560ms;
 }
 
+.stagger.visible>*:nth-child(9) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 640ms;
+}
+
+.stagger.visible>*:nth-child(10) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 720ms;
+}
+
+.stagger.visible>*:nth-child(11) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 800ms;
+}
+
+.stagger.visible>*:nth-child(12) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 880ms;
+}
+
+/* ── Count-up animation (CSS only fallback) */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Flip card ────────────────────────── */
+.flip-card {
+  perspective: 1200px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
 /* ═══════════════════════════════════════════
    ANIMATIONS
    ═══════════════════════════════════════════ */
@@ -618,6 +746,14 @@ body.nav-drawer-open .floating-widget {
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
 
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .reveal,
   .reveal-up,
   .reveal-left,
@@ -628,8 +764,122 @@ body.nav-drawer-open .floating-widget {
     transition: none !important;
   }
 
+  .flip-card-inner {
+    transition: none !important;
+  }
+
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* ── Lightbox overlay ──────────────────── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.lightbox-img {
+  max-width: min(90vw, 1200px);
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Timeline (About section) ─────────── */
+.timeline-track {
+  position: relative;
+}
+
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--chalk-2);
+}
+
+.timeline-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--teal), var(--green));
+  transition: height 0.1s linear;
+  pointer-events: none;
+}
+
+/* ── Section progress nav ─────────────── */
+.section-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  padding: 0;
+}
+
+.section-nav-dot.active {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 0 8px rgba(95,193,209,0.6);
+  width: 8px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.section-nav-dot:hover:not(.active) {
+  border-color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.15);
+}
+
+/* ── Custom cursor ─────────────────────── */
+.custom-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s var(--ease-out), height 0.2s var(--ease-out), opacity 0.2s ease;
+}
+
+.cursor-ring.hover {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(95,193,209,0.8);
+}
+
+@media (hover: none) {
+  .custom-cursor {
+    display: none !important;
   }
 }
 

@@ -18,7 +18,7 @@ const WhySection: FC = () => {
   const gridRef  = useReveal()
 
   return (
-    <section style={{ background: theme.colors.surface, padding: '120px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ background: theme.colors.surface, padding: '60px 28px', position: 'relative', overflow: 'hidden' }}>
       <div className="orb orb-teal"  style={{ width: 600, height: 600, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', opacity: 0.3 }} />
       <div className="orb orb-purple" style={{ width: 400, height: 400, top: '10%', right: '-10%', opacity: 0.2 }} />
       

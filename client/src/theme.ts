@@ -14,12 +14,20 @@ export const theme = {
     surface2: '#111118',
     surface3: '#1A1A24',
 
+    // Light surfaces (consulting sections)
+    chalk: '#F7F7F5',
+    chalk2: '#EEEEEC',
+    ink: '#0D0D10',
+    ink2: '#3A3A40',
+    ink3: '#7A7A82',
+
     // Brand Accents
     teal: '#5FC1D1',
     tealMid: '#4AAFBF',
     green: '#6DBD4E',
     greenMid: '#58A83E',
     purple: '#C084FC',
+    amber: '#FFAA33',
 
     // Text (Apple-inspired palette)
     text1: '#F5F5F7', // Primary white
@@ -48,6 +56,7 @@ export const theme = {
     // Borders
     border: 'rgba(255, 255, 255, 0.08)',
     borderMd: 'rgba(255, 255, 255, 0.14)',
+    borderChalk: 'rgba(0, 0, 0, 0.08)',
 
     // Glows
     glowTeal: 'rgba(95, 193, 209, 0.14)',
@@ -55,8 +64,9 @@ export const theme = {
   },
 
   typography: {
-    fontDisplay: '"Plus Jakarta Sans", "Sora", "SF Pro Display", -apple-system, sans-serif',
-    fontBody: '"Inter", -apple-system, "SF Pro Text", sans-serif',
+    fontDisplay: "'DM Serif Display', Georgia, serif",
+    fontBody: "'DM Sans', 'Inter', -apple-system, sans-serif",
+    fontData: "'Sora', 'Plus Jakarta Sans', sans-serif",
   },
 
   layout: {
