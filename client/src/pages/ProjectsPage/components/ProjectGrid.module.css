@@ -1,4 +1,4 @@
-.grid {
+/* .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -13,5 +13,23 @@
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+} */
+
+
+
+.grid {
+  display: grid;
+  /* 2 columns by default for clean, wide cards */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px; /* Slightly increased gap for better breathing room */
+  width: 100%;
+}
+
+/* Responsive breakpoint for small tablets and mobile viewports */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
