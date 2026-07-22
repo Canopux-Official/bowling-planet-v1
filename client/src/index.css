@@ -55,51 +55,58 @@
   --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ── Reset ─────────────────────────────── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/*
+  CRITICAL: base resets must live in @layer base.
+  Unlayered `* { margin:0; padding:0 }` after @import "tailwindcss"
+  beats all Tailwind spacing utilities (p-*, m-*, gap-*, etc.) because
+  unlayered CSS wins over @layer utilities in the cascade.
+*/
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 
-body {
-  font-family: var(--font-body);
-  background: var(--void);
-  color: var(--text-1);
-  overflow-x: hidden;
-  font-size: 16px;
-  line-height: 1.65;
-}
+  body {
+    font-family: var(--font-body);
+    background: var(--void);
+    color: var(--text-1);
+    overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.65;
+  }
 
-#root {
-  width: 100%;
-  min-height: 100svh;
-}
+  #root {
+    width: 100%;
+    min-height: 100svh;
+  }
 
-::-webkit-scrollbar {
-  width: 4px;
-}
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
 
-::-webkit-scrollbar-track {
-  background: var(--void);
-}
+  ::-webkit-scrollbar-track {
+    background: var(--void);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--surface-3);
-  border-radius: 2px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--surface-3);
+    border-radius: 2px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--teal);
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--teal);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -108,6 +115,23 @@ body {
 
 .font-display {
   font-family: var(--font-serif);
+}
+
+/* Project details page — force Plus Jakarta / Sora everywhere (incl. .font-display) */
+.project-details-page,
+.project-details-page .font-display,
+.project-details-page .label,
+.project-details-page button,
+.project-details-page input,
+.project-details-page a,
+.project-details-page p,
+.project-details-page h1,
+.project-details-page h2,
+.project-details-page h3,
+.project-details-page h4,
+.project-details-page li,
+.project-details-page span {
+  font-family: "Plus Jakarta Sans", "Sora", sans-serif;
 }
 
 .font-sans {
