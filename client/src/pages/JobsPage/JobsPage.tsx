@@ -73,8 +73,8 @@ const JobsPage: FC = () => {
 
   return (
     <>
-      <SEO 
-        title="Careers & Jobs" 
+      <SEO
+        title="Careers & Jobs"
         description="Join Bowling Planet and build India's best entertainment destinations. Explore our open roles."
       />
       {/* Hero */}
@@ -84,18 +84,15 @@ const JobsPage: FC = () => {
         <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <div ref={headRef} className="reveal" style={{ textAlign: 'center' }}>
-            <div className="label" style={{ justifyContent: 'center', marginBottom: 24 }}>Careers</div>
             <h1 className="font-display" style={{ fontSize: 'clamp(2.4rem, 5.5vw, 4.5rem)', fontWeight: 800, lineHeight: 1.06, letterSpacing: '-0.04em', marginBottom: 24 }}>
-              <span className="text-metallic" style={{ display: 'block' }}>Build India's Best</span>
-              <span className="text-gradient-brand" style={{ display: 'block' }}>Entertainment</span>
-              <span className="text-metallic" style={{ display: 'block' }}>Destinations.</span>
+              <span className="text-gradient-brand" style={{ display: 'block' }}>Careers</span>
             </h1>
             <p style={{ fontSize: 17, color: theme.colors.text2, maxWidth: 520, margin: '0 auto 52px', lineHeight: 1.75, fontFamily: theme.typography.fontBody }}>
               Join our team of consultants, designers and operators shaping the next generation of Family Entertainment Centers across India.
             </p>
           </div>
 
-          <div ref={gridRef} className="reveal careers-perks-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+          {/* <div ref={gridRef} className="reveal careers-perks-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
             {PERKS.map((p) => (
               <div key={p.label} className="glass-card" style={{ padding: '22px 18px', textAlign: 'left', borderRadius: 16 }}>
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{p.icon}</div>
@@ -103,7 +100,7 @@ const JobsPage: FC = () => {
                 <div style={{ fontSize: 12, color: theme.colors.text3, fontFamily: theme.typography.fontBody, lineHeight: 1.5 }}>{p.sub}</div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 

@@ -1,6 +1,4 @@
 import type { FC } from 'react'
-
-import styles from './Pagination.module.css'
 import type { IPaginationMeta } from '../types'
 
 interface PaginationProps {
@@ -14,13 +12,13 @@ const Pagination: FC<PaginationProps> = ({ meta, onPageChange }) => {
   const pages = Array.from({ length: meta.totalPages }, (_, i) => i + 1)
 
   return (
-    <nav className={styles.nav} aria-label="Pagination">
+    <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
       <button
         type="button"
-        className={styles.btn}
         disabled={meta.page <= 1}
         onClick={() => onPageChange(meta.page - 1)}
         aria-label="Previous page"
+        className="flex h-10 min-w-10 items-center justify-center rounded-xl border border-white/[0.08] px-3 text-sm font-semibold text-[#86868B] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
       >
         ←
       </button>
@@ -28,19 +26,23 @@ const Pagination: FC<PaginationProps> = ({ meta, onPageChange }) => {
         <button
           key={page}
           type="button"
-          className={`${styles.btn} ${page === meta.page ? styles.active : ''}`}
           aria-current={page === meta.page ? 'page' : undefined}
           onClick={() => onPageChange(page)}
+          className={`flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-semibold transition-colors ${
+            page === meta.page
+              ? 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1]'
+              : 'border-white/[0.08] text-[#86868B] hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1]'
+          }`}
         >
           {page}
         </button>
       ))}
       <button
         type="button"
-        className={styles.btn}
         disabled={meta.page >= meta.totalPages}
         onClick={() => onPageChange(meta.page + 1)}
         aria-label="Next page"
+        className="flex h-10 min-w-10 items-center justify-center rounded-xl border border-white/[0.08] px-3 text-sm font-semibold text-[#86868B] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
       >
         →
       </button>
