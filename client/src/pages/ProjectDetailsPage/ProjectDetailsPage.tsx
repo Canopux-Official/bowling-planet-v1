@@ -92,7 +92,7 @@ const ProjectDetailsPage: FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="project-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <Loader label="Loading project…" />
       </div>
     )
@@ -100,7 +100,7 @@ const ProjectDetailsPage: FC = () => {
 
   if (error || !project) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="project-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <div className="mx-auto max-w-xl text-center">
           {error ? (
             <ErrorState message={error} onRetry={() => void load()} />
@@ -123,7 +123,7 @@ const ProjectDetailsPage: FC = () => {
   const thumb = project.media?.[0]
 
   return (
-    <div className="min-h-[60vh] bg-black text-[#F5F5F7]">
+    <div className="project-details-page min-h-[60vh] bg-black text-[#F5F5F7]">
       <SEO
         title={project.title}
         description={project.description || `Read about the ${project.title} project`}
