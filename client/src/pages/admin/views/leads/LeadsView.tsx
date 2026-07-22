@@ -222,7 +222,7 @@ export const LeadsView: React.FC = () => {
                       <td style={{ padding: '16px 24px' }}>
                         {lead.phone ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {lead.phone.split(',').map((phoneStr:any, idx:any) => {
+                            {lead.phone.split(',').map((phoneStr: any, idx: any) => {
                               const trimmedPhone = phoneStr.trim();
                               return (
                                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
