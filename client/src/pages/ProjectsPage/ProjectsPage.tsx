@@ -4,7 +4,6 @@ import ErrorState from '../../components/common/ErrorState'
 import ProjectFilters, { type ProjectFilterState } from './components/ProjectFilters'
 import ProjectGrid from './components/ProjectGrid'
 import Pagination from './components/Pagination'
-import { useReveal } from '../../hooks/useReveal'
 import type { IPaginationMeta, IProject } from './types'
 import { getAllProjects } from './services/projectsApi'
 
@@ -21,13 +20,12 @@ const ProjectsPage: FC = () => {
   const [pagination, setPagination] = useState<IPaginationMeta>({
     total: 0,
     page: 1,
-    limit: 9,
+    limit: 12,
     totalPages: 0,
   })
   const [availableTags, setAvailableTags] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const headRef = useReveal()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -35,7 +33,7 @@ const ProjectsPage: FC = () => {
     try {
       const data = await getAllProjects({
         page,
-        limit: 9,
+        limit: 12,
         search: filters.search || undefined,
         tags: filters.tags.length ? filters.tags : undefined,
         sort: filters.sort,
@@ -44,7 +42,10 @@ const ProjectsPage: FC = () => {
       setProjects(data.projects)
       setPagination(data.pagination)
       const tags = Array.from(new Set(data.projects.flatMap((p) => p.tags))).sort()
-      if (tags.length) setAvailableTags(tags)
+      if (tags.length) setAvailableTags((prev) => {
+        const merged = Array.from(new Set([...prev, ...tags])).sort()
+        return merged
+      })
     } catch {
       setError('Unable to load projects.')
     } finally {
@@ -57,51 +58,46 @@ const ProjectsPage: FC = () => {
   }, [load])
 
   return (
-    <div className="bg-black text-[#F5F5F7]">
+    <div className="projects-catalogue min-h-[60vh] bg-black text-[#F5F5F7]">
       <SEO
         title="Our Projects"
         description="Explore the entertainment destinations and family entertainment centers we have built across India."
       />
 
-      {/* Hero — use div to avoid global section overflow clipping */}
-      <div className="relative px-5 pb-14 pt-32 sm:px-7 sm:pb-16 sm:pt-36">
-        <div className="orb orb-teal pointer-events-none absolute left-1/2 top-[-20%] h-[560px] w-[680px] -translate-x-1/2 opacity-50" />
-        <div className="orb orb-green pointer-events-none absolute bottom-[-8%] right-[-4%] h-[280px] w-[280px] opacity-70" />
-        <div aria-hidden="true" className="grid-bg pointer-events-none absolute inset-0 opacity-30" />
-
-        <div className="relative z-[1] mx-auto max-w-[1100px] text-center">
-          <div ref={headRef} className="reveal">
-            <h1 className="font-display mb-5 text-[clamp(2.4rem,5.5vw,4.5rem)] font-extrabold leading-[1.12] tracking-[-0.04em]">
-              <span className="text-gradient-brand ">Projects</span>
-            </h1>
-            <p className="mx-auto max-w-[520px] text-[17px] leading-relaxed text-[#A1A1A6]">
-              Selected FEC programmes delivered for malls, hotels, resorts and operators across India.
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+              Catalogue
             </p>
+            <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+              Project portfolio
+            </h1>
           </div>
+          {!loading && !error ? (
+            <p className="text-sm text-[#A1A1A6]">
+              {pagination.total} project{pagination.total === 1 ? '' : 's'}
+            </p>
+          ) : null}
         </div>
-      </div>
 
-      {/* Listing */}
-      <div className="relative px-5 pb-20 sm:px-7">
-        <div aria-hidden="true" className="grid-bg pointer-events-none absolute inset-0 opacity-15" />
-        <div className="relative z-[1] mx-auto max-w-[1200px]">
-          <ProjectFilters
-            value={filters}
-            availableTags={availableTags}
-            onChange={(next) => {
-              setFilters(next)
-              setPage(1)
-            }}
-          />
-          {error ? (
-            <ErrorState message={error} onRetry={() => void load()} />
-          ) : (
-            <>
-              <ProjectGrid projects={projects} loading={loading} />
-              {!loading ? <Pagination meta={pagination} onPageChange={setPage} /> : null}
-            </>
-          )}
-        </div>
+        <ProjectFilters
+          value={filters}
+          availableTags={availableTags}
+          onChange={(next) => {
+            setFilters(next)
+            setPage(1)
+          }}
+        />
+
+        {error ? (
+          <ErrorState message={error} onRetry={() => void load()} />
+        ) : (
+          <>
+            <ProjectGrid projects={projects} loading={loading} />
+            {!loading ? <Pagination meta={pagination} onPageChange={setPage} /> : null}
+          </>
+        )}
       </div>
     </div>
   )

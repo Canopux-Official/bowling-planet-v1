@@ -1,5 +1,5 @@
 import type { ProductStatus } from "../../ProductsPage/types"
-import type { IMedia } from "../../ProjectsPage/types"
+import type { IBulletList, IFeaturePoint, IMedia } from "../../ProjectsPage/types"
 
 export type { IMedia, ProductStatus }
 
@@ -22,6 +22,9 @@ export interface IProductItem {
   price: number
   thumbnail: IMedia
   gallery?: IMedia[]
+  featureList?: IBulletList[]
+  points?: IFeaturePoint[]
+  usedIn?: IUsageLocation[]
   baseProduct: IBaseProductRef
   status: ProductStatus
   purchaseCount: number
