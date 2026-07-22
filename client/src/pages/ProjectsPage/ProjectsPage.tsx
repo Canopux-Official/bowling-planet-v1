@@ -71,11 +71,8 @@ const ProjectsPage: FC = () => {
 
         <div className="relative z-[1] mx-auto max-w-[1100px] text-center">
           <div ref={headRef} className="reveal">
-            <div className="label mb-6 justify-center">Our Work</div>
             <h1 className="font-display mb-5 text-[clamp(2.4rem,5.5vw,4.5rem)] font-extrabold leading-[1.12] tracking-[-0.04em]">
-              <span className="text-metallic block">Entertainment</span>
-              <span className="text-gradient-brand block">Destinations</span>
-              <span className="text-metallic block">We&apos;ve Built.</span>
+              <span className="text-gradient-brand ">Projects</span>
             </h1>
             <p className="mx-auto max-w-[520px] text-[17px] leading-relaxed text-[#A1A1A6]">
               Selected FEC programmes delivered for malls, hotels, resorts and operators across India.
