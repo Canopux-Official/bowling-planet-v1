@@ -12,13 +12,13 @@ const Pagination: FC<PaginationProps> = ({ meta, onPageChange }) => {
   const pages = Array.from({ length: meta.totalPages }, (_, i) => i + 1)
 
   return (
-    <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+    <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
       <button
         type="button"
         disabled={meta.page <= 1}
         onClick={() => onPageChange(meta.page - 1)}
         aria-label="Previous page"
-        className="flex h-10 min-w-10 items-center justify-center rounded-xl border border-white/[0.08] px-3 text-sm font-semibold text-[#86868B] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-lg border border-white/[0.1] px-3 text-sm font-semibold text-[#A1A1A6] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
       >
         ←
       </button>
@@ -28,10 +28,10 @@ const Pagination: FC<PaginationProps> = ({ meta, onPageChange }) => {
           type="button"
           aria-current={page === meta.page ? 'page' : undefined}
           onClick={() => onPageChange(page)}
-          className={`flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-semibold transition-colors ${
+          className={`flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-lg border px-3 text-sm font-semibold transition-colors ${
             page === meta.page
               ? 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1]'
-              : 'border-white/[0.08] text-[#86868B] hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1]'
+              : 'border-white/[0.1] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1]'
           }`}
         >
           {page}
@@ -42,7 +42,7 @@ const Pagination: FC<PaginationProps> = ({ meta, onPageChange }) => {
         disabled={meta.page >= meta.totalPages}
         onClick={() => onPageChange(meta.page + 1)}
         aria-label="Next page"
-        className="flex h-10 min-w-10 items-center justify-center rounded-xl border border-white/[0.08] px-3 text-sm font-semibold text-[#86868B] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-lg border border-white/[0.1] px-3 text-sm font-semibold text-[#A1A1A6] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1] disabled:cursor-not-allowed disabled:opacity-40"
       >
         →
       </button>

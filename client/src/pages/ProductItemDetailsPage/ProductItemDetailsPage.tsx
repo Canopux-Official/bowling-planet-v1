@@ -14,7 +14,6 @@ import {
   getProductItemBySlug,
   type IProductItem,
 } from './services/productItemDetailsApi'
-import styles from './ProductItemDetailsPage.module.css'
 
 const ProductItemDetailsPage: FC = () => {
   const { itemSlug } = useParams<{ baseSlug: string; itemSlug: string }>()
@@ -49,66 +48,80 @@ const ProductItemDetailsPage: FC = () => {
 
   if (loading) {
     return (
-      <main className={styles.page}>
+      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <Loader label="Loading product…" />
-      </main>
+      </div>
     )
   }
 
   if (error || !item) {
     return (
-      <main className={styles.page}>
+      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <ErrorState
           message={error ?? 'Product not found.'}
           onRetry={() => void load()}
         />
-      </main>
+      </div>
     )
   }
 
   return (
-    <main className={styles.page}>
-      <SEO 
-        title={item.title} 
+    <div className="min-h-[60vh] bg-black text-[#F5F5F7]">
+      <SEO
+        title={item.title}
         description={item.description || `Details about ${item.title}`}
         ogImage={item.thumbnail?.url}
         schemaMarkup={{
-          "@context": "https://schema.org",
-          "@type": "Product",
-          "name": item.title,
-          "description": item.description,
-          "image": item.thumbnail?.url,
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: item.title,
+          description: item.description,
+          image: item.thumbnail?.url,
           ...(item.price && {
-            "offers": {
-              "@type": "Offer",
-              "price": item.price,
-              "priceCurrency": "INR"
-            }
-          })
+            offers: {
+              '@type': 'Offer',
+              price: item.price,
+              priceCurrency: 'INR',
+            },
+          }),
         }}
       />
-      <div className={styles.inner}>
-        <ItemParentLink baseProduct={item.baseProduct} />
-        <ItemHeader
-          title={item.title}
-          description={item.description}
-          price={item.price}
-        />
-        <ItemGallery
-          thumbnail={item.thumbnail}
-          gallery={item.gallery}
-          title={item.title}
-        />
-        <ItemFeatureList featureList={item.featureList} />
-        <ItemPoints points={item.points} />
-        <ItemUsedIn usedIn={item.usedIn} />
-        <ItemPurchaseCTA 
-          hasPrice={item.price !== undefined} 
-          itemTitle={item.title}
-          itemId={item._id || item.slug}
-        />
+
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
+        <div className="mb-5">
+          <ItemParentLink baseProduct={item.baseProduct} />
+        </div>
+
+        {/* Two-column catalogue detail — core product visible first viewport */}
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start lg:gap-10">
+          {/* Left: gallery + sticky CTA */}
+          <div className="space-y-4 lg:sticky lg:top-24">
+            <ItemGallery
+              thumbnail={item.thumbnail}
+              gallery={item.gallery}
+              title={item.title}
+            />
+            <ItemPurchaseCTA
+              hasPrice={item.price !== undefined}
+              itemTitle={item.title}
+              itemId={item._id || item.slug}
+            />
+          </div>
+
+          {/* Right: details sections */}
+          <div className="space-y-8">
+            <ItemHeader
+              title={item.title}
+              description={item.description}
+              price={item.price}
+            />
+            <ItemFeatureList featureList={item.featureList} />
+            <ItemPoints points={item.points} />
+            <ItemUsedIn usedIn={item.usedIn} />
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   )
 }
 

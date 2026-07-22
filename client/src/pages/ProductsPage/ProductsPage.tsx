@@ -1,10 +1,8 @@
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import SEO from '../../components/SEO'
 import ProductsFilters, { type ProductsFilterState } from './components/ProductsFilters'
 import BaseProductGrid from './components/BaseProductGrid'
 import Pagination from './components/Pagination'
-import { theme } from '../../theme'
-import { useReveal } from '../../hooks/useReveal'
 import {
   getAllBaseProducts,
   type IBaseProduct,
@@ -15,16 +13,25 @@ const ProductsPage: FC = () => {
   const [filters, setFilters] = useState<ProductsFilterState>({ search: '' })
   const [page, setPage] = useState(1)
   const [products, setProducts] = useState<IBaseProduct[]>([])
-  const [pagination, setPagination] = useState<IPaginationMeta>({ page: 1, limit: 10, total: 0, pages: 0 })
+  const [pagination, setPagination] = useState<IPaginationMeta>({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0,
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const headRef = useReveal()
+  const [activeSlug, setActiveSlug] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await getAllBaseProducts({ page, limit: 10, search: filters.search || undefined })
+      const data = await getAllBaseProducts({
+        page,
+        limit: 12,
+        search: filters.search || undefined,
+      })
       setProducts(data.products)
       setPagination(data.pagination)
     } catch {
@@ -34,47 +41,78 @@ const ProductsPage: FC = () => {
     }
   }, [filters.search, page])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const categories = useMemo(
+    () => products.map((p) => ({ slug: p.slug, title: p.title })),
+    [products],
+  )
+
+  const visibleProducts = useMemo(() => {
+    if (!activeSlug) return products
+    return products.filter((p) => p.slug === activeSlug)
+  }, [products, activeSlug])
+
+  const handleSelectCategory = (slug: string | null) => {
+    setActiveSlug(slug)
+    if (slug) {
+      document.getElementById(`category-${slug}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    }
+  }
 
   return (
-    <>
-      <SEO 
-        title="Products & Equipment" 
+    <div className="products-catalogue min-h-[60vh] bg-black text-[#F5F5F7]">
+      <SEO
+        title="Products & Equipment"
         description="Explore our world-class entertainment products and equipment for your FEC."
       />
-      {/* Hero */}
-      <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
-        <div className="orb orb-teal" style={{ width: 700, height: 600, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.5 }} />
-        <div className="orb orb-green" style={{ width: 300, height: 300, bottom: '-5%', left: '-5%' }} />
-        <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
-        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div ref={headRef} className="reveal" style={{ textAlign: 'center' }}>
-            <div className="label" style={{ justifyContent: 'center', marginBottom: 24 }}>Our Products</div>
-            <h1 className="font-display" style={{ fontSize: 'clamp(2.4rem, 5.5vw, 4.5rem)', fontWeight: 800, lineHeight: 1.06, letterSpacing: '-0.04em', marginBottom: 24 }}>
-              <span className="text-metallic" style={{ display: 'block' }}>World-Class</span>
-              <span className="text-gradient-brand" style={{ display: 'block' }}>Entertainment</span>
-              <span className="text-metallic" style={{ display: 'block' }}>Products.</span>
-            </h1>
-            <p style={{ fontSize: 17, color: theme.colors.text2, maxWidth: 520, margin: '0 auto', lineHeight: 1.75, fontFamily: theme.typography.fontBody }}>
-              Explore our entertainment categories — each containing the variants and configurations available for your FEC.
-            </p>
-          </div>
-        </div>
-      </section>
 
-      {/* Content */}
-      <section style={{ background: theme.colors.surface, padding: '60px 28px 80px', position: 'relative' }}>
-        <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.2, pointerEvents: 'none' }} />
-        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <ProductsFilters
-            value={filters}
-            onChange={(next) => { setFilters(next); setPage(1) }}
-          />
-          <BaseProductGrid products={products} loading={loading} error={error} onRetry={() => void load()} />
-          {!loading && !error ? <Pagination meta={pagination} onPageChange={setPage} /> : null}
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+              Catalogue
+            </p>
+            <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+              Product categories
+            </h1>
+          </div>
+          {!loading && !error ? (
+            <p className="text-sm text-[#A1A1A6]">
+              {pagination.total} categor{pagination.total === 1 ? 'y' : 'ies'}
+            </p>
+          ) : null}
         </div>
-      </section>
-    </>
+
+        <ProductsFilters
+          value={filters}
+          categories={categories}
+          activeSlug={activeSlug}
+          onSelectCategory={handleSelectCategory}
+          onChange={(next) => {
+            setFilters(next)
+            setPage(1)
+            setActiveSlug(null)
+          }}
+        />
+
+        <BaseProductGrid
+          products={visibleProducts}
+          loading={loading}
+          error={error}
+          onRetry={() => void load()}
+        />
+
+        {!loading && !error && !activeSlug ? (
+          <Pagination meta={pagination} onPageChange={setPage} />
+        ) : null}
+      </div>
+    </div>
   )
 }
 

@@ -1,5 +1,6 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import SEO from '../../components/SEO'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
 import ProductItemsGrid from './components/ProductItemsGrid'
@@ -9,10 +10,8 @@ import {
   type BaseProductWithItems,
   type IProductItem,
 } from './services/baseProductDetailsApi'
-import { theme } from '../../theme'
-import { useReveal } from '../../hooks/useReveal'
 import MediaItem from '../../components/common/MediaItem'
-import { Plus, Check } from 'lucide-react'
+import { Plus, Check, Package } from 'lucide-react'
 import { useLeadTracker } from '../../context/LeadTrackerContext'
 
 function sortItems(items: IProductItem[], sort: ProductItemsSortOption): IProductItem[] {
@@ -42,16 +41,19 @@ const BaseProductDetailsPage: FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sort, setSort] = useState<ProductItemsSortOption>('featured')
-  const headRef = useReveal()
-  const gridRef = useReveal()
+  const [activePill, setActivePill] = useState<string | null>(null)
   const { state, addToEnquiry } = useLeadTracker()
 
   const load = useCallback(async () => {
-    if (!slug) { setError('Product category not found.'); setLoading(false); return }
-    setLoading(true); setError(null)
+    if (!slug) {
+      setError('Product category not found.')
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    setError(null)
     try {
       const result = await getBaseProductWithItems(slug)
-      console.log(result)
       setData(result)
     } catch {
       setError('Unable to load this product category.')
@@ -61,96 +63,150 @@ const BaseProductDetailsPage: FC = () => {
     }
   }, [slug])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    void load()
+  }, [load])
 
   const sortedItems = useMemo(() => (data ? sortItems(data.items, sort) : []), [data, sort])
 
+  const visibleItems = useMemo(() => {
+    if (!activePill) return sortedItems
+    return sortedItems.filter((item) => item.slug === activePill)
+  }, [sortedItems, activePill])
+
   if (loading) {
     return (
-      <section style={{ background: theme.colors.void, minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 28px' }}>
+      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <Loader label="Loading category…" />
-      </section>
+      </div>
     )
   }
 
   if (error || !data) {
     return (
-      <section style={{ background: theme.colors.void, minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 28px' }}>
+      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <ErrorState message={error ?? 'Product category not found.'} onRetry={() => void load()} />
-      </section>
+      </div>
     )
   }
 
-  return (
-    <>
-      {/* Hero */}
-      <section style={{ background: theme.colors.void, padding: '140px 28px 80px', position: 'relative', overflow: 'hidden' }}>
-        <div className="orb orb-teal" style={{ width: 600, height: 500, top: '-20%', right: '-8%', opacity: 0.5 }} />
-        <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
-        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <Link to="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: theme.colors.text2, textDecoration: 'none', fontSize: 14, marginBottom: 40, fontFamily: theme.typography.fontBody, transition: 'color 0.2s' }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = theme.colors.teal)}
-            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = theme.colors.text2)}
-          >
-            ← All products
-          </Link>
+  const categoryId = data._id || data.slug
+  const isAdded = state.enquiryCart.some((i) => i.id === categoryId)
 
-          <div ref={headRef} className="reveal bpd-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
-            <div>
-              <div className="label" style={{ marginBottom: 20 }}>Category</div>
-              <h1 className="font-display text-metallic" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 20 }}>
-                {data.title}
-              </h1>
-              {data.description ? (
-                <p style={{ color: theme.colors.text2, fontSize: 16, lineHeight: 1.7, fontFamily: theme.typography.fontBody, maxWidth: 480 }}>
-                  {data.description}
-                </p>
-              ) : null}
-              <div style={{ marginTop: '32px' }}>
-                <button
-                  type="button"
-                  className={`btn-enquiry ${state.enquiryCart.some(i => i.id === (data._id || data.slug)) ? 'added' : ''}`}
-                  style={{ width: 'auto', padding: '14px 28px', fontSize: 14 }}
-                  onClick={() => addToEnquiry({ id: data._id || data.slug, type: 'product', title: data.title })}
-                >
-                  {state.enquiryCart.some(i => i.id === (data._id || data.slug)) ? (
-                    <><Check size={16} /> Remove from Enquiry</>
-                  ) : (
-                    <><Plus size={16} /> Enquire About Category</>
-                  )}
-                </button>
+  return (
+    <div className="min-h-[60vh] bg-black text-[#F5F5F7]">
+      <SEO
+        title={`${data.title} | Products`}
+        description={data.description || `Browse ${data.title} equipment and variants.`}
+        ogImage={data.thumbnail?.url}
+      />
+
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
+        {/* Compact category bar — tinted vanishing wash */}
+        <div
+          className="relative mb-5 overflow-hidden rounded-2xl border border-[#5FC1D1]/20 p-4 sm:p-5"
+          style={{
+            background:
+              'radial-gradient(120% 140% at 0% 0%, rgba(95,193,209,0.22) 0%, rgba(95,193,209,0.08) 38%, rgba(109,189,78,0.05) 62%, transparent 100%), linear-gradient(180deg, rgba(17,17,24,0.95) 0%, rgba(10,10,15,0.4) 70%, transparent 100%)',
+          }}
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#5FC1D1]/15 blur-3xl"
+          />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <Link
+                to="/products"
+                className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-[#A1A1A6] transition-colors hover:text-[#5FC1D1]"
+              >
+                ← All categories
+              </Link>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="hidden h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-white/[0.1] sm:block">
+                  <MediaItem media={data.thumbnail} alt={data.title} />
+                </div>
+                <div className="min-w-0">
+                  <p className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+                    <Package size={12} />
+                    Category
+                  </p>
+                  <h1 className="font-display text-[clamp(1.35rem,2.8vw,1.85rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+                    {data.title}
+                  </h1>
+                  {data.description ? (
+                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#A1A1A6] line-clamp-2">
+                      {data.description}
+                    </p>
+                  ) : null}
+                </div>
               </div>
             </div>
-            <div style={{ aspectRatio: '16/10', borderRadius: 20, overflow: 'hidden', border: `1px solid ${theme.colors.border}` }}>
-              <MediaItem media={data.thumbnail} alt={data.title} />
-            </div>
+
+            <button
+              type="button"
+              onClick={() => addToEnquiry({ id: categoryId, type: 'product', title: data.title })}
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                isAdded
+                  ? 'border-[#6DBD4E]/45 bg-[#6DBD4E]/10 text-[#6DBD4E]'
+                  : 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1] hover:bg-[#5FC1D1]/20'
+              }`}
+            >
+              {isAdded ? <Check size={15} /> : <Plus size={15} />}
+              {isAdded ? 'In enquiry' : 'Enquire category'}
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* Variants */}
-      <section style={{ background: theme.colors.surface, padding: '60px 28px 80px', position: 'relative' }}>
-        <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.2, pointerEvents: 'none' }} />
-        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+        {/* Product pills + toolbar */}
+        <div className="mb-5 space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <div className="label" style={{ marginBottom: 10 }}>Browse</div>
-              <h2 className="font-display text-metallic" style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.03em' }}>
-                Available Variants
+              <h2 className="font-display text-lg font-bold text-[#F5F5F7]">
+                Products in this category
               </h2>
+              <p className="text-sm text-[#A1A1A6]">
+                {sortedItems.length} product{sortedItems.length === 1 ? '' : 's'}
+              </p>
             </div>
             <ProductItemsSort value={sort} onChange={setSort} />
           </div>
-          <div ref={gridRef} className="reveal">
-            <ProductItemsGrid items={sortedItems} />
-          </div>
-        </div>
-      </section>
 
-      <style>{`
-        @media (max-width: 900px) { .bpd-hero-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
-    </>
+          {sortedItems.length > 0 ? (
+            <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Products in category">
+              <button
+                type="button"
+                onClick={() => setActivePill(null)}
+                className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                  activePill === null
+                    ? 'border-[#5FC1D1] bg-[#5FC1D1]/15 text-[#5FC1D1]'
+                    : 'border-white/15 bg-[#111118] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#F5F5F7]'
+                }`}
+              >
+                All products
+              </button>
+              {sortedItems.map((item) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => setActivePill(item.slug)}
+                  className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                    activePill === item.slug
+                      ? 'border-[#5FC1D1] bg-[#5FC1D1]/15 text-[#5FC1D1]'
+                      : 'border-white/15 bg-[#111118] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#F5F5F7]'
+                  }`}
+                >
+                  {item.title}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <ProductItemsGrid items={visibleItems} />
+      </div>
+    </div>
   )
 }
 
