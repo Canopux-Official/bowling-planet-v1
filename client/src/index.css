@@ -75,6 +75,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   body {
@@ -84,11 +86,18 @@
     overflow-x: hidden;
     font-size: 16px;
     line-height: 1.65;
+    max-width: 100%;
   }
 
   #root {
     width: 100%;
+    max-width: 100%;
     min-height: 100svh;
+    overflow-x: clip;
+  }
+
+  img, video {
+    max-width: 100%;
   }
 
   ::-webkit-scrollbar {
@@ -225,6 +234,55 @@
 
 .font-data {
   font-family: var(--font-data);
+}
+
+/* Home page — slightly tighter visual scale at 100% zoom + responsive guards */
+.landing-page {
+  zoom: 0.88;
+}
+
+/* Design font (DM Serif Display) — headings only on the home page */
+.landing-page .font-display:not(:is(h1, h2, h3, h4, h5, h6)) {
+  font-family: var(--font-sans);
+}
+
+.landing-page :is(h1, h2, h3, h4, h5, h6).font-display {
+  font-family: var(--font-serif);
+}
+
+/* Match "Immersive Experiences" section-heading style across the home page */
+.landing-page .landing-section-heading {
+  font-family: var(--font-serif) !important;
+  font-weight: 400 !important;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: none;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  -webkit-background-clip: unset;
+}
+
+@media (max-width: 900px) {
+  .landing-page {
+    zoom: 0.95;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-page {
+    zoom: 1;
+  }
+
+  .landing-page section {
+    overflow-x: clip;
+  }
+}
+
+@supports not (zoom: 1) {
+  .landing-page {
+    font-size: 93%;
+  }
 }
 
 /* Metallic headline gradient — Apple's signature look on dark */
@@ -955,43 +1013,6 @@ body.nav-drawer-open .floating-widget {
   background: rgba(255,255,255,0.15);
 }
 
-/* ── Custom cursor ─────────────────────── */
-.custom-cursor {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-}
-
-.cursor-dot {
-  width: 6px;
-  height: 6px;
-  background: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.cursor-ring {
-  width: 32px;
-  height: 32px;
-  border: 1.5px solid rgba(255,255,255,0.6);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s var(--ease-out), height 0.2s var(--ease-out), opacity 0.2s ease;
-}
-
-.cursor-ring.hover {
-  width: 52px;
-  height: 52px;
-  border-color: rgba(95,193,209,0.8);
-}
-
-@media (hover: none) {
-  .custom-cursor {
-    display: none !important;
-  }
-}
-
 /* ═══════════════════════════════════════════
    RESPONSIVE — NAV UTILITY CLASSES
    (replaces Tailwind hidden/md:flex classes)
@@ -1006,6 +1027,28 @@ body.nav-drawer-open .floating-widget {
 
 .nav-hamburger {
   display: none !important;
+}
+
+@media (max-width: 900px) {
+  .nav-desktop-links {
+    display: none !important;
+  }
+
+  .nav-desktop-cta {
+    display: none !important;
+  }
+
+  .nav-hamburger {
+    display: flex !important;
+  }
+
+  .nav-wordmark {
+    display: none !important;
+  }
+
+  .section-progress-nav {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1059,79 +1102,25 @@ body.nav-drawer-open .floating-widget {
   #services,
   #products,
   #franchise,
-  #careers {
+  #careers,
+  #case-studies,
+  #blog,
+  #trusted {
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-top: 32px !important;
-    padding-bottom: 32px !important;
   }
 
-  /* Remove gap between Portfolio and Services on mobile */
-  #portfolio {
-    padding-bottom: 0px !important;
+  #video-showcase {
+    padding-top: 48px !important;
   }
 
-  #services {
-    padding-top: 0px !important;
-  }
-
-  #contact {
-    padding: 80px 16px 60px !important;
-  }
-
-  /* ── About: two-col → single col ──────── */
-  .about-two-col {
+  .landing-fluid-grid {
     grid-template-columns: 1fr !important;
-    gap: 40px !important;
+    gap: 32px !important;
   }
 
-  /* Clip floating badge so it doesn't overflow on mobile */
-  .about-card-wrap {
-    overflow: visible !important;
-  }
-
-  .about-floating-badge {
-    display: none !important;
-  }
-
-  /* ── Portfolio grid: 2-col on mobile ─────── */
-  .portfolio-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
-
-  .portfolio-img {
-    height: 140px !important;
-  }
-
-  .portfolio-title {
-    font-size: 13px !important;
-  }
-
-  .portfolio-card-details {
-    padding: 12px 14px !important;
-  }
-
-  /* ── Services cards: side-by-side → stack */
-  .services-grid {
-    grid-template-columns: 1fr !important;
-    gap: 20px !important;
-  }
-
-  /* ── Products grid → 1-col ─────────────── */
-  .products-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  /* ── Franchise: two-col → single col ───── */
-  .franchise-grid {
-    grid-template-columns: 1fr !important;
-    gap: 40px !important;
-  }
-
-  .franchise-highlights {
-    grid-template-columns: repeat(2, 1fr) !important;
+  .landing-page h2.landing-section-heading {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
   }
 
   /* ── Contact info row: wrap + center ───── */

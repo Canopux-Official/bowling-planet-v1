@@ -1,52 +1,25 @@
 import type { FC } from 'react'
 import type { ITeamMember } from '../../services/teamApi'
-import { theme } from '../../../../theme'
 
 interface TeamMemberCardProps {
   member: ITeamMember
 }
 
 const TeamMemberCard: FC<TeamMemberCardProps> = ({ member }) => (
-  <article
-    className="glass-card"
-    style={{
-      padding: '28px 24px',
-      borderRadius: 20,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      textAlign: 'center',
-      gap: 12,
-    }}
-  >
-    <div style={{
-      width: 80,
-      height: 80,
-      borderRadius: '50%',
-      overflow: 'hidden',
-      border: `2px solid ${theme.colors.teal}40`,
-      flexShrink: 0,
-    }}>
+  <article className="flex h-full flex-col items-center rounded-xl border border-white/[0.08] bg-[#111118] p-4 text-center transition-colors hover:border-[#5FC1D1]/35">
+    <div className="mb-3 h-14 w-14 overflow-hidden rounded-full border border-[#5FC1D1]/30 bg-[#0A0A0F]">
       <img
         src={member.image.url}
         alt={member.name}
         loading="lazy"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        className="h-full w-full object-cover"
       />
     </div>
-    <div>
-      <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: theme.colors.text1, marginBottom: 4, letterSpacing: '-0.01em' }}>
-        {member.name}
-      </h3>
-      <p style={{ fontSize: 13, color: theme.colors.teal, fontFamily: theme.typography.fontBody, fontWeight: 600, marginBottom: member.experience ? 6 : 0 }}>
-        {member.designation}
-      </p>
-      {member.experience ? (
-        <p style={{ fontSize: 12, color: theme.colors.text3, fontFamily: theme.typography.fontBody, lineHeight: 1.5 }}>
-          {member.experience}
-        </p>
-      ) : null}
-    </div>
+    <h3 className="text-sm font-bold text-[#F5F5F7]">{member.name}</h3>
+    <p className="mt-1 text-[11px] font-semibold text-[#5FC1D1]">{member.designation}</p>
+    {member.experience ? (
+      <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-[#636366]">{member.experience}</p>
+    ) : null}
   </article>
 )
 

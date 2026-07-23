@@ -28,9 +28,8 @@ const WhySection: FC = () => {
 
         {/* Title */}
         <div ref={titleRef} className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
-          <h2 className="font-display text-metallic" style={{
-            fontWeight: 800, fontSize: 'clamp(3rem, 6vw, 5rem)',
-            letterSpacing: '-0.04em', lineHeight: 1.05,
+          <h2 className="font-display landing-section-heading" style={{
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
           }}>
             Why Choose Us.
           </h2>

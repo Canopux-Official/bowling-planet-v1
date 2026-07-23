@@ -36,7 +36,10 @@ export interface FranchisePageData {
 
 export const franchisePageApi = {
   getFranchisePageData: async (): Promise<{ success: boolean; data: FranchisePageData }> => {
-    const res = await apiClient('/franchise-page', { method: 'GET' });
+    const res = await apiClient('/franchise-page', {
+      method: 'GET',
+      headers: { 'x-skip-auth-refresh': 'true' },
+    });
     return res;
   },
 

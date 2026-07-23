@@ -14,7 +14,13 @@ interface CalculatorState {
     showResults: boolean
 }
 
-const RoiCalculatorSection: FC = () => {
+interface RoiCalculatorSectionProps {
+    compact?: boolean
+    /** Franchise sidebar: fill sticky column; scroll internally only after report opens */
+    panel?: boolean
+}
+
+const RoiCalculatorSection: FC<RoiCalculatorSectionProps> = ({ compact = false, panel = false }) => {
     const ref = useReveal()
     const { state, logCTAEvent } = useLeadTracker()
 
@@ -130,53 +136,82 @@ const RoiCalculatorSection: FC = () => {
     return (
         <section
             id="roi-calculator"
+            className={panel ? 'roi-panel h-full' : undefined}
             style={{
                 background: '#0A0A0F',
-                padding: '120px 28px',
+                padding: panel ? '16px 14px 20px' : compact ? '40px 20px' : '120px 28px',
                 position: 'relative',
-                overflow: 'hidden',
+                overflow: panel ? 'auto' : 'hidden',
+                height: panel ? '100%' : undefined,
+                maxHeight: panel ? '100%' : undefined,
             }}
         >
             {/* Glow orbs */}
-            <div className="orb orb-purple" style={{ width: 600, height: 600, top: '10%', right: '-5%' }} />
-            <div className="orb orb-teal" style={{ width: 500, height: 500, bottom: '-10%', left: '-8%' }} />
+            {!panel ? (
+                <>
+                    <div className="orb orb-purple" style={{ width: 600, height: 600, top: '10%', right: '-5%' }} />
+                    <div className="orb orb-teal" style={{ width: 500, height: 500, bottom: '-10%', left: '-8%' }} />
+                    <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
+                </>
+            ) : (
+                <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.2, pointerEvents: 'none' }} />
+            )}
 
-            {/* Grid pattern */}
-            <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
-
-            <div className="divider-purple" style={{ marginBottom: 80 }} />
+            {!compact && !panel ? <div className="divider-purple" style={{ marginBottom: 80 }} /> : null}
 
             <div
                 ref={ref}
                 className="reveal"
                 style={{
-                    maxWidth: 1320,
+                    maxWidth: panel ? '100%' : 1320,
                     margin: '0 auto',
                     position: 'relative',
                     zIndex: 1,
                 }}
             >
                 {/* ── Title ──────────────────────────────────────── */}
-                <div style={{ textAlign: 'center', marginBottom: 80 }}>
+                <div style={{ textAlign: panel ? 'left' : 'center', marginBottom: panel || compact ? 16 : 80 }}>
+                    <p
+                        style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: '#5FC1D1',
+                            marginBottom: 6,
+                        }}
+                    >
+                        ROI Calculator
+                    </p>
                     <h2
                         className="font-display text-metallic"
                         style={{
                             fontWeight: 800,
-                            fontSize: 'clamp(3rem, 6vw, 5rem)',
+                            fontSize: panel
+                                ? 'clamp(1.15rem, 2vw, 1.4rem)'
+                                : compact
+                                  ? 'clamp(1.35rem, 2.8vw, 1.85rem)'
+                                  : 'clamp(3rem, 6vw, 5rem)',
                             letterSpacing: '-0.04em',
-                            lineHeight: 1.05,
+                            lineHeight: 1.15,
                         }}
                     >
                         Know Your ROI.
                     </h2>
-                    <div className="text-gradient-brand" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', fontWeight: 600, marginTop: 16 }}>
-                        Transparent projections for your franchise model.
-                    </div>
+                    {!panel ? (
+                        <div className="text-gradient-brand" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', fontWeight: 600, marginTop: 16 }}>
+                            Transparent projections for your franchise model.
+                        </div>
+                    ) : (
+                        <p style={{ fontSize: 12, color: '#86868B', marginTop: 6, lineHeight: 1.45 }}>
+                            Set your model — report unlocks below.
+                        </p>
+                    )}
                 </div>
 
                 {/* ── Content Layout ────────────────────────────── */}
                 {!calc.showResults ? (
-                    <div style={{ maxWidth: 800, margin: '0 auto' }}>
+                    <div style={{ maxWidth: panel ? '100%' : 800, margin: panel ? 0 : '0 auto' }}>
                         <RoiConfigForm
                             inputs={calc.inputs}
                             tier={calc.tier}
@@ -195,8 +230,8 @@ const RoiCalculatorSection: FC = () => {
                         <div 
                             style={{ 
                                 display: 'grid', 
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-                                gap: 40, 
+                                gridTemplateColumns: panel ? '1fr' : 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', 
+                                gap: panel ? 16 : 40, 
                                 alignItems: 'start',
                                 filter: isUnlocked ? 'none' : 'blur(8px)',
                                 pointerEvents: isUnlocked ? 'auto' : 'none',
@@ -211,9 +246,9 @@ const RoiCalculatorSection: FC = () => {
                                         background: `linear-gradient(135deg, ${matched.color}08, rgba(255,255,255,0.01))`,
                                         border: `1px solid ${matched.color}15`,
                                         borderRadius: 16,
-                                        padding: '20px',
-                                        position: 'sticky',
-                                        top: 100,
+                                        padding: panel ? '14px' : '20px',
+                                        position: panel ? 'relative' : 'sticky',
+                                        top: panel ? undefined : 100,
                                     }}
                                 >
                                     <h4 className="font-display" style={{ fontSize: 14, fontWeight: 700, color: matched.color, marginBottom: 16 }}>
@@ -293,7 +328,7 @@ const RoiCalculatorSection: FC = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     zIndex: 10,
-                                    padding: '40px 20px',
+                                    padding: panel ? '16px 10px' : '40px 20px',
                                 }}
                             >
                                 <div
@@ -301,18 +336,18 @@ const RoiCalculatorSection: FC = () => {
                                         background: 'rgba(15, 15, 22, 0.85)',
                                         backdropFilter: 'blur(16px)',
                                         border: '1px solid rgba(255, 255, 255, 0.08)',
-                                        borderRadius: 24,
-                                        padding: '40px',
+                                        borderRadius: panel ? 16 : 24,
+                                        padding: panel ? '20px 16px' : '40px',
                                         maxWidth: 460,
                                         width: '100%',
                                         boxShadow: '0 24px 48px rgba(0, 0, 0, 0.8)',
                                         textAlign: 'center',
                                     }}
                                 >
-                                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 700, color: '#FFF', marginBottom: 12 }}>
+                                    <h3 className="font-display" style={{ fontSize: panel ? 18 : 24, fontWeight: 700, color: '#FFF', marginBottom: 12 }}>
                                         Unlock Full ROI Breakdown
                                     </h3>
-                                    <p style={{ fontSize: 14, color: '#A0A0AB', lineHeight: 1.5, marginBottom: 28 }}>
+                                    <p style={{ fontSize: 13, color: '#A0A0AB', lineHeight: 1.5, marginBottom: 20 }}>
                                         Enter your contact details to access investment yields, payback matrices, and customized franchise data.
                                     </p>
 
@@ -387,7 +422,7 @@ const RoiCalculatorSection: FC = () => {
                 )}
             </div>
 
-            <div className="divider" style={{ marginTop: 80 }} />
+            {!panel ? <div className="divider" style={{ marginTop: 80 }} /> : null}
         </section>
     )
 }

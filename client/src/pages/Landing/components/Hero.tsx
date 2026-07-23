@@ -50,6 +50,9 @@ const RotatingWord: FC<{ activities?: string[] }> = ({ activities = ACTIVITIES }
       style={{
         display: 'inline-block',
         whiteSpace: 'nowrap',
+        maxWidth: '100%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(10px)',
         transition: 'opacity 0.3s ease, transform 0.3s ease',
@@ -221,8 +224,8 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
           position: 'relative',
           zIndex: 1,
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 500px), 1fr))',
-          gap: 120,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+          gap: 'clamp(32px, 6vw, 72px)',
           alignItems: 'center'
         }}
       >
@@ -274,9 +277,9 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="font-display"
             style={{
-              fontSize: 'clamp(2.5rem, 5vw, 5.5rem)',
+              fontSize: 'clamp(2rem, 4.5vw, 4rem)',
               fontWeight: 400,
-              lineHeight: 1.05,
+              lineHeight: 1.08,
               letterSpacing: '-0.02em',
               marginBottom: 0,
             }}
@@ -284,7 +287,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             <span className="text-metallic" style={{ display: 'block', fontSize: '0.6em', marginBottom: -5 }}>Consulting & Setup For</span>
             <span style={{
               display: 'flex',
-              height: 'clamp(3rem, 6vw, 6.5rem)',
+              height: 'clamp(2.4rem, 5vw, 4.5rem)',
               overflow: 'hidden',
               alignItems: 'center',
               justifyContent: 'flex-start',
