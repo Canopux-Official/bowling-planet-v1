@@ -73,7 +73,7 @@ const ROITeaser: FC = () => {
         Interactive Projection Teaser
       </h4>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: 24, marginBottom: 32 }}>
         <div>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-3)', marginBottom: 8 }}>Area (Sq. Ft.)</div>
           <div style={{ fontFamily: 'var(--font-data)', fontSize: 32, fontWeight: 700, color: '#F5F5F7' }}>
@@ -131,7 +131,7 @@ const FranchiseSection: FC = () => {
   const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id);
 
   return (
-    <section id="franchise" style={{ background: '#0A0A0F', padding: '100px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section id="franchise" style={{ background: '#0A0A0F', padding: 'clamp(48px, 8vw, 72px) clamp(16px, 4vw, 28px)', position: 'relative', overflow: 'hidden' }}>
 
       {/* Glow orbs */}
       <div className="orb orb-green" style={{ width: 700, height: 600, top: '-20%', right: '-10%', opacity: 0.2 }} />
@@ -150,9 +150,8 @@ const FranchiseSection: FC = () => {
         {/* ── Title ──────────────────────────────────────── */}
         <div style={{ textAlign: 'center', marginBottom: 80 }}>
           <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>Ownership</div>
-          <h2 className="font-display text-metallic" style={{
-            fontWeight: 400, fontSize: 'clamp(2.8rem, 6vw, 4.5rem)',
-            letterSpacing: '-0.02em', lineHeight: 1.05,
+          <h2 className="font-display landing-section-heading" style={{
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
           }}>
             Franchise Opportunities.
           </h2>
@@ -161,8 +160,8 @@ const FranchiseSection: FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-            gap: 80, alignItems: 'start',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: 'clamp(32px, 6vw, 80px)', alignItems: 'start',
           }}>
 
           {/* ── Left: Copy & Interactive Element ──────────── */}
@@ -220,7 +219,7 @@ const FranchiseSection: FC = () => {
                 {/* Watermark Number */}
                 <div style={{
                   position: 'absolute', top: -20, right: -10,
-                  fontSize: 140, fontWeight: 900, fontFamily: 'var(--font-display)',
+                  fontSize: 140, fontWeight: 900, fontFamily: 'var(--font-sans)',
                   color: `${p.color}08`, pointerEvents: 'none', userSelect: 'none', lineHeight: 1, zIndex: 0,
                 }}>
                   {p.num}

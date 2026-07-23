@@ -58,7 +58,7 @@ const AboutSection: FC = () => {
       id="about"
       ref={sectionRef}
       
-      style={{ background: '#000', padding: '100px 28px', position: 'relative', overflow: 'hidden' }}
+      style={{ background: '#000', padding: 'clamp(48px, 8vw, 72px) clamp(16px, 4vw, 28px)', position: 'relative', overflow: 'hidden' }}
     >
       {/* Grid */}
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
@@ -78,7 +78,7 @@ const AboutSection: FC = () => {
               About
             </span>
           </div>
-          <h2 className="font-display" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', color: '#F5F5F7', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
+          <h2 className="font-display landing-section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)' }}>
             Our Story.
           </h2>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: 17, color: 'rgba(245,245,247,0.6)', marginTop: 16, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.7 }}>

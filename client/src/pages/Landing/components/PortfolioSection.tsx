@@ -1,294 +1,349 @@
 /**
- * PortfolioSection — Bento-grid with filter tabs (layoutId reflow),
- * cursor-tracked spotlight on large card, and lightbox on click.
+ * PortfolioSection — Our Work
+ * Interactive list + preview showcase. Layout stays balanced with any project count.
  */
 
-import { type FC, useState, useEffect } from 'react'
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { useReveal } from '../../../hooks/useReveal'
+import { type FC, useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
-// import { useReducedMotion } from '../../../hooks/useReducedMotion'
-import { X, ArrowRight } from 'lucide-react'
+import { useReducedMotion } from '../../../hooks/useReducedMotion'
 import { MOCK_PROJECTS } from '../../ProjectsPage/services/mockdata'
 
-const CATEGORIES = ['All', 'Bowling', 'Softplay', 'Arcade', 'VR']
+const CATEGORIES = ['All', 'Bowling', 'Softplay', 'Arcade', 'VR'] as const
 
-const DEFAULT_PROJECTS = MOCK_PROJECTS.slice(0, 6).map((p, i) => ({
+const LOCAL_IMAGES = [
+  '/products/Bowling_Lane_Dubai.avif',
+  '/products/Arcade_Games_Calicut.avif',
+  '/products/Softplay_Ahemdabad.avif',
+  '/products/Softplay_New_Delhi.avif',
+] as const
+
+const FALLBACK_IMAGE = LOCAL_IMAGES[0]
+
+const BROKEN_URL_SNIPPETS = [
+  'photo-1561571175-901768826500',
+  'photo-1596558450255-7c0b7be9d56a',
+  'photo-1566442539401-44754a6db240',
+  'photo-1628102491629-778571d893a3',
+]
+
+type Category = (typeof CATEGORIES)[number]
+
+type ProjectCardData = {
+  id: string
+  slug?: string
+  name: string
+  image: string
+  location: string
+  category: Category
+  description?: string
+}
+
+const categoryFromTags = (tags?: string[], fallback: Category = 'Bowling'): Category => {
+  const joined = (tags || []).join(' ').toLowerCase()
+  if (joined.includes('soft') || joined.includes('kids')) return 'Softplay'
+  if (joined.includes('arcade') || joined.includes('redemption')) return 'Arcade'
+  if (joined.includes('vr') || joined.includes('immersive')) return 'VR'
+  if (joined.includes('bowl') || joined.includes('duckpin') || joined.includes('lane')) return 'Bowling'
+  return fallback
+}
+
+const resolveImage = (url: string | undefined, index: number): string => {
+  if (!url || !url.trim()) return LOCAL_IMAGES[index % LOCAL_IMAGES.length]
+  if (BROKEN_URL_SNIPPETS.some((s) => url.includes(s))) {
+    return LOCAL_IMAGES[index % LOCAL_IMAGES.length]
+  }
+  // Prefer local product assets when already pointing at them
+  if (url.startsWith('/products/')) return url
+  return url
+}
+
+const DEFAULT_PROJECTS: ProjectCardData[] = MOCK_PROJECTS.slice(0, 6).map((p, i) => ({
   id: p._id || p.slug || String(i),
+  slug: p.slug,
   name: p.title || '',
-  image: p.media?.[0]?.url || '/products/Bowling_Lane_Dubai.avif',
+  // Always use reliable local assets for mock showcase (avoids dead Unsplash URLs)
+  image: LOCAL_IMAGES[i % LOCAL_IMAGES.length],
   location: ['Dubai', 'Delhi', 'Ahmedabad', 'Calicut', 'Mumbai', 'Surat'][i % 6],
-  category: ['Bowling', 'Softplay', 'Arcade', 'VR', 'Bowling', 'Softplay'][i % 6],
+  category: categoryFromTags(p.tags as string[] | undefined, (['Bowling', 'Softplay', 'Arcade', 'VR', 'Bowling', 'Softplay'] as Category[])[i % 6]),
+  description: p.description,
 }))
 
-/* ── Lightbox ─────────────────────────────────────────────────── */
-const Lightbox: FC<{ src: string; alt: string; onClose: () => void }> = ({ src, alt, onClose }) => (
-  <AnimatePresence>
-    <motion.div
-      className="lightbox-overlay"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.img
-        className="lightbox-img"
-        src={src}
-        alt={alt}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        onClick={e => e.stopPropagation()}
-      />
-      <button
-        onClick={onClose}
-        aria-label="Close lightbox"
-        style={{
-          position: 'absolute', top: 20, right: 20,
-          background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-          borderRadius: 12, padding: 10, cursor: 'pointer',
-          display: 'flex', color: '#fff', backdropFilter: 'blur(8px)',
-        }}
-      >
-        <X size={20} />
-      </button>
-    </motion.div>
-  </AnimatePresence>
-)
+const ProjectImage: FC<{ src: string; alt: string; className?: string }> = ({
+  src,
+  alt,
+  className,
+}) => {
+  const [current, setCurrent] = useState(src)
 
-/* ── Bento project card ───────────────────────────────────────── */
-const ProjectCard: FC<{
-  project: typeof DEFAULT_PROJECTS[0]
-  large?: boolean
-  onOpenLightbox: (src: string, alt: string) => void
-  index: number
-  isActive?: boolean
-}> = ({ project, large, onOpenLightbox, index, isActive }) => {
-  // const reduced = useReducedMotion()
-  const [hover, setHover] = useState(false)
-  const activeState = isActive || hover
+  useEffect(() => {
+    setCurrent(src)
+  }, [src])
 
   return (
-    <motion.div
-      layout
-      layoutId={`project-${project.id}`}
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0, transition: { delay: index * 0.1 } }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onClick={() => onOpenLightbox(project.image, project.name)}
-      style={{
-        borderRadius: 24,
-        overflow: 'hidden',
-        cursor: 'zoom-in',
-        position: 'relative',
-        background: '#0A0A0F',
-        height: large ? 480 : 320,
-        boxShadow: activeState ? `0 20px 50px rgba(168, 85, 247, 0.25)` : '0 10px 30px rgba(0,0,0,0.5)',
+    <img
+      src={current}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={className}
+      onError={() => {
+        if (current !== FALLBACK_IMAGE) setCurrent(FALLBACK_IMAGE)
       }}
-      whileHover={{ scale: 1.015 }}
-      transition={{ layout: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }, scale: { duration: 0.3 } }}
-    >
-      {/* Image */}
-      <motion.img
-        src={project.image}
-        alt={project.name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: activeState ? 'grayscale(0%)' : 'grayscale(30%)' }}
-        animate={{ scale: activeState ? 1.08 : 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      />
-
-      {/* Persistent subtle overlay for text readability */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
-      }} />
-
-      {/* Info overlay (slides up slightly on hover) */}
-      <motion.div 
-        style={{ 
-          position: 'absolute', bottom: 0, left: 0, right: 0, 
-          padding: large ? '36px' : '24px',
-          background: activeState ? 'linear-gradient(to top, rgba(168,85,247,0.2) 0%, rgba(20,10,25,0.85) 60%, transparent 100%)' : 'transparent',
-          backdropFilter: activeState ? 'blur(8px)' : 'none',
-        }}
-        animate={{ y: activeState ? 0 : 10 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div style={{ display: 'flex', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-          <span style={{
-            fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 700,
-            letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: '#5FC1D1', background: 'rgba(95,193,209,0.15)',
-            padding: '4px 12px', borderRadius: 100,
-            border: '1px solid rgba(95,193,209,0.3)',
-          }}>
-            {project.category}
-          </span>
-          <motion.span 
-            animate={{ opacity: activeState ? 1 : 0.6 }}
-            style={{
-              fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 600,
-              color: 'rgba(255,255,255,0.9)', background: 'rgba(255,255,255,0.05)',
-              padding: '4px 12px', borderRadius: 100,
-              border: '1px solid rgba(255,255,255,0.15)',
-            }}
-          >
-            📍 {project.location}
-          </motion.span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: large ? 32 : 20, color: '#F5F5F7', lineHeight: 1.2, margin: 0 }}>
-            {project.name}
-          </h3>
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: activeState ? 1 : 0, x: activeState ? 0 : -10 }}
-            style={{
-              width: 40, height: 40, borderRadius: '50%', background: '#5FC1D1', color: '#000',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}
-          >
-            <ArrowRight size={20} />
-          </motion.div>
-        </div>
-      </motion.div>
-    </motion.div>
+    />
   )
 }
 
-/* ── PortfolioSection ─────────────────────────────────────────── */
 const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
-  const titleRef = useReveal()
   const { logCTAEvent } = useLeadTracker()
-  const [activeFilter, setActiveFilter] = useState('All')
-  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
+  const navigate = useNavigate()
+  const reduced = useReducedMotion()
+  const [activeFilter, setActiveFilter] = useState<Category>('All')
+  const [activeId, setActiveId] = useState<string>('')
+  const [paused, setPaused] = useState(false)
 
-  const projects = data?.projectIds?.length
-    ? data.projectIds.map((p, i) => ({
-        id: p._id || p.id,
-        name: p.title || p.name,
-        image: p.media?.[0]?.url || p.image || '/products/Bowling_Lane_Dubai.avif',
-        location: ['Dubai', 'Delhi', 'Ahmedabad', 'Calicut'][i % 4],
-        category: ['Bowling', 'Softplay', 'Arcade', 'VR'][i % 4],
-      }))
-    : DEFAULT_PROJECTS
+  const projects = useMemo(() => {
+    if (data?.projectIds?.length) {
+      return data.projectIds.map((p, i) => ({
+        id: String(p._id || p.id || i),
+        slug: p.slug,
+        name: p.title || p.name || 'Untitled project',
+        image: resolveImage(p.media?.[0]?.url || p.image, i),
+        location: p.location || p.city || ['Dubai', 'Delhi', 'Ahmedabad', 'Calicut'][i % 4],
+        category: categoryFromTags(
+          p.tags,
+          (['Bowling', 'Softplay', 'Arcade', 'VR'] as Category[])[i % 4],
+        ),
+        description: p.description,
+      })) as ProjectCardData[]
+    }
+    return DEFAULT_PROJECTS
+  }, [data])
 
-  const filtered = activeFilter === 'All'
-    ? projects
-    : projects.filter(p => p.category === activeFilter)
+  const filtered =
+    activeFilter === 'All' ? projects : projects.filter((p) => p.category === activeFilter)
 
+  // Keep selection valid when filter changes
   useEffect(() => {
-    setActiveIndex(0)
-  }, [activeFilter])
+    if (!filtered.length) {
+      setActiveId('')
+      return
+    }
+    if (!filtered.some((p) => p.id === activeId)) {
+      setActiveId(filtered[0].id)
+    }
+  }, [filtered, activeId])
 
+  const active = filtered.find((p) => p.id === activeId) || filtered[0]
+
+  // Gentle autoplay through the list
   useEffect(() => {
-    if (!filtered.length) return
-    const cycle = setInterval(() => {
-      setActiveIndex(prev => (prev + 1) % Math.min(filtered.length, 5))
-    }, 2500)
-    return () => clearInterval(cycle)
-  }, [filtered.length])
+    if (reduced || paused || filtered.length < 2) return
+    const timer = setInterval(() => {
+      setActiveId((prev) => {
+        const idx = filtered.findIndex((p) => p.id === prev)
+        const next = filtered[(idx + 1) % filtered.length]
+        return next.id
+      })
+    }, 4200)
+    return () => clearInterval(timer)
+  }, [filtered, paused, reduced])
+
+  const openProject = (project: ProjectCardData) => {
+    const href = project.slug ? `/projects/${project.slug}` : '/projects'
+    navigate(href)
+  }
 
   return (
-    <>
-      <section
-        id="portfolio"
-        style={{ background: '#000', padding: '40px 28px', position: 'relative', overflow: 'hidden' }}
-      >
-        <div className="orb orb-green" style={{ width: 600, height: 600, top: '5%', right: '-8%', opacity: 0.25 }} />
-        <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.25, pointerEvents: 'none' }} />
+    <section id="portfolio" className="relative overflow-hidden bg-black px-4 py-10 sm:px-6 sm:py-12">
+      <div className="orb orb-green pointer-events-none absolute right-[-8%] top-[5%] h-[420px] w-[420px] opacity-20" />
+      <div aria-hidden="true" className="grid-bg pointer-events-none absolute inset-0 opacity-20" />
 
-        <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          {/* Heading */}
-          <div ref={titleRef} className="reveal" style={{ marginBottom: 52 }}>
-            <div className="label" style={{ marginBottom: 20 }}>Prestigious Projects</div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
-              <h2 className="font-display text-metallic" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
-                Our Work.
-              </h2>
-              <Link
-                to="/projects"
-                onClick={() => logCTAEvent('Landing: View All Projects')}
-                className="btn btn-ghost"
-                style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}
+      <div className="relative z-[1] mx-auto max-w-[1100px]">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+          <div>
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+              Prestigious projects
+            </p>
+            <h2 className="font-display landing-section-heading text-[clamp(1.75rem,3.5vw,2.75rem)]">
+              Our Work
+            </h2>
+          </div>
+          <Link
+            to="/projects"
+            onClick={() => logCTAEvent('Landing: View All Projects')}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-[#F5F5F7] transition-colors hover:border-[#5FC1D1]/45 hover:text-[#5FC1D1]"
+          >
+            View all <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        <div
+          className="mb-5 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Filter projects"
+        >
+          {CATEGORIES.map((cat) => {
+            const isActive = activeFilter === cat
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveFilter(cat)}
+                className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                  isActive
+                    ? 'border-[#5FC1D1] bg-[#5FC1D1]/15 text-[#5FC1D1]'
+                    : 'border-white/15 bg-[#111118] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#F5F5F7]'
+                }`}
               >
-                View All Projects <ArrowRight size={16} />
-              </Link>
+                {cat}
+              </button>
+            )
+          })}
+        </div>
+
+        {filtered.length === 0 || !active ? (
+          <p className="py-10 text-center text-sm text-[#86868B]">No projects in this category yet.</p>
+        ) : (
+          <div
+            className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] lg:gap-5"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
+            {/* Project list */}
+            <div
+              className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1 lg:max-h-[480px]"
+              role="listbox"
+              aria-label="Projects"
+            >
+              <AnimatePresence mode="popLayout">
+                {filtered.map((project, i) => {
+                  const isActive = project.id === active.id
+                  return (
+                    <motion.button
+                      key={project.id}
+                      type="button"
+                      role="option"
+                      aria-selected={isActive}
+                      layout={!reduced}
+                      initial={reduced ? false : { opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.25, delay: reduced ? 0 : Math.min(i * 0.04, 0.2) }}
+                      onMouseEnter={() => setActiveId(project.id)}
+                      onFocus={() => setActiveId(project.id)}
+                      onClick={() => {
+                        setActiveId(project.id)
+                        openProject(project)
+                      }}
+                      className="group relative flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border px-3.5 py-3 text-left transition-colors duration-300"
+                      style={{
+                        borderColor: isActive ? 'rgba(95,193,209,0.45)' : 'rgba(255,255,255,0.1)',
+                        background: isActive ? 'rgba(95,193,209,0.1)' : 'rgba(17,17,24,0.9)',
+                      }}
+                    >
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#0A0A0F]">
+                        <ProjectImage
+                          src={project.image}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center gap-2">
+                          <span className="font-[family-name:var(--font-data)] text-[11px] font-bold tracking-wider text-[#5FC1D1]/80">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#A1A1A6]">
+                            {project.category}
+                          </span>
+                        </div>
+                        <h3
+                          className={`truncate text-[15px] font-bold leading-snug transition-colors ${
+                            isActive ? 'text-[#5FC1D1]' : 'text-[#F5F5F7] group-hover:text-[#5FC1D1]'
+                          }`}
+                        >
+                          {project.name}
+                        </h3>
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-[#86868B]">
+                          <MapPin size={11} />
+                          {project.location}
+                        </p>
+                      </div>
+                      <ArrowUpRight
+                        size={16}
+                        className={`shrink-0 transition-all duration-300 ${
+                          isActive
+                            ? 'text-[#5FC1D1] translate-x-0 opacity-100'
+                            : 'translate-x-1 text-white/30 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
+                        }`}
+                      />
+                      {isActive && (
+                        <motion.span
+                          layoutId={reduced ? undefined : 'portfolio-active-bar'}
+                          className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-[#5FC1D1]"
+                        />
+                      )}
+                    </motion.button>
+                  )
+                })}
+              </AnimatePresence>
+            </div>
+
+            {/* Preview stage */}
+            <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0F] sm:min-h-[340px] lg:min-h-[480px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active.id}
+                  initial={reduced ? false : { opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.99 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute inset-0"
+                >
+                  <ProjectImage
+                    src={active.image}
+                    alt={active.name}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <span className="rounded-full border border-[#5FC1D1]/40 bg-[#5FC1D1]/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#5FC1D1]">
+                        {active.category}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] font-medium text-[#E8E8ED] backdrop-blur-sm">
+                        <MapPin size={11} />
+                        {active.location}
+                      </span>
+                    </div>
+                    <h3 className="font-display mb-2 text-[clamp(1.35rem,2.5vw,2rem)] font-bold leading-tight text-[#F5F5F7]">
+                      {active.name}
+                    </h3>
+                    {active.description && (
+                      <p className="mb-4 line-clamp-2 max-w-xl text-sm leading-relaxed text-white/70">
+                        {active.description}
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logCTAEvent(`Portfolio: ${active.name}`)
+                        openProject(active)
+                      }}
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#5FC1D1] px-4 py-2.5 text-sm font-bold text-black transition-transform hover:scale-[1.02]"
+                    >
+                      View project <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
-
-          {/* Filter tabs */}
-          <LayoutGroup>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 36, flexWrap: 'wrap' }}>
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveFilter(cat)}
-                  style={{
-                    position: 'relative',
-                    padding: '12px 24px',
-                    borderRadius: 100,
-                    border: `1px solid ${activeFilter === cat ? 'rgba(95,193,209,0.8)' : 'rgba(255,255,255,0.15)'}`,
-                    background: activeFilter === cat ? 'rgba(95,193,209,0.15)' : 'rgba(255,255,255,0.02)',
-                    color: activeFilter === cat ? '#5FC1D1' : 'rgba(255,255,255,0.7)',
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 15,
-                    fontWeight: 700,
-                    letterSpacing: '0.02em',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    boxShadow: activeFilter === cat ? '0 0 16px rgba(95,193,209,0.2)' : 'none',
-                  }}
-                >
-                  {activeFilter === cat && (
-                    <motion.div
-                      layoutId="filter-pill"
-                      style={{ position: 'absolute', inset: -1, borderRadius: 100, background: 'rgba(95,193,209,0.05)', border: '1px solid rgba(95,193,209,0.4)' }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 35 }}
-                    />
-                  )}
-                  <span style={{ position: 'relative', zIndex: 1 }}>{cat}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Bento grid */}
-            <AnimatePresence mode="popLayout">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-                {filtered.slice(0, 5).map((project, i) => (
-                  <div
-                    key={project.id}
-                    style={{ gridColumn: i === 0 ? 'span 2' : 'span 1' }}
-                  >
-                    <ProjectCard
-                      project={project}
-                      large={i === 0}
-                      index={i}
-                      isActive={activeIndex === i}
-                      onOpenLightbox={(src, alt) => setLightbox({ src, alt })}
-                    />
-                  </div>
-                ))}
-              </div>
-            </AnimatePresence>
-          </LayoutGroup>
-        </div>
-      </section>
-
-      {/* Lightbox */}
-      {lightbox && (
-        <Lightbox
-          src={lightbox.src}
-          alt={lightbox.alt}
-          onClose={() => setLightbox(null)}
-        />
-      )}
-    </>
+        )}
+      </div>
+    </section>
   )
 }
 

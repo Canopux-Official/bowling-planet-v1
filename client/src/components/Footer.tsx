@@ -46,7 +46,7 @@ const Footer: FC = () => {
     <>
 
       {/* ── Footer ─────────────────────────────────────────── */}
-      <footer style={{ background: '#000000', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '64px 28px 40px' }}>
+      <footer style={{ background: '#000000', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(40px, 8vw, 64px) clamp(16px, 4vw, 28px) clamp(28px, 5vw, 40px)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
 
           {/* Top row */}

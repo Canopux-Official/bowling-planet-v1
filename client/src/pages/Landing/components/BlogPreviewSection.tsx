@@ -159,7 +159,7 @@ const BlogPreviewSection: FC = () => {
   const { logCTAEvent } = useLeadTracker()
 
   return (
-    <section id="blog" style={{ background: '#000', padding: '100px 28px', position: 'relative' }}>
+    <section id="blog" style={{ background: '#000', padding: 'clamp(48px, 8vw, 72px) clamp(16px, 4vw, 28px)', position: 'relative' }}>
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.25, pointerEvents: 'none' }} />
       
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -167,7 +167,7 @@ const BlogPreviewSection: FC = () => {
         <div ref={titleRef} className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24, marginBottom: 56 }}>
           <div>
             <div className="label" style={{ marginBottom: 16 }}>Insights</div>
-            <h2 className="font-display" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: 'var(--text-1)', lineHeight: 1.1, letterSpacing: '-0.02em', margin: 0 }}>
+            <h2 className="font-display landing-section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)', margin: 0 }}>
               The Playbook.
             </h2>
           </div>
@@ -181,7 +181,7 @@ const BlogPreviewSection: FC = () => {
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 24 }}>
           {MOCK_POSTS.map((post, i) => (
             <BlogCard key={post.id} post={post} index={i} />
           ))}

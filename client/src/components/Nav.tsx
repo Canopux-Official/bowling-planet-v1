@@ -8,9 +8,9 @@ const NAV_LINKS = [
   { label: 'About',     path: '/about'     },
   { label: 'Projects',  path: '/projects'  },
   { label: 'Products',  path: '/products'  },
-  { label: 'Franchise', path: '/franchise' },
   { label: 'Careers',   path: '/careers'   },
   { label: 'Blog',      path: '/blog'      },
+  { label: 'Franchise', path: '/franchise' },
 ]
 
 const Nav: FC = () => {
@@ -72,8 +72,9 @@ const Nav: FC = () => {
         style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200 }}
       >
         <div style={{
-          maxWidth: 1320, margin: '0 auto', padding: '0 28px',
+          maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px, 4vw, 28px)',
           height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 12,
         }}>
 
           {/* Logo */}
@@ -81,12 +82,12 @@ const Nav: FC = () => {
             to="/"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             aria-label="Bowling Planet — Home"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', minWidth: 0 }}
           >
             <img
               src="/logo.avif"
               alt="Bowling Planet"
-              style={{ height: 52, width: 'auto' }}
+              style={{ height: 44, width: 'auto', flexShrink: 0 }}
               onError={e => {
                 const t = e.currentTarget
                 if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = '/logo.avif' }
@@ -96,7 +97,8 @@ const Nav: FC = () => {
               className="nav-wordmark"
               style={{
                 fontFamily: '"Sora", sans-serif', fontWeight: 700,
-                fontSize: 22, letterSpacing: '-0.02em', color: '#F5F5F7',
+                fontSize: 20, letterSpacing: '-0.02em', color: '#F5F5F7',
+                whiteSpace: 'nowrap',
               }}
             >
               Bowling Planet

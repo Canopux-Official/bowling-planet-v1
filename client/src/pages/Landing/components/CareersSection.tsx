@@ -23,7 +23,7 @@ const CareersSection: FC = () => {
   const { logCTAEvent } = useLeadTracker()
 
   return (
-    <section id="careers"  style={{ background: '#000', padding: '100px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section id="careers"  style={{ background: '#000', padding: 'clamp(48px, 8vw, 72px) clamp(16px, 4vw, 28px)', position: 'relative', overflow: 'hidden' }}>
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
       <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -33,11 +33,8 @@ const CareersSection: FC = () => {
             Careers
           </div>
           
-          <h2 className="font-display" style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-            color: '#F5F5F7',
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
+          <h2 className="font-display landing-section-heading" style={{
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
             marginBottom: 24,
           }}>
             Build the Future of<br />Entertainment With Us.

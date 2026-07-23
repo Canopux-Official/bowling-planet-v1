@@ -55,9 +55,9 @@ const StatChip: FC<{
       onMouseLeave={() => setTilted(false)}
       style={{
         textAlign: 'center',
-        padding: '28px 20px',
+        padding: 'clamp(20px, 4vw, 28px) clamp(12px, 3vw, 20px)',
         flex: 1,
-        minWidth: 120,
+        minWidth: 0,
         borderRight: '1px solid rgba(255,255,255,0.1)',
         transform: tilted && !reduced ? 'perspective(600px) rotateX(4deg) translateY(-3px)' : 'none',
         transition: 'transform 0.3s var(--ease-out)',
@@ -230,9 +230,16 @@ const CredibilityStrip: FC<{ data?: any }> = ({ data }) => {
       {/* Subtle grid on light bg */}
       <div aria-hidden="true" className="grid-bg" style={{ background: '#000', position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 28px', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px, 4vw, 28px)', position: 'relative', zIndex: 1 }}>
         {/* Stats row */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', overflowX: 'auto' }}>
+        <div
+          className="credibility-stats"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
           {stats.map((s, i) => (
             <StatChip
               key={s.label}

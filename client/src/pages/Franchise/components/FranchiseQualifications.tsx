@@ -74,7 +74,7 @@ const FranchiseQualifications: FC = () => {
     <section
       style={{
         background: theme.colors.void,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -84,20 +84,20 @@ const FranchiseQualifications: FC = () => {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             Partner Qualifications
           </div>
           <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            marginBottom: 16,
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
           }}>
-            Are You the Right Partner?
+            Partner fit
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
-            We don't ask for perfection — just the right mindset. Most qualifications are skills we help you develop.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+            Core requirements—most skills we help you build.
           </p>
         </div>
 
@@ -108,8 +108,8 @@ const FranchiseQualifications: FC = () => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: 20,
-            marginBottom: 40,
+            gap: 12,
+            marginBottom: 24,
           }}
         >
           {visible.map((q) => {
@@ -118,8 +118,8 @@ const FranchiseQualifications: FC = () => {
               <div
                 key={q.num}
                 style={{
-                  padding: '36px',
-                  borderRadius: 20,
+                  padding: '20px',
+                  borderRadius: 16,
                   background: `linear-gradient(180deg, ${ts.color}05, rgba(255,255,255,0.01))`,
                   border: `1px solid ${ts.color}15`,
                   display: 'flex',

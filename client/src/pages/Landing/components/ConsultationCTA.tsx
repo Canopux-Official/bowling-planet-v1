@@ -14,7 +14,7 @@ const ConsultationCTA: FC = () => {
   const { logCTAEvent } = useLeadTracker()
 
   return (
-    <section id="cta" style={{ background: '#050508', padding: '120px 28px', position: 'relative', overflow: 'hidden' }}>
+    <section id="cta" style={{ background: '#050508', padding: 'clamp(48px, 8vw, 80px) clamp(16px, 4vw, 28px)', position: 'relative', overflow: 'hidden' }}>
       
       {/* Glow orbs */}
       <div className="orb orb-teal" style={{ width: 800, height: 800, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.15 }} />
@@ -27,7 +27,7 @@ const ConsultationCTA: FC = () => {
           style={{
             background: 'rgba(255,255,255,0.02)',
             border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 32, padding: '80px 40px',
+            borderRadius: 32, padding: 'clamp(36px, 8vw, 80px) clamp(20px, 5vw, 40px)',
             textAlign: 'center',
             boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
             backdropFilter: 'blur(20px)',
@@ -42,9 +42,8 @@ const ConsultationCTA: FC = () => {
             <Calendar size={28} />
           </div>
 
-          <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 400,
-            lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 24,
+          <h2 className="font-display landing-section-heading" style={{
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)', marginBottom: 24,
           }}>
             Ready to Build<br />Something Extraordinary?
           </h2>

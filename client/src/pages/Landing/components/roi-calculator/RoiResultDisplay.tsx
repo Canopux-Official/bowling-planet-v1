@@ -462,7 +462,8 @@ function MetricCard({ icon, label, value, subtext, color }: { icon: React.ReactN
         alignItems: 'center',
         gap: 14,
         flex: 1,
-        minWidth: 200,
+        minWidth: 0,
+        flex: '1 1 160px',
       }}
     >
       <div style={{ width: 40, height: 40, borderRadius: 10, background: `${color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: color }}>

@@ -102,7 +102,7 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1561571175-901768826500?q=80&w=600&auto=format&fit=crop",
+        url: "/products/Bowling_Lane_Dubai.avif",
         publicId: "projects/neon_pin_01"
       }
     ],
@@ -128,7 +128,7 @@ export const MOCK_PROJECTS: Partial<IProject>[] = [
       { type: "image", url: "https://images.unsplash.com/photo-1544256718-3bcf237f3974?q=80&w=800", publicId: "supernova_01" },
       { type: "image", url: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800", publicId: "supernova_02" },
       { type: "image", url: "https://images.unsplash.com/photo-1511882150382-421056c89033?q=80&w=800", publicId: "supernova_03" },
-      { type: "image", url: "https://images.unsplash.com/photo-1561571175-901768826500?q=80&w=800", publicId: "supernova_04" },
+      { type: "image", url: "/products/Bowling_Lane_Dubai.avif", publicId: "supernova_04" },
       { type: "image", url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800", publicId: "supernova_05" },
       { type: "image", url: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800", publicId: "supernova_06" },
       { type: "image", url: "https://images.unsplash.com/photo-1580234810907-b40315b76418?q=80&w=800", publicId: "supernova_07" },

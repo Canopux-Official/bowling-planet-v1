@@ -5,21 +5,46 @@
 import { type FC, useState } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
-import type { IFranchiseFAQ } from '../../../services/franchisePageApi';
+import type { IFranchiseFAQ } from '../../../services/franchisePageApi'
+
+/** Used only when CMS/API returns no FAQs — never replaces loaded CMS content */
+const FALLBACK_FAQS: IFranchiseFAQ[] = [
+  {
+    q: 'Why should I choose Bowling Planet for my FEC business?',
+    a: 'You get a strong, proven partner with Bowling Planet. We bring 17+ years of industry expertise, turnkey delivery, and ₹0 franchise fees — so you keep more equity while we help you open and operate.',
+  },
+  {
+    q: 'What kinds of games and entertainment are offered?',
+    a: 'Over 700+ games across bowling, VR, arcade, redemption, toddler zones, and more — sourced, installed, and supported end to end.',
+  },
+  {
+    q: 'What is the minimum investment required?',
+    a: 'Our Economy tier starts from about ₹35 Lakhs for a neighbourhood game lounge. Higher tiers scale up to mega-complex programmes based on size and attractions.',
+  },
+  {
+    q: 'Do I need prior FEC experience?',
+    a: 'No. We guide registrations, site evaluation, training, and pre-opening prep so first-time operators can launch with confidence.',
+  },
+  {
+    q: 'Is there a franchise fee?',
+    a: 'No. Franchise fee is ₹0. Our model is built around consulting and delivery value, not entry barriers.',
+  },
+]
 
 interface FranchiseFAQProps {
-  faqs: IFranchiseFAQ[];
+  faqs: IFranchiseFAQ[]
 }
 
 const FranchiseFAQ: FC<FranchiseFAQProps> = ({ faqs }) => {
   const [open, setOpen] = useState<number | null>(0)
   const headRef = useReveal()
+  const list = faqs.length > 0 ? faqs : FALLBACK_FAQS
 
   return (
     <section
       style={{
         background: theme.colors.void,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -28,29 +53,29 @@ const FranchiseFAQ: FC<FranchiseFAQProps> = ({ faqs }) => {
       <div className="orb orb-teal" style={{ width: 400, height: 400, bottom: '-5%', right: '-5%' }} />
 
       <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             Frequently Asked Questions
           </div>
           <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            marginBottom: 16,
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
           }}>
-            Your Questions, Answered Honestly.
+            Your questions, answered
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 480, margin: '0 auto' }}>
-            No marketing fluff. Real answers from people who've helped launch 21+ FEC businesses.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+            Real answers for franchise partners evaluating an FEC opportunity.
           </p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {faqs.map((faq, i) => {
+          {list.map((faq, i) => {
             const isOpen = open === i
             return (
               <div
-                key={i}
+                key={`${faq.q}-${i}`}
                 className="glass-card"
                 style={{
                   borderRadius: 16,
@@ -133,4 +158,3 @@ const FranchiseFAQ: FC<FranchiseFAQProps> = ({ faqs }) => {
 }
 
 export default FranchiseFAQ
-
