@@ -126,21 +126,7 @@
   font-family: var(--font-serif);
 }
 
-/* Catalogue / company pages — Plus Jakarta Sans everywhere (incl. .font-display) */
-.about-catalogue,
-.about-catalogue .font-display,
-.about-catalogue .label,
-.about-catalogue button,
-.about-catalogue input,
-.about-catalogue select,
-.about-catalogue a,
-.about-catalogue p,
-.about-catalogue h1,
-.about-catalogue h2,
-.about-catalogue h3,
-.about-catalogue h4,
-.about-catalogue li,
-.about-catalogue span,
+/* Catalogue / listing / detail pages — Plus Jakarta Sans everywhere (incl. .font-display) */
 .products-catalogue,
 .products-catalogue .font-display,
 .products-catalogue .label,
@@ -238,21 +224,7 @@
 .jobs-catalogue h3,
 .jobs-catalogue h4,
 .jobs-catalogue li,
-.jobs-catalogue span,
-.franchise-catalogue,
-.franchise-catalogue .font-display,
-.franchise-catalogue .label,
-.franchise-catalogue button,
-.franchise-catalogue input,
-.franchise-catalogue select,
-.franchise-catalogue a,
-.franchise-catalogue p,
-.franchise-catalogue h1,
-.franchise-catalogue h2,
-.franchise-catalogue h3,
-.franchise-catalogue h4,
-.franchise-catalogue li,
-.franchise-catalogue span {
+.jobs-catalogue span {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 

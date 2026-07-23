@@ -76,7 +76,7 @@ const BaseProductDetailsPage: FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="base-product-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <Loader label="Loading category…" />
       </div>
     )
@@ -84,7 +84,7 @@ const BaseProductDetailsPage: FC = () => {
 
   if (error || !data) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="base-product-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <ErrorState message={error ?? 'Product category not found.'} onRetry={() => void load()} />
       </div>
     )
@@ -94,7 +94,7 @@ const BaseProductDetailsPage: FC = () => {
   const isAdded = state.enquiryCart.some((i) => i.id === categoryId)
 
   return (
-    <div className="min-h-[60vh] bg-black text-[#F5F5F7]">
+    <div className="base-product-details-page min-h-[60vh] bg-black text-[#F5F5F7]">
       <SEO
         title={`${data.title} | Products`}
         description={data.description || `Browse ${data.title} equipment and variants.`}

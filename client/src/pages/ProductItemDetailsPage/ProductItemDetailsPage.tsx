@@ -48,7 +48,7 @@ const ProductItemDetailsPage: FC = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="product-item-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <Loader label="Loading product…" />
       </div>
     )
@@ -56,7 +56,7 @@ const ProductItemDetailsPage: FC = () => {
 
   if (error || !item) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
+      <div className="product-item-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <ErrorState
           message={error ?? 'Product not found.'}
           onRetry={() => void load()}
@@ -66,7 +66,7 @@ const ProductItemDetailsPage: FC = () => {
   }
 
   return (
-    <div className="min-h-[60vh] bg-black text-[#F5F5F7]">
+    <div className="product-item-details-page min-h-[60vh] bg-black text-[#F5F5F7]">
       <SEO
         title={item.title}
         description={item.description || `Details about ${item.title}`}
