@@ -14,18 +14,19 @@ interface BrandInfo {
   note: string
   year: string
   category: string
+  logo: string
 }
 
 const BRANDS: BrandInfo[] = [
-  { name: 'Roongta Group', note: '4 bowling lanes installed across cinema multiplexes', year: '2022', category: 'Cinema / FEC' },
-  { name: 'Woop', note: 'Full FEC layout design and equipment supply', year: '2021', category: 'FEC' },
-  { name: 'Shott', note: 'Pre-opening consulting and staffing framework', year: '2022', category: 'FEC' },
-  { name: 'Idea Crate', note: 'Game selection, ROI modeling, operations setup', year: '2020', category: 'FEC' },
-  { name: 'Playaza', note: 'Arcade sourcing and redemption game distribution', year: '2023', category: 'Arcade' },
-  { name: 'KidZania', note: 'Equipment supply and venue advisory', year: '2019', category: 'FEC' },
-  { name: 'Cinemax', note: 'FEC annexe consulting for multiplex lobby revenue', year: '2018', category: 'Cinema' },
-  { name: 'Inox', note: 'Bowling and VR integration advisory', year: '2019', category: 'Cinema' },
-  { name: 'Essel World', note: 'Major attraction sourcing and ops consulting', year: '2020', category: 'Theme Park' },
+  { name: 'Roongta Group', note: '4 bowling lanes installed across cinema multiplexes', year: '2022', category: 'Cinema / FEC', logo: '/brands/roongta.svg' },
+  { name: 'Woop', note: 'Full FEC layout design and equipment supply', year: '2021', category: 'FEC', logo: '/brands/woop.svg' },
+  { name: 'Shott', note: 'Pre-opening consulting and staffing framework', year: '2022', category: 'FEC', logo: '/brands/shott.svg' },
+  { name: 'Idea Crate', note: 'Game selection, ROI modeling, operations setup', year: '2020', category: 'FEC', logo: '/brands/idea-crate.svg' },
+  { name: 'Playaza', note: 'Arcade sourcing and redemption game distribution', year: '2023', category: 'Arcade', logo: '/brands/playaza.svg' },
+  { name: 'KidZania', note: 'Equipment supply and venue advisory', year: '2019', category: 'FEC', logo: '/brands/kidzania.svg' },
+  { name: 'Cinemax', note: 'FEC annexe consulting for multiplex lobby revenue', year: '2018', category: 'Cinema', logo: '/brands/cinemax.svg' },
+  { name: 'Inox', note: 'Bowling and VR integration advisory', year: '2019', category: 'Cinema', logo: '/brands/inox.svg' },
+  { name: 'Essel World', note: 'Major attraction sourcing and ops consulting', year: '2020', category: 'Theme Park', logo: '/brands/essel-world.svg' },
 ]
 
 const BrandModal: FC<{ brand: BrandInfo; onClose: () => void }> = ({ brand, onClose }) => (
@@ -58,9 +59,17 @@ const BrandModal: FC<{ brand: BrandInfo; onClose: () => void }> = ({ brand, onCl
             {brand.category}
           </span>
         </div>
-        <h3 className="mb-2 font-display text-[clamp(1.35rem,4vw,1.75rem)] font-normal leading-tight text-[#F5F5F7]">
-          {brand.name}
-        </h3>
+        {brand.logo ? (
+          <img
+            src={brand.logo}
+            alt={brand.name}
+            className="mb-3 h-10 w-auto max-w-[200px] object-contain object-left"
+          />
+        ) : (
+          <h3 className="mb-2 font-display text-[clamp(1.35rem,4vw,1.75rem)] font-normal leading-tight text-[#F5F5F7]">
+            {brand.name}
+          </h3>
+        )}
         <p className="mb-5 text-sm leading-relaxed text-[#A1A1A6]">{brand.note}</p>
         {brand.year ? (
           <div className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-black/40 px-3.5 py-3">
@@ -102,13 +111,23 @@ const BrandCard: FC<{
         {brand.category}
       </span>
     </div>
-    <span
-      className={`font-[family-name:var(--font-data)] font-extrabold leading-snug tracking-[-0.02em] text-white ${
-        compact ? 'text-[15px] sm:text-base' : 'text-xl sm:text-2xl'
-      }`}
-    >
-      {brand.name}
-    </span>
+    {brand.logo ? (
+      <img
+        src={brand.logo}
+        alt={brand.name}
+        className={`w-auto object-contain object-left ${
+          compact ? 'h-8 max-w-[140px] sm:h-9 sm:max-w-[160px]' : 'h-10 max-w-[180px] sm:h-11 sm:max-w-[200px]'
+        }`}
+      />
+    ) : (
+      <span
+        className={`font-[family-name:var(--font-data)] font-extrabold leading-snug tracking-[-0.02em] text-white ${
+          compact ? 'text-[15px] sm:text-base' : 'text-xl sm:text-2xl'
+        }`}
+      >
+        {brand.name}
+      </span>
+    )}
   </button>
 )
 
@@ -125,6 +144,7 @@ const TrustedBrands: FC<{ data?: string[] }> = ({ data }) => {
               note: 'Trusted partner.',
               year: '',
               category: 'FEC',
+              logo: '',
             },
         )
       : BRANDS

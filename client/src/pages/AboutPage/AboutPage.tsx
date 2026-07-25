@@ -1,7 +1,6 @@
 import type { FC } from 'react'
 import {
   Award,
-  Globe2,
   Package,
   Briefcase,
   Wrench,
@@ -26,8 +25,8 @@ const STATS = [
 ]
 
 const CERTS = [
-  { title: 'ISO 9001:2015', sub: 'Quality certified', icon: Award },
-  { title: 'IAAPA Member', sub: 'Global attractions', icon: Globe2 },
+  { title: 'ISO 9001:2015', sub: 'Quality certified', logo: '/partners/iso.svg' },
+  { title: 'IAAPA Member', sub: 'Global attractions', logo: '/partners/iaapa.svg' },
   { title: 'Authorized Exporter', sub: 'Sourcing & logistics', icon: Package },
 ]
 
@@ -186,14 +185,17 @@ const AboutPage: FC = () => (
           </div>
           <div className="space-y-3">
             {CERTS.map((c) => {
-              const Icon = c.icon
               return (
                 <article
                   key={c.title}
                   className="group flex cursor-default items-center gap-4 rounded-xl border border-white/[0.08] bg-[#111118] p-4 transition-colors hover:border-[#5FC1D1]/40"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#5FC1D1]/30 bg-[#5FC1D1]/10 text-[#5FC1D1] transition-colors group-hover:bg-[#5FC1D1]/20">
-                    <Icon size={18} />
+                    {'logo' in c && c.logo ? (
+                      <img src={c.logo} alt="" aria-hidden className="h-6 w-auto max-w-[28px] object-contain" />
+                    ) : 'icon' in c && c.icon ? (
+                      <c.icon size={18} />
+                    ) : null}
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-[#F5F5F7]">{c.title}</h3>
@@ -240,23 +242,57 @@ const AboutPage: FC = () => (
         <h2 id="about-purpose-heading" className="sr-only">
           Vision and mission
         </h2>
-        <article className="rounded-2xl border border-white/[0.1] bg-[#111118] p-5 sm:p-6">
-          <div className="mb-3 flex items-center gap-2 text-[#5FC1D1]">
-            <Eye size={16} />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">Vision</span>
+        <article className="relative overflow-hidden rounded-2xl border border-[#5FC1D1]/25 p-5 sm:p-6">
+          <div className="absolute inset-0">
+            <img
+              src="/about/vision-particles.png"
+              alt=""
+              aria-hidden
+              className="h-full w-full object-cover object-center opacity-80"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.78) 100%), radial-gradient(ellipse 80% 70% at 80% 20%, rgba(95,193,209,0.18), transparent 55%)',
+              }}
+            />
           </div>
-          <p className="text-sm leading-relaxed text-[#A1A1A6]">
-            The most trusted partner for building and operating FECs across India and key markets.
-          </p>
+          <div className="relative z-[1]">
+            <div className="mb-3 flex items-center gap-2 text-[#5FC1D1]">
+              <Eye size={16} />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">Vision</span>
+            </div>
+            <p className="text-sm leading-relaxed text-[#D1D1D6]">
+              The most trusted partner for building and operating FECs across India and key markets.
+            </p>
+          </div>
         </article>
-        <article className="rounded-2xl border border-white/[0.1] bg-[#111118] p-5 sm:p-6">
-          <div className="mb-3 flex items-center gap-2 text-[#6DBD4E]">
-            <Target size={16} />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">Mission</span>
+        <article className="relative overflow-hidden rounded-2xl border border-[#6DBD4E]/25 p-5 sm:p-6">
+          <div className="absolute inset-0">
+            <img
+              src="/about/mission-particles.png"
+              alt=""
+              aria-hidden
+              className="h-full w-full object-cover object-center opacity-80"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.78) 100%), radial-gradient(ellipse 80% 70% at 80% 20%, rgba(109,189,78,0.16), transparent 55%)',
+              }}
+            />
           </div>
-          <p className="text-sm leading-relaxed text-[#A1A1A6]">
-            Complete programmes—consult, plan, supply, install, operate—for lasting commercial outcomes.
-          </p>
+          <div className="relative z-[1]">
+            <div className="mb-3 flex items-center gap-2 text-[#6DBD4E]">
+              <Target size={16} />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">Mission</span>
+            </div>
+            <p className="text-sm leading-relaxed text-[#D1D1D6]">
+              Complete programmes—consult, plan, supply, install, operate—for lasting commercial outcomes.
+            </p>
+          </div>
         </article>
       </section>
 

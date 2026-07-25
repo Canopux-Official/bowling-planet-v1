@@ -10,7 +10,6 @@ import {
   type BaseProductWithItems,
   type IProductItem,
 } from './services/baseProductDetailsApi'
-import MediaItem from '../../components/common/MediaItem'
 import { Plus, Check, Package } from 'lucide-react'
 import { useLeadTracker } from '../../context/LeadTrackerContext'
 
@@ -102,19 +101,35 @@ const BaseProductDetailsPage: FC = () => {
       />
 
       <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
-        {/* Compact category bar — tinted vanishing wash */}
-        <div
-          className="relative mb-5 overflow-hidden rounded-2xl border border-[#5FC1D1]/20 p-4 sm:p-5"
-          style={{
-            background:
-              'radial-gradient(120% 140% at 0% 0%, rgba(95,193,209,0.22) 0%, rgba(95,193,209,0.08) 38%, rgba(109,189,78,0.05) 62%, transparent 100%), linear-gradient(180deg, rgba(17,17,24,0.95) 0%, rgba(10,10,15,0.4) 70%, transparent 100%)',
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#5FC1D1]/15 blur-3xl"
-          />
-          <div className="relative flex flex-wrap items-start justify-between gap-4">
+        {/* Compact category bar — category thumbnail as backdrop */}
+        <div className="relative mb-5 overflow-hidden rounded-2xl border border-[#5FC1D1]/20 p-4 sm:p-5">
+          {data.thumbnail?.url ? (
+            <div className="absolute inset-0">
+              <img
+                src={data.thumbnail.url}
+                alt=""
+                aria-hidden
+                className="h-full w-full object-cover object-center"
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 48%, rgba(0,0,0,0.55) 100%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.2), transparent 55%)',
+                }}
+              />
+            </div>
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(120% 140% at 0% 0%, rgba(95,193,209,0.22) 0%, rgba(95,193,209,0.08) 38%, rgba(109,189,78,0.05) 62%, transparent 100%), linear-gradient(180deg, rgba(17,17,24,0.95) 0%, rgba(10,10,15,0.4) 70%, transparent 100%)',
+              }}
+            />
+          )}
+
+          <div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <Link
                 to="/products"
@@ -123,31 +138,26 @@ const BaseProductDetailsPage: FC = () => {
                 ← All categories
               </Link>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="hidden h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-white/[0.1] sm:block">
-                  <MediaItem media={data.thumbnail} alt={data.title} />
-                </div>
-                <div className="min-w-0">
-                  <p className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
-                    <Package size={12} />
-                    Category
+              <div className="min-w-0">
+                <p className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+                  <Package size={12} />
+                  Category
+                </p>
+                <h1 className="font-display text-[clamp(1.35rem,2.8vw,1.85rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+                  {data.title}
+                </h1>
+                {data.description ? (
+                  <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#A1A1A6] line-clamp-2">
+                    {data.description}
                   </p>
-                  <h1 className="font-display text-[clamp(1.35rem,2.8vw,1.85rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
-                    {data.title}
-                  </h1>
-                  {data.description ? (
-                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#A1A1A6] line-clamp-2">
-                      {data.description}
-                    </p>
-                  ) : null}
-                </div>
+                ) : null}
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => addToEnquiry({ id: categoryId, type: 'product', title: data.title })}
-              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors ${
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${
                 isAdded
                   ? 'border-[#6DBD4E]/45 bg-[#6DBD4E]/10 text-[#6DBD4E]'
                   : 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1] hover:bg-[#5FC1D1]/20'

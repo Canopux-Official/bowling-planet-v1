@@ -2,14 +2,13 @@ import type { FC } from 'react'
 import { Network } from 'lucide-react'
 
 const PARTNERS = [
-  { name: 'IAAPA', color: '#5FC1D1' },
-  { name: 'ISO', color: '#6DBD4E' },
-  { name: 'AES', color: '#5FC1D1' },
-  { name: 'RAW', color: '#6DBD4E' },
-  { name: 'UNIS', color: '#5FC1D1' },
-  { name: 'SEGA', color: '#6DBD4E' },
-  { name: 'AMF', color: '#5FC1D1' },
-  { name: 'Qubica', color: '#6DBD4E' },
+  { name: 'IAAPA', logo: '/partners/iaapa.svg' },
+  { name: 'ISO', logo: '/partners/iso.svg' },
+  { name: 'AES', logo: '/partners/aes.svg' },
+  { name: 'RAW', logo: '/partners/raw.svg' },
+  { name: 'UNIS', logo: '/partners/unis.svg' },
+  { name: 'SEGA', logo: '/partners/sega.svg' },
+  { name: 'AMF', logo: '/partners/amf.svg' },
 ]
 
 const EndorsedConnections: FC = () => (
@@ -21,16 +20,19 @@ const EndorsedConnections: FC = () => (
       </h2>
     </div>
 
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
       {PARTNERS.map((partner) => (
         <div
           key={partner.name}
-          className="flex h-16 cursor-default items-center justify-center rounded-xl border border-white/[0.08] bg-[#111118] px-2 transition-all hover:-translate-y-0.5 hover:border-[#5FC1D1]/40 hover:shadow-[0_8px_24px_rgba(95,193,209,0.08)]"
+          className="flex h-16 cursor-default items-center justify-center rounded-xl border border-white/[0.08] bg-[#111118] px-3 transition-all hover:-translate-y-0.5 hover:border-[#5FC1D1]/40 hover:shadow-[0_8px_24px_rgba(95,193,209,0.08)]"
           title={partner.name}
         >
-          <span className="text-sm font-bold tracking-wide text-[#F5F5F7]" style={{ color: partner.color }}>
-            {partner.name}
-          </span>
+          <img
+            src={partner.logo}
+            alt={partner.name}
+            className="max-h-9 w-auto max-w-[88%] object-contain"
+            loading="lazy"
+          />
         </div>
       ))}
     </div>
