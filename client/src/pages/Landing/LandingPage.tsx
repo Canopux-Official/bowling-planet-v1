@@ -13,8 +13,6 @@ import PortfolioSection from './components/PortfolioSection'
 import CaseStudiesSection from './components/CaseStudiesSection'
 import ProductsSection from './components/ProductsSection'
 import BlogPreviewSection from './components/BlogPreviewSection'
-import FranchiseSection from './components/FranchiseSection'
-import CareersSection from './components/CareersSection'
 const LandingPage: FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);
 
@@ -59,10 +57,10 @@ const LandingPage: FC = () => {
       <BlogPreviewSection />
 
       {/* 10. Franchise (Dark) */}
-      <FranchiseSection />
+      {/* <FranchiseSection /> */}
 
       {/* 11. Careers */}
-      <CareersSection />
+      {/* <CareersSection /> */}
     </div>
   )
 }

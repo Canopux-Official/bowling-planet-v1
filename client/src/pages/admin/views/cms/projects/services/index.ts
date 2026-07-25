@@ -1,6 +1,5 @@
 import { apiClient } from "../../../../../../services/apiClient";
 
-
 export interface IMedia {
     type: 'image' | 'video';
     url: string;
@@ -32,7 +31,8 @@ export interface ITestimonial {
     companyName?: string;
     message: string;
     rating?: number;
-    clientImage?: IMedia;
+    clientImage?: IMedia;       // The smaller avatar image
+    testimonialImage?: IMedia;  // <-- ADDED: The larger right side image
 }
 
 export interface IProject {
@@ -87,7 +87,8 @@ function buildProjectFormData(
     data: Partial<IProject>,
     galleryFiles: File[],
     setupStepFiles: { [index: number]: File } = {},
-    testimonialFiles: { [index: number]: File } = {}
+    testimonialFiles: { [index: number]: File } = {},
+    testimonialCoverFiles: { [index: number]: File } = {} // <-- ADDED
 ): FormData {
     const formData = new FormData();
 
@@ -112,6 +113,11 @@ function buildProjectFormData(
     // Testimonial avatar images — same convention
     Object.entries(testimonialFiles).forEach(([idx, file]) => {
         formData.append(`testimonialImage_${idx}`, file);
+    });
+
+    // Testimonial right-side cover images — <-- ADDED
+    Object.entries(testimonialCoverFiles).forEach(([idx, file]) => {
+        formData.append(`testimonialCover_${idx}`, file);
     });
 
     return formData;
@@ -139,9 +145,10 @@ export const projectService = {
         projectData: Partial<IProject>,
         galleryFiles: File[] = [],
         setupStepFiles: { [index: number]: File } = {},
-        testimonialFiles: { [index: number]: File } = {}
+        testimonialFiles: { [index: number]: File } = {},
+        testimonialCoverFiles: { [index: number]: File } = {} // <-- ADDED
     ): Promise<ISingleProjectResponse> => {
-        const body = buildProjectFormData(projectData, galleryFiles, setupStepFiles, testimonialFiles);
+        const body = buildProjectFormData(projectData, galleryFiles, setupStepFiles, testimonialFiles, testimonialCoverFiles);
         return apiClient('/project/admin', {
             method: 'POST',
             headers: { 'Content-Type': undefined as any },
@@ -154,16 +161,16 @@ export const projectService = {
         projectData: Partial<IProject>,
         galleryFiles: File[] = [],
         setupStepFiles: { [index: number]: File } = {},
-        testimonialFiles: { [index: number]: File } = {}
+        testimonialFiles: { [index: number]: File } = {},
+        testimonialCoverFiles: { [index: number]: File } = {} // <-- ADDED
     ): Promise<ISingleProjectResponse> => {
-        const body = buildProjectFormData(projectData, galleryFiles, setupStepFiles, testimonialFiles);
+        const body = buildProjectFormData(projectData, galleryFiles, setupStepFiles, testimonialFiles, testimonialCoverFiles);
         return apiClient(`/project/admin/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': undefined as any },
             body,
         });
     },
-
 
     delete: async (id: string): Promise<{ success: boolean; message: string }> => {
         return apiClient(`/project/admin/${id}`, { method: 'DELETE' });

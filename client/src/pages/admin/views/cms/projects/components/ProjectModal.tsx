@@ -1,7 +1,8 @@
 // import React, { useState, useEffect } from 'react';
-// import { X, Plus, Trash2, Upload } from 'lucide-react';
+// import { X, Plus, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 // import { type IProject, projectService, type IFeaturePoint, type IBulletList, type ISetupStep, type ITestimonial } from '../services';
 // import { theme } from '../../../../../../theme';
+// import { useToast } from '../../../../components/Toast';
 
 // interface ProjectModalProps {
 //   project: IProject | null;
@@ -13,6 +14,7 @@
 // export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onClose, onSaveSuccess }) => {
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState('');
+//   const { showToast } = useToast();
 
 //   // --- Core Fields ---
 //   const [title, setTitle] = useState('');
@@ -29,6 +31,10 @@
 //   const [bulletLists, setBulletLists] = useState<IBulletList[]>([]);
 //   const [setupSteps, setSetupSteps] = useState<ISetupStep[]>([]);
 //   const [testimonials, setTestimonials] = useState<ITestimonial[]>([]);
+
+//   // Local state map to track files tied to nested sub-structures
+//   const [setupStepFiles, setSetupStepFiles] = useState<{ [key: number]: File }>({});
+//   const [testimonialFiles, setTestimonialFiles] = useState<{ [key: number]: File }>({});
 
 //   useEffect(() => {
 //     if (project) {
@@ -53,6 +59,8 @@
 //       setTestimonials([]);
 //     }
 //     setNewFiles([]);
+//     setSetupStepFiles({});
+//     setTestimonialFiles({});
 //     setError('');
 //   }, [project, isOpen]);
 
@@ -65,7 +73,7 @@
 //     }
 //   };
 
-//   // --- Dynamic Array Actions: Feature Points ---
+//   // --- Dynamic Array Actions ---
 //   const addFeaturePoint = () => setFeaturePoints([...featurePoints, { title: '', description: '' }]);
 //   const updateFeaturePoint = (idx: number, key: keyof IFeaturePoint, val: string) => {
 //     const updated = [...featurePoints];
@@ -74,7 +82,6 @@
 //   };
 //   const removeFeaturePoint = (idx: number) => setFeaturePoints(featurePoints.filter((_, i) => i !== idx));
 
-//   // --- Dynamic Array Actions: Bullet Lists ---
 //   const addBulletList = () => setBulletLists([...bulletLists, { heading: '', items: [''] }]);
 //   const updateBulletHeading = (idx: number, val: string) => {
 //     const updated = [...bulletLists];
@@ -98,7 +105,6 @@
 //   };
 //   const removeBulletList = (idx: number) => setBulletLists(bulletLists.filter((_, i) => i !== idx));
 
-//   // --- Dynamic Array Actions: Setup Steps ---
 //   const addSetupStep = () => {
 //     setSetupSteps([...setupSteps, { stepNumber: setupSteps.length + 1, title: '', description: '', points: [''] }]);
 //   };
@@ -127,9 +133,16 @@
 //   };
 //   const removeSetupStep = (idx: number) => {
 //     setSetupSteps(setupSteps.filter((_, i) => i !== idx).map((s, i) => ({ ...s, stepNumber: i + 1 })));
+//     const updatedFiles = { ...setupStepFiles };
+//     delete updatedFiles[idx];
+//     setSetupStepFiles(updatedFiles);
+//   };
+//   const handleSetupStepImageChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+//     if (e.target.files && e.target.files[0]) {
+//       setSetupStepFiles({ ...setupStepFiles, [idx]: e.target.files[0] });
+//     }
 //   };
 
-//   // --- Dynamic Array Actions: Testimonials ---
 //   const addTestimonial = () => {
 //     setTestimonials([...testimonials, { clientName: '', message: '', designation: '', companyName: '', rating: 5 }]);
 //   };
@@ -138,7 +151,17 @@
 //     updated[idx] = { ...updated[idx], [key]: val };
 //     setTestimonials(updated);
 //   };
-//   const removeTestimonial = (idx: number) => setTestimonials(testimonials.filter((_, i) => i !== idx));
+//   const removeTestimonial = (idx: number) => {
+//     setTestimonials(testimonials.filter((_, i) => i !== idx));
+//     const updatedFiles = { ...testimonialFiles };
+//     delete updatedFiles[idx];
+//     setTestimonialFiles(updatedFiles);
+//   };
+//   const handleTestimonialImageChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+//     if (e.target.files && e.target.files[0]) {
+//       setTestimonialFiles({ ...testimonialFiles, [idx]: e.target.files[0] });
+//     }
+//   };
 
 //   // --- Form Submission Pipeline ---
 //   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,6 +170,7 @@
 //     setError('');
 
 //     const formattedTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
+
 //     const payload: Partial<IProject> = {
 //       title,
 //       description,
@@ -161,14 +185,18 @@
 
 //     try {
 //       if (project?._id) {
-//         await projectService.update(project._id, payload, newFiles);
+//         await projectService.update(project._id, payload, newFiles, setupStepFiles, testimonialFiles);
+//         showToast('success', 'Project updated successfully');
 //       } else {
-//         await projectService.create(payload, newFiles);
+//         await projectService.create(payload, newFiles, setupStepFiles, testimonialFiles);
+//         showToast('success', 'Project created successfully');
 //       }
 //       onSaveSuccess();
 //       onClose();
 //     } catch (err: any) {
-//       setError(err.message || 'Something went wrong saving the project.');
+//       const msg = err.message || 'Something went wrong saving the project.';
+//       setError(msg);
+//       showToast('error', msg);
 //     } finally {
 //       setLoading(false);
 //     }
@@ -217,7 +245,18 @@
 //               {newFiles.map((f, i) => (
 //                 <div key={i} style={{ ...thumbnailWrapperStyle, opacity: 0.7, backgroundColor: theme.colors.adminBorder }}>
 //                   <div style={{ fontSize: '10px', padding: '4px', color: theme.colors.adminText }}>{f.name}</div>
-//                   <button type="button" onClick={() => setNewFiles(newFiles.filter((_, idx) => idx !== i))} style={deleteThumbBtnStyle}><Trash2 size={12} /></button>
+//                   <button type="button" onClick={() => {
+//                     // 1. Update the state
+//                     setNewFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== i));
+
+//                     // 2. Show the toast immediately
+//                     showToast('success', 'Deleting....');
+
+//                     // 3. Delay the reload so the toast is visible
+//                     setTimeout(() => {
+//                       window.location.reload();
+//                     }, 1200); // 1200ms gives the user enough time to read "Deleting...."
+//                   }} style={deleteThumbBtnStyle}><Trash2 size={12} /></button>
 //                 </div>
 //               ))}
 //             </div>
@@ -281,12 +320,38 @@
 //                   <span style={{ color: theme.colors.adminTextMuted, fontWeight: 600 }}>Step {step.stepNumber}</span>
 //                   <button type="button" onClick={() => removeSetupStep(stepIdx)} style={removeIconBtnStyle}><Trash2 size={16} /></button>
 //                 </div>
-//                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px' }}>
-//                   <input type="text" placeholder="Step Title" value={step.title} onChange={(e) => updateSetupStepField(stepIdx, 'title', e.target.value)} required style={inputStyle} />
-//                   <textarea placeholder="Step Subtext Description" value={step.description || ''} onChange={(e) => updateSetupStepField(stepIdx, 'description', e.target.value)} rows={2} style={inputStyle} />
+
+//                 <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
+//                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+//                     <input type="text" placeholder="Step Title" value={step.title} onChange={(e) => updateSetupStepField(stepIdx, 'title', e.target.value)} required style={inputStyle} />
+//                     <textarea placeholder="Step Subtext Description" value={step.description || ''} onChange={(e) => updateSetupStepField(stepIdx, 'description', e.target.value)} rows={2} style={inputStyle} />
+//                   </div>
+
+//                   {/* Local Step Image Context */}
+//                   <div style={{ width: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+//                     <label style={inlineImageUploadAreaStyle}>
+//                       {setupStepFiles[stepIdx] ? (
+//                         <div style={{ fontSize: '11px', textAlign: 'center', wordBreak: 'break-all', padding: '4px' }}>{setupStepFiles[stepIdx].name}</div>
+//                       ) : step.image?.url ? (
+//                         <img src={step.image.url} alt="Step" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+//                       ) : (
+//                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
+//                           <ImageIcon size={16} /> Step Image
+//                         </div>
+//                       )}
+//                       <input type="file" accept="image/*" onChange={(e) => handleSetupStepImageChange(stepIdx, e)} style={{ display: 'none' }} />
+//                     </label>
+//                     {(step.image?.url || setupStepFiles[stepIdx]) && (
+//                       <button type="button" style={{ background: 'none', color: '#ff4d4d', border: 'none', fontSize: '11px', cursor: 'pointer' }} onClick={() => {
+//                         updateSetupStepField(stepIdx, 'image', undefined);
+//                         const updated = { ...setupStepFiles };
+//                         delete updated[stepIdx];
+//                         setSetupStepFiles(updated);
+//                       }}>Remove Image</button>
+//                     )}
+//                   </div>
 //                 </div>
 
-//                 {/* Nested Steps Point Arrays */}
 //                 <div style={{ paddingLeft: '16px' }}>
 //                   <label style={{ ...labelStyle, fontSize: '12px' }}>Detailed Sub-points</label>
 //                   {step.points?.map((pt, ptIdx) => (
@@ -314,18 +379,46 @@
 //                   <input type="number" min={1} max={5} placeholder="Rating (1-5)" value={test.rating || 5} onChange={(e) => updateTestimonialField(tIdx, 'rating', Number(e.target.value))} style={{ ...inputStyle, width: '20%' }} />
 //                   <button type="button" onClick={() => removeTestimonial(tIdx)} style={removeIconBtnStyle}><Trash2 size={16} /></button>
 //                 </div>
-//                 <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-//                   <input type="text" placeholder="Designation (e.g. CEO)" value={test.designation || ''} onChange={(e) => updateTestimonialField(tIdx, 'designation', e.target.value)} style={inputStyle} />
-//                   <input type="text" placeholder="Company Name" value={test.companyName || ''} onChange={(e) => updateTestimonialField(tIdx, 'companyName', e.target.value)} style={inputStyle} />
+
+//                 <div style={{ display: 'flex', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+//                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+//                     <div style={{ display: 'flex', gap: '8px' }}>
+//                       <input type="text" placeholder="Designation (e.g. CEO)" value={test.designation || ''} onChange={(e) => updateTestimonialField(tIdx, 'designation', e.target.value)} style={inputStyle} />
+//                       <input type="text" placeholder="Company Name" value={test.companyName || ''} onChange={(e) => updateTestimonialField(tIdx, 'companyName', e.target.value)} style={inputStyle} />
+//                     </div>
+//                     <textarea placeholder="Review Message Text Content" value={test.message} onChange={(e) => updateTestimonialField(tIdx, 'message', e.target.value)} required rows={2} style={inputStyle} />
+//                   </div>
+
+//                   {/* Local Testimonial Profile Avatar Image Context */}
+//                   <div style={{ width: '100px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+//                     <label style={{ ...inlineImageUploadAreaStyle, width: '70px', height: '70px', borderRadius: '50%' }}>
+//                       {testimonialFiles[tIdx] ? (
+//                         <div style={{ fontSize: '9px', textAlign: 'center', padding: '2px' }}>Selected</div>
+//                       ) : test.clientImage?.url ? (
+//                         <img src={test.clientImage.url} alt="Client" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+//                       ) : (
+//                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', fontSize: '10px' }}>
+//                           <ImageIcon size={14} /> Avatar
+//                         </div>
+//                       )}
+//                       <input type="file" accept="image/*" onChange={(e) => handleTestimonialImageChange(tIdx, e)} style={{ display: 'none' }} />
+//                     </label>
+//                     {(test.clientImage?.url || testimonialFiles[tIdx]) && (
+//                       <button type="button" style={{ background: 'none', color: '#ff4d4d', border: 'none', fontSize: '11px', cursor: 'pointer' }} onClick={() => {
+//                         updateTestimonialField(tIdx, 'clientImage', undefined);
+//                         const updated = { ...testimonialFiles };
+//                         delete updated[tIdx];
+//                         setTestimonialFiles(updated);
+//                       }}>Clear</button>
+//                     )}
+//                   </div>
 //                 </div>
-//                 <textarea placeholder="Review Message Text Content" value={test.message} onChange={(e) => updateTestimonialField(tIdx, 'message', e.target.value)} required rows={2} style={inputStyle} />
 //               </div>
 //             ))}
 //           </div>
 
 //           <hr style={dividerStyle} />
 
-//           {/* Control Flags Footer Layout */}
 //           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: theme.colors.adminText, fontWeight: 500 }}>
 //             <input type="checkbox" checked={isPublished} onChange={(e) => setIsPublished(e.target.checked)} style={{ transform: 'scale(1.1)' }} />
 //             Publish project directly to visibility indexes
@@ -341,7 +434,7 @@
 //   );
 // };
 
-// // --- Embedded Layout CSS Inline Constants Profiles ---
+// // --- CSS Inline Constant Profiles ---
 // const backdropStyle: React.CSSProperties = {
 //   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
 //   backgroundColor: 'rgba(0,0,0,0.65)', display: 'flex', justifyContent: 'center',
@@ -373,6 +466,11 @@
 //   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: `1px dashed ${theme.colors.adminBorder}`,
 //   padding: '16px', borderRadius: '8px', cursor: 'pointer', color: theme.colors.adminTextMuted, fontSize: '14px', backgroundColor: 'rgba(0,0,0,0.05)'
 // };
+// const inlineImageUploadAreaStyle: React.CSSProperties = {
+//   display: 'flex', width: '100%', height: '64px', alignItems: 'center', justifyContent: 'center',
+//   border: `1px dashed ${theme.colors.adminBorder}`, borderRadius: '6px', cursor: 'pointer',
+//   color: theme.colors.adminTextMuted, backgroundColor: 'rgba(0,0,0,0.15)', overflow: 'hidden'
+// };
 // const thumbnailWrapperStyle: React.CSSProperties = { position: 'relative', width: '75px', height: '75px', border: `1px solid ${theme.colors.adminBorder}`, borderRadius: '6px', overflow: 'hidden' };
 // const deleteThumbBtnStyle: React.CSSProperties = { position: 'absolute', top: '2px', right: '2px', backgroundColor: 'rgba(255,77,77,0.9)', border: 'none', borderRadius: '4px', color: 'white', cursor: 'pointer', padding: '4px' };
 // const subAddBtnStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '4px', background: 'none', color: '#3b82f6', border: 'none', cursor: 'pointer', padding: '4px', fontSize: '13px', fontWeight: 600 };
@@ -380,6 +478,7 @@
 // const closeIconBtnStyle: React.CSSProperties = { background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.adminText };
 // const cancelBtnStyle: React.CSSProperties = { padding: '10px 18px', border: `1px solid ${theme.colors.adminBorder}`, background: 'none', borderRadius: '6px', color: theme.colors.adminText, cursor: 'pointer', fontSize: '14px' };
 // const saveBtnStyle: React.CSSProperties = { padding: '10px 18px', border: 'none', backgroundColor: '#3b82f6', borderRadius: '6px', color: 'white', cursor: 'pointer', fontWeight: 600, fontSize: '14px' };
+
 
 
 
@@ -420,6 +519,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
   // Local state map to track files tied to nested sub-structures
   const [setupStepFiles, setSetupStepFiles] = useState<{ [key: number]: File }>({});
   const [testimonialFiles, setTestimonialFiles] = useState<{ [key: number]: File }>({});
+  const [testimonialCoverFiles, setTestimonialCoverFiles] = useState<{ [key: number]: File }>({}); // <-- ADDED: Track large side images
 
   useEffect(() => {
     if (project) {
@@ -446,6 +546,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
     setNewFiles([]);
     setSetupStepFiles({});
     setTestimonialFiles({});
+    setTestimonialCoverFiles({}); // <-- ADDED: Reset on entry
     setError('');
   }, [project, isOpen]);
 
@@ -541,10 +642,19 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
     const updatedFiles = { ...testimonialFiles };
     delete updatedFiles[idx];
     setTestimonialFiles(updatedFiles);
+
+    const updatedCovers = { ...testimonialCoverFiles }; // <-- ADDED: Clean up cover images map
+    delete updatedCovers[idx];
+    setTestimonialCoverFiles(updatedCovers);
   };
   const handleTestimonialImageChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setTestimonialFiles({ ...testimonialFiles, [idx]: e.target.files[0] });
+    }
+  };
+  const handleTestimonialCoverChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => { // <-- ADDED: Handle cover drops
+    if (e.target.files && e.target.files[0]) {
+      setTestimonialCoverFiles({ ...testimonialCoverFiles, [idx]: e.target.files[0] });
     }
   };
 
@@ -570,10 +680,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
 
     try {
       if (project?._id) {
-        await projectService.update(project._id, payload, newFiles, setupStepFiles, testimonialFiles);
+        // Pass testimonialCoverFiles as 5th argument
+        await projectService.update(project._id, payload, newFiles, setupStepFiles, testimonialFiles, testimonialCoverFiles);
         showToast('success', 'Project updated successfully');
       } else {
-        await projectService.create(payload, newFiles, setupStepFiles, testimonialFiles);
+        // Pass testimonialCoverFiles as 5th argument
+        await projectService.create(payload, newFiles, setupStepFiles, testimonialFiles, testimonialCoverFiles);
         showToast('success', 'Project created successfully');
       }
       onSaveSuccess();
@@ -631,16 +743,11 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                 <div key={i} style={{ ...thumbnailWrapperStyle, opacity: 0.7, backgroundColor: theme.colors.adminBorder }}>
                   <div style={{ fontSize: '10px', padding: '4px', color: theme.colors.adminText }}>{f.name}</div>
                   <button type="button" onClick={() => {
-                    // 1. Update the state
                     setNewFiles((prevFiles) => prevFiles.filter((_, idx) => idx !== i));
-
-                    // 2. Show the toast immediately
                     showToast('success', 'Deleting....');
-
-                    // 3. Delay the reload so the toast is visible
                     setTimeout(() => {
                       window.location.reload();
-                    }, 1200); // 1200ms gives the user enough time to read "Deleting...."
+                    }, 1200);
                   }} style={deleteThumbBtnStyle}><Trash2 size={12} /></button>
                 </div>
               ))}
@@ -712,7 +819,6 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                     <textarea placeholder="Step Subtext Description" value={step.description || ''} onChange={(e) => updateSetupStepField(stepIdx, 'description', e.target.value)} rows={2} style={inputStyle} />
                   </div>
 
-                  {/* Local Step Image Context */}
                   <div style={{ width: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                     <label style={inlineImageUploadAreaStyle}>
                       {setupStepFiles[stepIdx] ? (
@@ -765,7 +871,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                   <button type="button" onClick={() => removeTestimonial(tIdx)} style={removeIconBtnStyle}><Trash2 size={16} /></button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '8px', flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <input type="text" placeholder="Designation (e.g. CEO)" value={test.designation || ''} onChange={(e) => updateTestimonialField(tIdx, 'designation', e.target.value)} style={inputStyle} />
@@ -775,15 +881,16 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                   </div>
 
                   {/* Local Testimonial Profile Avatar Image Context */}
-                  <div style={{ width: '100px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                    <label style={{ ...inlineImageUploadAreaStyle, width: '70px', height: '70px', borderRadius: '50%' }}>
+                  <div style={{ width: '90px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', color: theme.colors.adminTextMuted, fontWeight: 500 }}>Avatar</span>
+                    <label style={{ ...inlineImageUploadAreaStyle, width: '64px', height: '64px', borderRadius: '50%' }}>
                       {testimonialFiles[tIdx] ? (
                         <div style={{ fontSize: '9px', textAlign: 'center', padding: '2px' }}>Selected</div>
                       ) : test.clientImage?.url ? (
                         <img src={test.clientImage.url} alt="Client" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', fontSize: '10px' }}>
-                          <ImageIcon size={14} /> Avatar
+                          <ImageIcon size={14} /> Upload
                         </div>
                       )}
                       <input type="file" accept="image/*" onChange={(e) => handleTestimonialImageChange(tIdx, e)} style={{ display: 'none' }} />
@@ -797,6 +904,32 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, isOpen, onC
                       }}>Clear</button>
                     )}
                   </div>
+
+                  {/* <-- ADDED: Local Testimonial Right-Side Cover Image Context */}
+                  <div style={{ width: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', color: theme.colors.adminTextMuted, fontWeight: 500 }}>Cover Image</span>
+                    <label style={{ ...inlineImageUploadAreaStyle, width: '100%', height: '64px', borderRadius: '6px' }}>
+                      {testimonialCoverFiles[tIdx] ? (
+                        <div style={{ fontSize: '9px', textAlign: 'center', padding: '4px', wordBreak: 'break-all' }}>{testimonialCoverFiles[tIdx].name}</div>
+                      ) : (test as any).testimonialImage?.url ? (
+                        <img src={(test as any).testimonialImage.url} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', fontSize: '10px' }}>
+                          <ImageIcon size={14} /> Upload
+                        </div>
+                      )}
+                      <input type="file" accept="image/*" onChange={(e) => handleTestimonialCoverChange(tIdx, e)} style={{ display: 'none' }} />
+                    </label>
+                    {((test as any).testimonialImage?.url || testimonialCoverFiles[tIdx]) && (
+                      <button type="button" style={{ background: 'none', color: '#ff4d4d', border: 'none', fontSize: '11px', cursor: 'pointer' }} onClick={() => {
+                        updateTestimonialField(tIdx, 'testimonialImage', undefined);
+                        const updated = { ...testimonialCoverFiles };
+                        delete updated[tIdx];
+                        setTestimonialCoverFiles(updated);
+                      }}>Clear</button>
+                    )}
+                  </div>
+
                 </div>
               </div>
             ))}

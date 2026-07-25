@@ -37,6 +37,7 @@ import homePageRoutes from './routes/homePage.routes';
 import globalSettingsRoutes from './routes/globalSettings.routes';
 import franchisePageRoutes from './routes/franchisePage.routes';
 import leadRoutes from './routes/lead.routes';
+import landingPageRoutes from './routes/landingPage.routes'
 import { apiSecretMiddleware } from './middleware/apiSecretMiddleware';
 
 import seoRoutes from './routes/seo.routes';
@@ -155,6 +156,7 @@ app.use('/homepage', homePageRoutes);
 app.use('/global-settings', globalSettingsRoutes);
 app.use('/franchise-page', franchisePageRoutes);
 app.use('/leads', leadRoutes);
+app.use('/landing',landingPageRoutes)
 // ------------------------------------------------------------------
 // 8. 404 HANDLER — catches any request that didn't match a route.
 //    Must come AFTER all app.use() route registrations.

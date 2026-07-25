@@ -5,7 +5,10 @@
  */
 
 import { type FC, useState, useEffect, useRef, useCallback } from 'react'
+import { Star } from 'lucide-react'
 import { useReducedMotion } from '../../../hooks/useReducedMotion'
+import { getShowcaseTestimonials, type ITestimonialShowcase } from '../services'
+
 
 interface CaseStudy {
   id: string
@@ -52,57 +55,95 @@ const CASE_STUDIES: CaseStudy[] = [
   },
 ]
 
-const TESTIMONIALS = [
-  {
-    id: 't1',
-    quote:
-      "Bowling Planet didn't just sell us equipment. They engineered our entire business model. Their pre-opening consulting saved us millions in layout mistakes.",
-    author: 'Rahul S.',
-    role: 'Director, Regional FEC Chain',
-  },
-  {
-    id: 't2',
-    quote:
-      'The ROI projections they ran for our game mix were spot on. We hit our break-even target four months ahead of schedule thanks to their data-driven approach.',
-    author: 'Priya M.',
-    role: 'Operations Head, Premium Arcade',
-  },
-  {
-    id: 't3',
-    quote:
-      'Their PAN-India support network is unmatched. When we need spares or tech support for our VR setups, they are there the same day.',
-    author: 'Amit K.',
-    role: 'Owner, Multi-city Entertainment Brand',
-  },
-]
+const FALLBACK_SIDE_IMAGE = '/products/Bowling_Lane_Dubai.avif'
 
 const TestimonialCarousel: FC = () => {
+  const [testimonials, setTestimonials] = useState<ITestimonialShowcase[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const reduced = useReducedMotion()
 
+  // Fetch real testimonials from the landing API
   useEffect(() => {
-    if (reduced || paused) return
+    let isMounted = true
+
+    const loadTestimonials = async () => {
+      try {
+        setIsLoading(true)
+        setHasError(false)
+        const res = await getShowcaseTestimonials({ limit: 8 })
+        if (!isMounted) return
+        setTestimonials(res.data)
+      } catch (err) {
+        if (!isMounted) return
+        setHasError(true)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    loadTestimonials()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (reduced || paused || testimonials.length < 2) return
     const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % TESTIMONIALS.length)
+      setIndex((i) => (i + 1) % testimonials.length)
     }, 6500)
     return () => clearInterval(timer)
-  }, [reduced, paused])
+  }, [reduced, paused, testimonials.length])
+
+  // Keep index valid if the list shrinks
+  useEffect(() => {
+    if (index >= testimonials.length && testimonials.length > 0) {
+      setIndex(0)
+    }
+  }, [testimonials.length, index])
 
   const go = (dir: -1 | 1) => {
-    setIndex((i) => (i + dir + TESTIMONIALS.length) % TESTIMONIALS.length)
+    setIndex((i) => (i + dir + testimonials.length) % testimonials.length)
   }
+
+  if (isLoading) {
+    return (
+      <div id="testimonials" className="relative mx-auto mt-10 max-w-[900px] sm:mt-12">
+        <div className="rounded-2xl border border-white/10 bg-[#0A0A0F] px-5 py-12 text-center text-sm text-[#86868B]">
+          Loading testimonials…
+        </div>
+      </div>
+    )
+  }
+
+  if (hasError || testimonials.length === 0) {
+    return (
+      <div id="testimonials" className="relative mx-auto mt-10 max-w-[900px] sm:mt-12">
+        <div className="rounded-2xl border border-white/10 bg-[#0A0A0F] px-5 py-12 text-center text-sm text-[#86868B]">
+          {hasError ? "Couldn't load testimonials right now." : 'No testimonials yet.'}
+        </div>
+      </div>
+    )
+  }
+
+  const active = testimonials[index]
+  const sideImageUrl = active.testimonialImage?.url || FALLBACK_SIDE_IMAGE
+  const roleLine = [active.designation, active.companyName].filter(Boolean).join(', ')
 
   return (
     <div
       id="testimonials"
-      className="relative mx-auto mt-10 max-w-[780px] sm:mt-12"
+      className="relative mx-auto mt-10 max-w-[900px] sm:mt-12"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Soft panel — readable without harsh white-on-black glare */}
+      {/* Dark panel — matches site theme, not the white reference design */}
       <div
-        className="relative overflow-hidden rounded-2xl border px-5 py-7 sm:px-8 sm:py-9"
+        className="relative overflow-hidden rounded-2xl border"
         style={{
           background: 'linear-gradient(165deg, rgba(95,193,209,0.1) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.03) 100%)',
           borderColor: 'rgba(95,193,209,0.28)',
@@ -115,28 +156,69 @@ const TestimonialCarousel: FC = () => {
           style={{ background: 'radial-gradient(circle, rgba(95,193,209,0.25), transparent 70%)' }}
         />
 
-        <div className="relative z-[1] mb-2 text-center text-2xl leading-none text-[#5FC1D1]/55">
-          &ldquo;
-        </div>
+        <div className="relative z-[1] grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
+          {/* Left — quote + client info */}
+          <div className="flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9">
+            <div className="mb-2 text-3xl leading-none text-[#5FC1D1]/55">&ldquo;</div>
 
-        <div className="relative z-[1] overflow-hidden">
-          <div
-            className="flex transition-transform duration-500 ease-out"
-            style={{ transform: `translateX(-${index * 100}%)` }}
-          >
-            {TESTIMONIALS.map((t) => (
-              <div key={t.id} className="min-w-full box-border px-1 text-center sm:px-3">
-                <p className="mx-auto mb-5 max-w-[640px] text-[clamp(1rem,2vw,1.25rem)] font-normal leading-relaxed text-[#D8DCE3]">
-                  {t.quote}
-                </p>
-                <div className="text-sm font-semibold text-[#5FC1D1]">{t.author}</div>
-                <div className="mt-1 text-xs text-[#8B93A0]">{t.role}</div>
+            <p className="mb-6 max-w-[520px] text-[clamp(0.95rem,1.6vw,1.1rem)] font-normal leading-relaxed text-[#D8DCE3]">
+              {active.message}
+            </p>
+
+            <div className="flex items-center gap-3">
+              {active.clientImage?.url ? (
+                <img
+                  src={active.clientImage.url}
+                  alt={active.clientName}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-12 w-12 shrink-0 rounded-full border border-white/10 object-cover"
+                />
+              ) : (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-[#5FC1D1]">
+                  {active.clientName?.[0]?.toUpperCase() || '?'}
+                </div>
+              )}
+              <div>
+                <div className="text-sm font-semibold text-[#5FC1D1]">{active.clientName}</div>
+                {roleLine && <div className="mt-0.5 text-xs text-[#8B93A0]">{roleLine}</div>}
               </div>
-            ))}
+            </div>
+
+            {typeof active.rating === 'number' && active.rating > 0 && (
+              <div className="mt-4 flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={14}
+                    fill={i < (active.rating || 0) ? '#5FC1D1' : 'none'}
+                    color={i < (active.rating || 0) ? '#5FC1D1' : 'rgba(255,255,255,0.2)'}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right — large showcase image */}
+          <div className="relative min-h-[220px] md:min-h-[320px]">
+            <img
+              src={sideImageUrl}
+              alt={active.project?.title || active.clientName}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(to right, rgba(10,10,15,0.55) 0%, transparent 25%), linear-gradient(to top, rgba(10,10,15,0.55) 0%, transparent 35%)',
+              }}
+            />
           </div>
         </div>
 
-        <div className="relative z-[1] mt-7 flex items-center justify-center gap-4">
+        <div className="relative z-[1] flex items-center justify-center gap-4 border-t border-white/10 px-5 py-4 sm:px-8">
           <button
             type="button"
             onClick={() => go(-1)}
@@ -149,7 +231,7 @@ const TestimonialCarousel: FC = () => {
           </button>
 
           <div className="flex items-center gap-2">
-            {TESTIMONIALS.map((_, i) => (
+            {testimonials.map((_, i) => (
               <button
                 key={i}
                 type="button"

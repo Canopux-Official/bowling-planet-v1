@@ -3,50 +3,61 @@
  * Includes magnetic hover cards and an animated reading-time chip.
  */
 
-import { type FC, useRef, useState } from 'react'
+import { type FC, useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { useReducedMotion } from '../../../hooks/useReducedMotion'
 import { ArrowRight, Clock } from 'lucide-react'
+import { getPublishedBlogs, type IBlogSummary } from '../services'
 
-const MOCK_POSTS = [
-  {
-    id: 'p1',
-    title: 'The Math Behind the Magic: Calculating FEC ROI in Tier 2 Cities',
-    excerpt: 'Why secondary markets are outperforming metros in pure payback periods, and the equipment mix required to capitalize.',
-    date: 'Oct 12, 2023',
-    readTime: '4 min',
-    category: 'Strategy',
-    img: '/products/Arcade_Games_Calicut.avif'
-  },
-  {
-    id: 'p2',
-    title: 'VR Arenas vs. Traditional Arcades: A Square-Foot Revenue Analysis',
-    excerpt: 'A deep dive into revenue per square foot (RPSF) data from 20 venues to determine the optimal allocation of floor space.',
-    date: 'Nov 04, 2023',
-    readTime: '6 min',
-    category: 'Analytics',
-    img: '/products/Bowling_Lane_Dubai.avif'
-  },
-  {
-    id: 'p3',
-    title: 'Staffing for Scale: Building a Zero-Downtime Operations Team',
-    excerpt: 'The exact HR framework we use to train technicians and floor managers before the doors even open.',
-    date: 'Dec 18, 2023',
-    readTime: '5 min',
-    category: 'Operations',
-    img: '/products/Softplay_Ahemdabad.avif'
-  }
-]
+
+const FALLBACK_IMAGE = '/products/Arcade_Games_Calicut.avif'
+
+type BlogCardData = {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  date: string
+  readTime: string
+  category: string
+  img: string
+}
+
+const formatDate = (iso?: string): string => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+}
+
+// Schema doesn't store readTime or content in the summary response — approximate
+// from excerpt length as a lightweight stand-in until word-count/content is available.
+const estimateReadTime = (excerpt?: string): string => {
+  const words = excerpt ? excerpt.trim().split(/\s+/).length : 0
+  const minutes = Math.max(1, Math.round(words / 40))
+  return `${minutes} min`
+}
+
+const mapBlogToCard = (b: IBlogSummary): BlogCardData => ({
+  id: b._id,
+  slug: b.slug,
+  title: b.title,
+  excerpt: b.excerpt || '',
+  date: formatDate(b.publishedAt || b.createdAt),
+  readTime: estimateReadTime(b.excerpt),
+  category: b.tags?.[0] ? b.tags[0].charAt(0).toUpperCase() + b.tags[0].slice(1) : 'Insights',
+  img: b.coverImage?.url || FALLBACK_IMAGE,
+})
 
 /* ── Magnetic Blog Card ───────────────────────────────────────── */
-const BlogCard: FC<{ post: typeof MOCK_POSTS[0]; index: number }> = ({ post, index }) => {
+const BlogCard: FC<{ post: BlogCardData; index: number }> = ({ post, index }) => {
   const reduced = useReducedMotion()
   const ref = useRef<HTMLAnchorElement>(null)
   const [hover, setHover] = useState(false)
-  
+
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const xSpring = useSpring(x, { stiffness: 150, damping: 20 })
@@ -68,7 +79,7 @@ const BlogCard: FC<{ post: typeof MOCK_POSTS[0]; index: number }> = ({ post, ind
 
   return (
     <motion.a
-      href="/blog"
+      href={`/blog/${post.slug}`}
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHover(true)}
@@ -132,12 +143,12 @@ const BlogCard: FC<{ post: typeof MOCK_POSTS[0]; index: number }> = ({ post, ind
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'var(--text-2)', lineHeight: 1.6, flex: 1 }}>
           {post.excerpt}
         </p>
-        
+
         {/* Animated read more link */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, marginTop: 24,
           fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 700,
-          color: hover ? '#5FC1D1' : 'var(--text-3)',
+          color: hover ? '#5FC1D1' : 'white',
           transition: 'color 0.3s ease'
         }}>
           Read full article
@@ -158,10 +169,40 @@ const BlogPreviewSection: FC = () => {
   const titleRef = useReveal()
   const { logCTAEvent } = useLeadTracker()
 
+  const [posts, setPosts] = useState<BlogCardData[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadBlogs = async () => {
+      try {
+        setIsLoading(true)
+        setHasError(false)
+        const res = await getPublishedBlogs({ page: 1, limit: 3 })
+        console.log(res)
+        if (!isMounted) return
+        setPosts(res.blogs.map(mapBlogToCard))
+      } catch (err) {
+        if (!isMounted) return
+        setHasError(true)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    loadBlogs()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
     <section id="blog" style={{ background: '#000', padding: 'clamp(48px, 8vw, 72px) clamp(16px, 4vw, 28px)', position: 'relative' }}>
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.25, pointerEvents: 'none' }} />
-      
+
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div ref={titleRef} className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24, marginBottom: 56 }}>
@@ -181,11 +222,25 @@ const BlogPreviewSection: FC = () => {
         </div>
 
         {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 24 }}>
-          {MOCK_POSTS.map((post, i) => (
-            <BlogCard key={post.id} post={post} index={i} />
-          ))}
-        </div>
+        {isLoading ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-3)', fontSize: 14, padding: '40px 0' }}>
+            Loading insights…
+          </p>
+        ) : hasError ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-3)', fontSize: 14, padding: '40px 0' }}>
+            Couldn&apos;t load insights right now.
+          </p>
+        ) : posts.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--text-3)', fontSize: 14, padding: '40px 0' }}>
+            No insights published yet.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 24 }}>
+            {posts.map((post, i) => (
+              <BlogCard key={post.id} post={post} index={i} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

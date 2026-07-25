@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import slugify from 'slugify';
 
-
 export interface IMedia {
   type: 'image' | 'video';
   url: string;
@@ -32,11 +31,11 @@ export interface ITestimonial {
   companyName?: string;
   message: string;
   rating?: number;
-  clientImage?: IMedia;
+  clientImage?: IMedia; // The smaller avatar image
+  testimonialImage?: IMedia; // <-- ADDED: The larger right side image
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 
 export interface IProject extends Document {
   title: string;
@@ -54,12 +53,11 @@ export interface IProject extends Document {
   updatedAt: Date;
 }
 
-
 const MediaSchema = new Schema<IMedia>(
   {
     type: { type: String, enum: ['image', 'video'], required: true },
     url: { type: String, required: true },
-    publicId: { type: String }, // add this line
+    publicId: { type: String },
   },
   { _id: false }
 );
@@ -98,11 +96,11 @@ const TestimonialSchema = new Schema<ITestimonial>(
     companyName: { type: String },
     message: { type: String, required: true },
     rating: { type: Number, min: 1, max: 5 },
-    clientImage: MediaSchema,
+    clientImage: MediaSchema, // The smaller avatar image
+    testimonialImage: MediaSchema, // <-- ADDED: The larger right side image
   },
-  { timestamps: true, _id: true } 
+  { timestamps: true, _id: true }
 );
-
 
 const ProjectSchema = new Schema<IProject>(
   {
@@ -113,7 +111,7 @@ const ProjectSchema = new Schema<IProject>(
     },
     slug: {
       type: String,
-      unique: true, 
+      unique: true,
       lowercase: true,
       trim: true,
       index: true,
@@ -136,12 +134,11 @@ const ProjectSchema = new Schema<IProject>(
     isDeleted: {
       type: Boolean,
       default: false,
-      select: false, 
+      select: false,
     },
   },
   { timestamps: true }
 );
-
 
 ProjectSchema.pre('save', async function () {
   const doc = this as IProject;
@@ -154,7 +151,7 @@ ProjectSchema.pre('save', async function () {
 
   const baseSlug = slugify(doc.slug || doc.title, {
     lower: true,
-    strict: true, 
+    strict: true,
     trim: true,
   });
 
@@ -162,7 +159,6 @@ ProjectSchema.pre('save', async function () {
   let suffix = 1;
 
   const ProjectModel = doc.constructor as Model<IProject>;
-
 
   while (
     await ProjectModel.exists({
@@ -177,7 +173,6 @@ ProjectSchema.pre('save', async function () {
   doc.slug = candidateSlug;
 });
 
-
 ProjectSchema.post('save', function (error: any, doc: IProject, next: (err?: Error) => void) {
   if (error.name === 'MongoServerError' && error.code === 11000 && error.keyPattern?.slug) {
     next(new Error('A project with this slug already exists. Please try again.'));
@@ -185,7 +180,6 @@ ProjectSchema.post('save', function (error: any, doc: IProject, next: (err?: Err
     next(error);
   }
 });
-
 
 const Project: Model<IProject> = mongoose.model<IProject>('Project', ProjectSchema);
 
