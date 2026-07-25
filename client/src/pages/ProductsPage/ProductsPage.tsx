@@ -72,35 +72,56 @@ const ProductsPage: FC = () => {
         description="Explore our world-class entertainment products and equipment for your FEC."
       />
 
-      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
-              Catalogue
-            </p>
-            <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
-              Product categories
-            </h1>
-          </div>
-          {!loading && !error ? (
-            <p className="text-sm text-[#A1A1A6]">
-              {pagination.total} categor{pagination.total === 1 ? 'y' : 'ies'}
-            </p>
-          ) : null}
+      {/* Hero — isolated Apple-style product render */}
+      <header className="relative overflow-hidden border-b border-white/[0.08]">
+        <div className="absolute inset-0">
+          <img
+            src="/heroes/products-hero-trampoline.png"
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-[center_35%]"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.68) 42%, rgba(0,0,0,0.94) 100%), radial-gradient(ellipse 70% 55% at 75% 35%, rgba(95,193,209,0.16), transparent 58%)',
+            }}
+          />
         </div>
 
-        <ProductsFilters
-          value={filters}
-          categories={categories}
-          activeSlug={activeSlug}
-          onSelectCategory={handleSelectCategory}
-          onChange={(next) => {
-            setFilters(next)
-            setPage(1)
-            setActiveSlug(null)
-          }}
-        />
+        <div className="relative z-[1] mx-auto max-w-[1280px] px-5 pb-8 pt-24 sm:px-7 sm:pb-10 sm:pt-28">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+                Catalogue
+              </p>
+              <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+                Product categories
+              </h1>
+            </div>
+            {!loading && !error ? (
+              <p className="text-sm text-[#A1A1A6]">
+                {pagination.total} categor{pagination.total === 1 ? 'y' : 'ies'}
+              </p>
+            ) : null}
+          </div>
 
+          <ProductsFilters
+            value={filters}
+            categories={categories}
+            activeSlug={activeSlug}
+            onSelectCategory={handleSelectCategory}
+            onChange={(next) => {
+              setFilters(next)
+              setPage(1)
+              setActiveSlug(null)
+            }}
+          />
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-8 sm:px-7">
         <BaseProductGrid
           products={visibleProducts}
           loading={loading}

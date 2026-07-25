@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" role="img" aria-label="IAAPA">
+  <circle cx="18" cy="24" r="14" fill="none" stroke="#5FC1D1" stroke-width="2.2"/>
+  <ellipse cx="18" cy="24" rx="6" ry="14" fill="none" stroke="#5FC1D1" stroke-width="1.6"/>
+  <path d="M5 24h26M8 16h20M8 32h20" fill="none" stroke="#5FC1D1" stroke-width="1.4"/>
+  <text x="40" y="30" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="0.5" fill="#5FC1D1">IAAPA</text>
+</svg>

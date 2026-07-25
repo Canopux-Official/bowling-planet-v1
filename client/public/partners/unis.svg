@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="UNIS">
+  <circle cx="20" cy="24" r="12" fill="none" stroke="#5FC1D1" stroke-width="2.2"/>
+  <path d="M14 24h12M20 18v12" stroke="#5FC1D1" stroke-width="2.2" stroke-linecap="round"/>
+  <text x="40" y="31" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="22" font-weight="900" fill="#5FC1D1" letter-spacing="2">UNIS</text>
+</svg>

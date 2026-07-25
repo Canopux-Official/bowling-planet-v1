@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 48" role="img" aria-label="KidZania">
+  <circle cx="18" cy="24" r="12" fill="none" stroke="#5FC1D1" stroke-width="2.2"/>
+  <circle cx="18" cy="24" r="5" fill="#5FC1D1"/>
+  <text x="38" y="31" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="20" font-weight="900" fill="#F5F5F7" letter-spacing="-0.5">KidZania</text>
+</svg>

@@ -64,32 +64,53 @@ const ProjectsPage: FC = () => {
         description="Explore the entertainment destinations and family entertainment centers we have built across India."
       />
 
-      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
-              Catalogue
-            </p>
-            <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
-              Project portfolio
-            </h1>
-          </div>
-          {!loading && !error ? (
-            <p className="text-sm text-[#A1A1A6]">
-              {pagination.total} project{pagination.total === 1 ? '' : 's'}
-            </p>
-          ) : null}
+      {/* Hero — 3D architectural wireframe backdrop */}
+      <header className="relative overflow-hidden border-b border-white/[0.08]">
+        <div className="absolute inset-0">
+          <img
+            src="/heroes/projects-hero-wireframe.png"
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-center"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.94) 100%), radial-gradient(ellipse 80% 60% at 70% 40%, rgba(95,193,209,0.18), transparent 60%)',
+            }}
+          />
         </div>
 
-        <ProjectFilters
-          value={filters}
-          availableTags={availableTags}
-          onChange={(next) => {
-            setFilters(next)
-            setPage(1)
-          }}
-        />
+        <div className="relative z-[1] mx-auto max-w-[1280px] px-5 pb-8 pt-24 sm:px-7 sm:pb-10 sm:pt-28">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+                Catalogue
+              </p>
+              <h1 className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+                Project portfolio
+              </h1>
+            </div>
+            {!loading && !error ? (
+              <p className="text-sm text-[#A1A1A6]">
+                {pagination.total} project{pagination.total === 1 ? '' : 's'}
+              </p>
+            ) : null}
+          </div>
 
+          <ProjectFilters
+            value={filters}
+            availableTags={availableTags}
+            onChange={(next) => {
+              setFilters(next)
+              setPage(1)
+            }}
+          />
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-8 sm:px-7">
         {error ? (
           <ErrorState message={error} onRetry={() => void load()} />
         ) : (

@@ -409,7 +409,11 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em', lineHeight: 1 }}>IAAPA</div>
+              <img
+                src="/partners/iaapa.svg"
+                alt="IAAPA"
+                style={{ height: 28, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block' }}
+              />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 12, letterSpacing: '0.1em' }}>Member<br />Certified</div>
             </div>
 
@@ -436,7 +440,11 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1 }}>ISO</div>
+              <img
+                src="/partners/iso.svg"
+                alt="ISO"
+                style={{ height: 36, width: 'auto', objectFit: 'contain', display: 'block', borderRadius: 4 }}
+              />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 12, letterSpacing: '0.1em' }}>9001:2015<br />Certified</div>
             </div>
           </motion.div>

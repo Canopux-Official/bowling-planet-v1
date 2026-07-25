@@ -67,10 +67,26 @@ const InsightsPage: FC = () => {
         description="Practical notes, blogs, and downloadable tools for FEC operators, investors, and destination partners."
       />
 
-      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
-        {/* Header with Label and Title */}
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div>
+      {/* Hero — FEC destination strategy studio backdrop */}
+      <header className="relative overflow-hidden border-b border-white/[0.08]">
+        <div className="absolute inset-0">
+          <img
+            src="/heroes/blogs-hero-planning-studio.png"
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-[center_45%]"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.94) 100%), radial-gradient(ellipse 80% 60% at 70% 40%, rgba(95,193,209,0.18), transparent 60%)',
+            }}
+          />
+        </div>
+
+        <div className="relative z-[1] mx-auto max-w-[1280px] px-5 pb-10 pt-24 sm:px-7 sm:pb-12 sm:pt-28">
+          <div className="mb-4">
             <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
               Resources
             </p>
@@ -78,14 +94,13 @@ const InsightsPage: FC = () => {
               Blogs & Resources
             </h1>
           </div>
+          <p className="max-w-[560px] text-sm leading-relaxed text-[#A1A1A6]">
+            Practical notes and downloadable tools for FEC operators, investors and destination partners.
+          </p>
         </div>
+      </header>
 
-        {/* Subtitle */}
-        <p className="mb-12 max-w-[560px] text-sm text-[#A1A1A6] leading-relaxed">
-          Practical notes and downloadable tools for FEC operators, investors and destination partners.
-        </p>
-
-        {/* Blogs and Resources Grid */}
+      <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-8 sm:px-7">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <BlogsColumn />
           <ResourcesColumn />
