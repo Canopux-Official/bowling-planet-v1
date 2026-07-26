@@ -45,7 +45,7 @@ const FranchiseWhyUs: FC = () => {
     <section
       style={{
         background: theme.colors.surface,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -55,21 +55,16 @@ const FranchiseWhyUs: FC = () => {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Header */}
-        <div ref={headRef} className="reveal" style={{ marginBottom: 64 }}>
-          <div className="why-us-header" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 40, flexWrap: 'wrap' }}>
-            <div>
-              <div className="label" style={{ marginBottom: 20 }}>The Advantage</div>
-              <h2 className="font-display" style={{
-                fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                lineHeight: 1.1,
-              }}>
-                <span className="text-metallic" style={{ display: 'block' }}>Why Our Partners</span>
-                <span className="text-metallic" style={{ display: 'block' }}>Always Win.</span>
-              </h2>
-            </div>
-          </div>
+        <div ref={headRef} className="reveal" style={{ marginBottom: 24 }}>
+          <div className="label" style={{ marginBottom: 8 }}>The Advantage</div>
+          <h2 className="font-display text-metallic" style={{
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
+          }}>
+            Why partners choose us
+          </h2>
         </div>
 
         {/* Highly Visual Bento Grid */}
@@ -90,13 +85,13 @@ const FranchiseWhyUs: FC = () => {
                 background: `linear-gradient(135deg, ${p.color}10, rgba(255,255,255,0.02))`,
                 border: `1px solid ${p.color}25`,
                 borderRadius: 24,
-                padding: '48px 40px',
+                padding: '24px 20px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
                 position: 'relative',
                 overflow: 'hidden',
-                minHeight: 280,
+                minHeight: 160,
                 transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
               }}
               onMouseEnter={e => {
@@ -137,18 +132,18 @@ const FranchiseWhyUs: FC = () => {
               {/* Text Content */}
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <h3 className="font-display" style={{
-                  fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)',
+                  fontSize: 'clamp(1.25rem, 2.5vw, 1.6rem)',
                   fontWeight: 800,
                   color: p.color,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.1,
-                  marginBottom: 16,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.15,
+                  marginBottom: 8,
                 }}>
                   {p.title}
                 </h3>
                 <p style={{
-                  fontSize: 16,
-                  color: theme.colors.text1,
+                  fontSize: 13,
+                  color: theme.colors.text2,
                   fontFamily: theme.typography.fontBody,
                   lineHeight: 1.5,
                   maxWidth: 400,
@@ -176,7 +171,7 @@ const FranchiseWhyUs: FC = () => {
         }
         @media (max-width: 600px) {
           .why-us-header > div:last-child { width: 100%; text-align: left; }
-          .bento-card { padding: 32px 24px !important; min-height: 220px !important; }
+          .bento-card { padding: 20px 16px !important; min-height: 140px !important; }
         }
       `}</style>
     </section>

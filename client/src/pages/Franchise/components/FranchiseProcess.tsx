@@ -66,7 +66,7 @@ const FranchiseProcess: FC = () => {
     <section
       style={{
         background: theme.colors.void,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -75,20 +75,20 @@ const FranchiseProcess: FC = () => {
       <div className="orb orb-teal" style={{ width: 600, height: 600, top: '20%', left: '-15%', opacity: 0.5 }} />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             The Journey
           </div>
           <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            marginBottom: 16,
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
           }}>
-            From Idea to Grand Opening.
+            Idea to grand opening
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 500, margin: '0 auto' }}>
-            We've done this 21+ times. Here's the exact playbook — transparent, proven, efficient.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+            A clear 7-step playbook from inquiry to launch.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ const FranchiseProcess: FC = () => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 20,
+            gap: 12,
           }}
         >
           {STEPS.map((step, idx) => {
@@ -111,8 +111,8 @@ const FranchiseProcess: FC = () => {
                 style={{ 
                   position: 'relative', 
                   overflow: 'hidden', 
-                  padding: '32px 24px', 
-                  borderRadius: 20,
+                  padding: '20px 16px', 
+                  borderRadius: 16,
                   display: 'flex',
                   flexDirection: 'column',
                   borderTop: `1px solid ${step.color}40`,

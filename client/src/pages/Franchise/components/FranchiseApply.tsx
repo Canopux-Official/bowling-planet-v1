@@ -150,7 +150,7 @@ const FranchiseApply: FC = () => {
       id="apply"
       style={{
         background: theme.colors.surface,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -159,29 +159,28 @@ const FranchiseApply: FC = () => {
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.4, pointerEvents: 'none' }} />
 
       <div style={{ maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             Apply Now
           </div>
-          <h2 className="font-display" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+          <h2 className="font-display text-metallic" style={{
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.05,
-            marginBottom: 20,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
+            marginBottom: 8,
           }}>
-            <span className="text-metallic" style={{ display: 'block' }}>Your City Needs This.</span>
-            <span className="text-metallic" style={{ display: 'block' }}>Be the One to Build It.</span>
+            Start your franchise application
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 480, margin: '0 auto' }}>
-            Fill in your details and our franchise development team will reach out within 24 hours.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 420, margin: '0 auto' }}>
+            Share your details—our team responds within 24 hours.
           </p>
         </div>
 
         <div ref={formRef} className="reveal">
           {submitted ? (
-            <div className="glass-card" style={{
-              padding: '72px 48px',
+            <div className="glass-card apply-success-card" style={{
+              padding: 'clamp(40px, 8vw, 72px) clamp(20px, 5vw, 48px)',
               borderRadius: 24,
               textAlign: 'center',
               borderColor: 'rgba(109,189,78,0.3)',

@@ -1,139 +1,62 @@
 /**
- * Franchise Hero — The first impression
- * Large cinematic headline with key value props in a visual grid
+ * Franchise intro — compact header (no cinematic hero)
+ * Still renders API-driven value props
  */
 import { type FC } from 'react'
-import { theme } from '../../../theme'
-import { useReveal } from '../../../hooks/useReveal'
-import type { IFranchiseValueProp } from '../../../services/franchisePageApi';
+import type { IFranchiseValueProp } from '../../../services/franchisePageApi'
 
 interface FranchiseHeroProps {
-  valueProps: IFranchiseValueProp[];
+  valueProps: IFranchiseValueProp[]
 }
 
-const FranchiseHero: FC<FranchiseHeroProps> = ({ valueProps }) => {
-  const headRef = useReveal()
-  const gridRef = useReveal()
-
-  return (
-    <section
-      style={{
-        background: theme.colors.void,
-        padding: '140px 28px 100px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Background orbs */}
-      <div className="orb orb-teal" style={{ width: 800, height: 700, top: '-25%', left: '50%', transform: 'translateX(-50%)', opacity: 0.6 }} />
-      <div className="orb orb-green" style={{ width: 400, height: 400, bottom: '-10%', right: '-5%' }} />
-      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.4, pointerEvents: 'none' }} />
-
-      <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-        {/* Eyebrow */}
-        <div className="label" style={{ justifyContent: 'center', marginBottom: 28 }}>
-          FEC Franchise Business Model
-        </div>
-
-        {/* Headline */}
-        <div ref={headRef} className="reveal">
-          <h1
-            className="font-display"
-            style={{
-              fontSize: 'clamp(2.6rem, 6.5vw, 5.5rem)',
-              fontWeight: 800,
-              lineHeight: 1.05,
-              letterSpacing: '-0.04em',
-              marginBottom: 28,
-            }}
-          >
-            <span className="text-metallic" style={{ display: 'block' }}>Own India's Most</span>
-            <span className="text-gradient-brand" style={{ display: 'block' }}>Exciting Entertainment</span>
-            <span className="text-metallic" style={{ display: 'block' }}>Business.</span>
-          </h1>
-
-          <p style={{
-            fontSize: 18,
-            color: theme.colors.text2,
-            maxWidth: 580,
-            margin: '0 auto 52px',
-            lineHeight: 1.75,
-            fontFamily: theme.typography.fontBody,
-          }}>
-            Partner with Bowling Planet — India's leading FEC consultant — and open your dream game zone
-            with full support, proven systems, and a guaranteed path to profit.
-          </p>
-
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href="#apply"
-              className="btn btn-primary"
-              style={{ fontSize: 16, padding: '16px 38px' }}
-            >
-              Apply for Franchise →
-            </a>
-            <a
-              href="#investment"
-              className="btn btn-ghost"
-              style={{ fontSize: 16, padding: '15px 38px' }}
-            >
-              View Investment Models
-            </a>
-          </div>
-        </div>
-
-        {/* Value props grid */}
-        <div
-          ref={gridRef}
-          className="reveal franchise-hero-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 14,
-            marginTop: 80,
-          }}
-        >
-          {valueProps.map((vp) => (
-            <div
-              key={vp.label}
-              className="glass-card"
-              style={{
-                padding: '22px 18px',
-                textAlign: 'left',
-                borderRadius: 16,
-              }}
-            >
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{vp.icon}</div>
-              <div style={{
-                fontFamily: theme.typography.fontDisplay,
-                fontWeight: 700,
-                fontSize: 14,
-                color: theme.colors.text1,
-                marginBottom: 4,
-                lineHeight: 1.3,
-              }}>{vp.label}</div>
-              <div style={{
-                fontSize: 12,
-                color: theme.colors.text3,
-                fontFamily: theme.typography.fontBody,
-                lineHeight: 1.5,
-              }}>{vp.sub}</div>
-            </div>
-          ))}
-        </div>
+const FranchiseHero: FC<FranchiseHeroProps> = ({ valueProps }) => (
+  <header className="border-b border-white/[0.08] px-5 py-6 sm:px-7 sm:py-7">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="max-w-2xl">
+        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+          Franchise
+        </p>
+        <h1 className="font-display text-[clamp(1.4rem,2.6vw,1.85rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
+          Own an entertainment business
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-[#A1A1A6]">
+          Partner with Bowling Planet for turnkey FEC consulting, supply and launch support—
+          with ₹0 franchise fees.
+        </p>
       </div>
+      <div className="flex flex-wrap gap-2">
+        <a
+          href="#apply"
+          className="inline-flex cursor-pointer items-center rounded-full border border-[#5FC1D1]/45 bg-[#5FC1D1]/15 px-4 py-2.5 text-sm font-semibold text-[#5FC1D1] transition-colors hover:bg-[#5FC1D1]/25"
+        >
+          Apply now →
+        </a>
+        <a
+          href="#investment"
+          className="inline-flex cursor-pointer items-center rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-[#F5F5F7] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1]"
+        >
+          Investment models
+        </a>
+      </div>
+    </div>
 
-      <style>{`
-        @media (max-width: 900px) {
-          .franchise-hero-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (max-width: 520px) {
-          .franchise-hero-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-        }
-      `}</style>
-    </section>
-  )
-}
+    {valueProps.length > 0 ? (
+      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        {valueProps.map((vp) => (
+          <div
+            key={vp.label}
+            className="rounded-xl border border-white/[0.08] bg-[#111118] p-3 sm:p-4"
+          >
+            <div className="mb-1.5 text-lg" aria-hidden="true">
+              {vp.icon}
+            </div>
+            <div className="text-sm font-bold leading-snug text-[#F5F5F7]">{vp.label}</div>
+            <div className="mt-0.5 text-[11px] leading-snug text-[#636366]">{vp.sub}</div>
+          </div>
+        ))}
+      </div>
+    ) : null}
+  </header>
+)
 
 export default FranchiseHero
-

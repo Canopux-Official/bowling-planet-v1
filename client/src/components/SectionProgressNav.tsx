@@ -11,14 +11,12 @@ const SECTIONS = [
   { id: 'credibility',  label: 'Credibility'   },
   { id: 'trusted',      label: 'Trusted By'    },
   { id: 'services',     label: 'Services'      },
-  { id: 'about',        label: 'About'         },
   { id: 'portfolio',    label: 'Our Work'      },
   { id: 'case-studies', label: 'Case Studies'  },
   { id: 'products',     label: 'Products'      },
   { id: 'blog',         label: 'Blog'          },
   { id: 'franchise',    label: 'Franchise'     },
   { id: 'careers',      label: 'Careers'       },
-  { id: 'consultation', label: 'Contact'       },
 ]
 
 const SectionProgressNav: FC = () => {
@@ -57,6 +55,7 @@ const SectionProgressNav: FC = () => {
   return (
     <div
       aria-label="Section navigation"
+      className="section-progress-nav"
       style={{
         position: 'fixed',
         right: 20,
@@ -69,6 +68,7 @@ const SectionProgressNav: FC = () => {
         flexDirection: 'column',
         gap: 10,
         alignItems: 'center',
+        pointerEvents: visible ? 'auto' : 'none',
       }}
     >
       {SECTIONS.map(({ id, label }) => (

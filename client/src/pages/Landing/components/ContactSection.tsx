@@ -25,7 +25,7 @@ const ContactSection: FC = () => {
   return (
     <section
       id="contact"
-      style={{ background: '#0A0A0F', padding: '160px 28px 120px', position: 'relative', overflow: 'hidden' }}
+      style={{ background: '#0A0A0F', padding: 'clamp(64px, 10vw, 100px) clamp(16px, 4vw, 28px) clamp(48px, 8vw, 80px)', position: 'relative', overflow: 'hidden' }}
     >
       {/* Background grid + orbs */}
       <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.5, pointerEvents: 'none' }} />
@@ -43,12 +43,11 @@ const ContactSection: FC = () => {
           Let's Work Together
         </div>
 
-        <h2 className="font-display" style={{
-          fontWeight: 800,
-          fontSize: 'clamp(3rem, 7vw, 6rem)',
-          letterSpacing: '-0.05em', lineHeight: 1.0, marginBottom: 28,
+        <h2 className="font-display landing-section-heading" style={{
+          fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
+          marginBottom: 28,
         }}>
-          <span className="text-metallic" style={{ display: 'block' }}>Start the</span>
+          <span style={{ display: 'block' }}>Start the</span>
           <span className="text-gradient-brand" style={{ display: 'block' }}>Conversation.</span>
         </h2>
 

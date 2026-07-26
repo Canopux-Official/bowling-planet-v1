@@ -1,19 +1,19 @@
 /**
- * ServicesSection — Three-pillar toggle with layoutId morphing card.
- * Tabs: Pre-Opening | Operations | Equipment
- * Active card expands with shared layout animation.
+ * ServicesSection — What We Do
+ * Professional horizontal phase stepper + detail panel.
+ * Keeps color-synced background + card enter/exit animation.
  */
 
-import { type FC } from 'react'
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { type FC, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight, Check } from 'lucide-react'
 
 interface Pillar {
   id: string
-  icon: string
+  step: string
   title: string
   eyebrow: string
   desc: string
@@ -25,7 +25,7 @@ interface Pillar {
 const PILLARS: Pillar[] = [
   {
     id: 'pre-opening',
-    icon: '◎',
+    step: '01',
     eyebrow: 'Phase One',
     title: 'Pre-Opening Consulting',
     desc: 'We partner with you before a single brick is laid — running location analytics, modeling your ROI, designing the optimal floor layout, and building the team that will make your opening day unforgettable.',
@@ -42,7 +42,7 @@ const PILLARS: Pillar[] = [
   },
   {
     id: 'operations',
-    icon: '⊕',
+    step: '02',
     eyebrow: 'Phase Two',
     title: 'Operations Management',
     desc: 'Running a profitable FEC demands operational excellence every day. We design your SOPs, HR frameworks, finance structures, and data-driven marketing engines — then monitor KPIs continuously.',
@@ -59,7 +59,7 @@ const PILLARS: Pillar[] = [
   },
   {
     id: 'equipment',
-    icon: '⬡',
+    step: '03',
     eyebrow: 'Distribution',
     title: 'Equipment Supply',
     desc: 'We source and distribute world-class FEC equipment globally — from a single arcade cabinet to a complete multi-zone entertainment destination, turnkey. ROI-modeled game selection included.',
@@ -81,159 +81,190 @@ const ServicesSection: FC = () => {
   const { logCTAEvent } = useLeadTracker()
   const navigate = useNavigate()
   const [active, setActive] = useState('pre-opening')
+  const [paused, setPaused] = useState(false)
+
   useEffect(() => {
+    if (paused) return
     const interval = setInterval(() => {
-      setActive(prev => {
-        const currentIndex = PILLARS.findIndex(p => p.id === prev)
-        const nextIndex = (currentIndex + 1) % PILLARS.length
-        return PILLARS[nextIndex].id
+      setActive((prev) => {
+        const currentIndex = PILLARS.findIndex((p) => p.id === prev)
+        return PILLARS[(currentIndex + 1) % PILLARS.length].id
       })
     }, 4500)
     return () => clearInterval(interval)
-  }, [])
+  }, [paused])
 
-  const activePillar = PILLARS.find(p => p.id === active)!
+  const activePillar = PILLARS.find((p) => p.id === active)!
 
   return (
     <section
       id="services"
-      style={{ 
-        backgroundColor: `rgba(${activePillar.rgb}, 0.05)`, 
-        transition: 'background-color 1.5s ease',
-        padding: '40px 28px', 
-        position: 'relative', 
-        overflow: 'hidden' 
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="relative overflow-hidden px-4 py-12 sm:px-6 sm:py-14"
+      style={{
+        backgroundColor: `rgba(${activePillar.rgb}, 0.045)`,
+        transition: 'background-color 1.2s ease',
       }}
     >
-      {/* Background orbs */}
-      <div className="orb orb-teal" style={{ width: 500, height: 500, top: '-10%', left: '-8%', opacity: 0.35 }} />
-      <div className="orb orb-green" style={{ width: 450, height: 450, bottom: '-8%', right: '-6%', opacity: 0.3 }} />
-      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, opacity: 0.3, pointerEvents: 'none' }} />
+      <div className="orb orb-teal pointer-events-none absolute -left-[8%] -top-[12%] h-[480px] w-[480px] opacity-28" />
+      <div className="orb orb-green pointer-events-none absolute -bottom-[10%] -right-[6%] h-[420px] w-[420px] opacity-22" />
+      <div aria-hidden="true" className="grid-bg pointer-events-none absolute inset-0 opacity-25" />
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 64, alignItems: 'center' }}>
-        {/* Left Column: Context & Timeline */}
-        <div ref={titleRef} className="reveal" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div className="label" style={{ marginBottom: 20 }}>What We Do</div>
-          <h2 className="font-display text-metallic" style={{ fontSize: 'clamp(2.8rem, 5vw, 4.5rem)', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 16 }}>
+      <div className="relative z-[1] mx-auto max-w-[1100px]">
+        {/* Header */}
+        <div ref={titleRef} className="reveal mb-8 max-w-[640px] sm:mb-10">
+          <div className="label mb-3.5">What We Do</div>
+          <h2 className="font-display landing-section-heading mb-3 text-[clamp(1.75rem,3.5vw,2.75rem)]">
             Three Pillars.
           </h2>
-          <p style={{ fontFamily: 'var(--font-sans)', color: 'var(--text-2)', fontSize: 17, lineHeight: 1.7, maxWidth: 500, marginBottom: 48 }}>
+          <p className="m-0 font-[family-name:var(--font-sans)] text-base leading-relaxed text-[color:var(--text-2)]">
             One seamless partner — from site selection to compounding ROI.
           </p>
-
-          <LayoutGroup>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 30, bottom: 30, left: 24, width: 2, background: 'rgba(255,255,255,0.05)' }} />
-              {PILLARS.map(p => (
-                <div
-                  key={p.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 24,
-                    opacity: active === p.id ? 1 : 0.4,
-                    transition: 'opacity 0.5s',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setActive(p.id)}
-                >
-                  <div style={{
-                    width: 50, height: 50, borderRadius: '50%',
-                    background: active === p.id ? p.color : '#222',
-                    border: `4px solid #000`,
-                    zIndex: 1,
-                    transition: 'all 0.5s',
-                    boxShadow: active === p.id ? `0 0 20px ${p.color}80` : 'none',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#000', fontWeight: 'bold'
-                  }}>
-                    {p.icon}
-                  </div>
-                  <div style={{
-                    padding: '16px 28px',
-                    borderRadius: 16,
-                    background: active === p.id ? `${p.color}15` : 'transparent',
-                    border: `1px solid ${active === p.id ? p.color + '40' : 'transparent'}`,
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 17,
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    color: active === p.id ? p.color : 'rgba(255,255,255,0.8)',
-                    transition: 'all 0.5s var(--ease-out)',
-                  }}>
-                    {p.eyebrow}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </LayoutGroup>
         </div>
 
-        {/* Right Column: Active Card content */}
-        <div>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              layoutId="service-card"
-              initial={{ opacity: 0, y: 16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                borderRadius: 28,
-                background: `rgba(255,255,255,0.02)`,
-                border: `1px solid ${activePillar.color}25`,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {/* Header section */}
-              <div style={{
-                padding: '48px 48px 32px 48px',
-                borderBottom: `1px solid ${activePillar.color}15`,
-                background: `linear-gradient(135deg, rgba(${activePillar.rgb},0.08) 0%, transparent 100%)`,
-              }}>
-                <div style={{ height: 3, width: 64, background: `linear-gradient(90deg, ${activePillar.color}, transparent)`, borderRadius: 2, marginBottom: 24 }} />
-                
-                <h3 className="font-display" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 400, color: '#F5F5F7', lineHeight: 1.1, letterSpacing: '-0.01em', marginBottom: 16 }}>
+        {/* Phase stepper */}
+        <div
+          role="tablist"
+          aria-label="Service pillars"
+          className="mb-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3"
+        >
+          {PILLARS.map((p) => {
+            const isActive = active === p.id
+            return (
+              <button
+                key={p.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActive(p.id)}
+                className="relative flex cursor-pointer flex-col items-start gap-2 rounded-2xl px-[18px] py-4 text-left transition-[border-color,background,transform,box-shadow] duration-300"
+                style={{
+                  border: `1px solid ${isActive ? `${p.color}55` : 'rgba(255,255,255,0.1)'}`,
+                  background: isActive ? `rgba(${p.rgb}, 0.1)` : 'rgba(255,255,255,0.02)',
+                  transform: isActive ? 'translateY(-1px)' : 'none',
+                  boxShadow: isActive ? `0 12px 32px rgba(${p.rgb}, 0.12)` : 'none',
+                }}
+              >
+                <div className="flex w-full items-center gap-2.5">
+                  <span
+                    className="font-[family-name:var(--font-data)] text-xs font-extrabold tracking-wider transition-colors duration-300"
+                    style={{ color: isActive ? p.color : 'rgba(255,255,255,0.35)' }}
+                  >
+                    {p.step}
+                  </span>
+                  <span
+                    className="font-[family-name:var(--font-sans)] text-[11px] font-bold uppercase tracking-[0.12em] transition-colors duration-300"
+                    style={{ color: isActive ? p.color : 'rgba(255,255,255,0.4)' }}
+                  >
+                    {p.eyebrow}
+                  </span>
+                </div>
+                <span
+                  className="font-[family-name:var(--font-sans)] text-[15px] font-bold leading-snug transition-colors duration-300"
+                  style={{ color: isActive ? '#F5F5F7' : 'rgba(245,245,247,0.55)' }}
+                >
+                  {p.title}
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute bottom-0 left-[18px] right-[18px] h-0.5 rounded-sm transition-opacity duration-300"
+                  style={{
+                    background: isActive ? p.color : 'transparent',
+                    opacity: isActive ? 1 : 0,
+                  }}
+                />
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Detail panel */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active}
+            role="tabpanel"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden rounded-[20px] backdrop-blur-md"
+            style={{
+              background: 'rgba(10,10,15,0.72)',
+              border: `1px solid ${activePillar.color}30`,
+            }}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2">
+              {/* Narrative */}
+              <div
+                className="border-b border-white/[0.08] p-6 sm:p-8 lg:border-b-0 lg:border-r"
+                style={{
+                  borderColor: `${activePillar.color}18`,
+                  background: `linear-gradient(160deg, rgba(${activePillar.rgb},0.1) 0%, transparent 55%)`,
+                }}
+              >
+                <div
+                  className="mb-4 h-[3px] w-12 rounded-sm"
+                  style={{ background: `linear-gradient(90deg, ${activePillar.color}, transparent)` }}
+                />
+                <p
+                  className="mb-2.5 font-[family-name:var(--font-sans)] text-xs font-bold uppercase tracking-[0.14em]"
+                  style={{ color: activePillar.color }}
+                >
+                  {activePillar.eyebrow}
+                </p>
+                <h3 className="font-display mb-3.5 text-[clamp(1.45rem,2.6vw,2rem)] font-normal leading-[1.15] tracking-[-0.015em] text-[#F5F5F7]">
                   {activePillar.title}
                 </h3>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 16, lineHeight: 1.7, color: 'var(--text-2)' }}>
+                <p className="mb-7 font-[family-name:var(--font-sans)] text-[15px] leading-relaxed text-[color:var(--text-2)]">
                   {activePillar.desc}
                 </p>
+                <button
+                  type="button"
+                  className="btn btn-primary inline-flex w-fit cursor-pointer items-center gap-2 px-[22px] py-3 text-sm font-bold text-black"
+                  style={{
+                    background: `linear-gradient(135deg, ${activePillar.color}, ${activePillar.color}cc)`,
+                  }}
+                  onClick={() => {
+                    logCTAEvent(`Services CTA: ${activePillar.title}`)
+                    navigate('/contact')
+                  }}
+                >
+                  Get Free Consultation
+                  <ArrowRight size={15} />
+                </button>
               </div>
 
-              {/* Bullets section */}
-              <div style={{ padding: '32px 48px 48px 48px' }}>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 24 }}>
-                  What's included
+              {/* Inclusions */}
+              <div className="p-6 sm:p-8">
+                <p className="mb-4 font-[family-name:var(--font-sans)] text-[11px] font-bold uppercase tracking-[0.14em] text-[color:var(--text-3)]">
+                  What&apos;s included
                 </p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 16 }}>
+                <ul className="m-0 grid list-none gap-2.5 p-0">
                   {activePillar.bullets.map((b) => (
-                    <li key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-                      <span style={{
-                        width: 6, height: 6, borderRadius: '50%',
-                        background: activePillar.color,
-                        flexShrink: 0, marginTop: 8,
-                        boxShadow: `0 0 8px ${activePillar.color}60`,
-                      }} />
-                      <span style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: 'var(--text-2)', lineHeight: 1.6 }}>{b}</span>
+                    <li
+                      key={b}
+                      className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
+                    >
+                      <span
+                        className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md"
+                        style={{
+                          background: `rgba(${activePillar.rgb}, 0.15)`,
+                          color: activePillar.color,
+                        }}
+                      >
+                        <Check size={12} strokeWidth={2.5} />
+                      </span>
+                      <span className="font-[family-name:var(--font-sans)] text-sm leading-snug text-[color:var(--text-2)]">
+                        {b}
+                      </span>
                     </li>
                   ))}
                 </ul>
-
-                <button
-                  className="btn btn-primary"
-                  style={{ marginTop: 40, background: `linear-gradient(135deg, ${activePillar.color}, ${activePillar.color}cc)`, color: '#000', fontSize: 15, padding: '14px 28px', width: '100%', display: 'flex', justifyContent: 'center' }}
-                  onClick={() => { logCTAEvent(`Services CTA: ${activePillar.title}`); navigate('/contact') }}
-                >
-                  Get Free Consultation
-                </button>
               </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   )

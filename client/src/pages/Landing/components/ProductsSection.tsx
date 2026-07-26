@@ -58,7 +58,8 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
   const titleRef = useReveal()
   const tagsRef  = useReveal()
   const { state, addToEnquiry, logCTAEvent } = useLeadTracker()
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  // Start open so mobile users see content without hover
+  const [activeIdx, setActiveIdx] = useState<number>(0)
   
   const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id)
 
@@ -70,12 +71,12 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
   ]
 
   return (
-    <section id="products" style={{ background: '#0B0B0F', position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+    <section id="products" style={{ background: '#0B0B0F', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
       
       {/* ── Dynamic Cinematic Backgrounds ── */}
       <AnimatePresence>
         {activeCategories.map((cat, i) => (
-          hoveredIdx === i && (
+          activeIdx === i && (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, scale: 1.05 }}
@@ -96,12 +97,12 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
         ))}
       </AnimatePresence>
 
-      <div style={{ maxWidth: 1320, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1, padding: '120px 28px', display: 'flex', flexDirection: 'column', gap: 80 }}>
+      <div style={{ maxWidth: 1100, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1, padding: 'clamp(48px, 8vw, 80px) clamp(16px, 4vw, 28px)', display: 'flex', flexDirection: 'column', gap: 'clamp(36px, 5vw, 56px)' }}>
 
         {/* ── Title ──────────────────────────────────────── */}
         <div ref={titleRef} className="reveal" style={{ maxWidth: 600 }}>
           <div className="label" style={{ marginBottom: 20 }}>Distribution</div>
-          <h2 className="font-display text-metallic" style={{ fontWeight: 400, fontSize: 'clamp(3rem, 6vw, 5.5rem)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+          <h2 className="font-display landing-section-heading" style={{ fontWeight: 400, fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)' }}>
             Equipment &<br />Attractions.
           </h2>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: 17, color: 'var(--text-2)', margin: '24px 0 0', lineHeight: 1.7 }}>
@@ -111,48 +112,57 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
         </div>
 
         {/* ── Interactive List ──────────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }} onMouseLeave={() => setHoveredIdx(null)}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {activeCategories.map((cat, i) => {
-            const isHovered = hoveredIdx === i
-            const isFaded = hoveredIdx !== null && hoveredIdx !== i
+            const isActive = activeIdx === i
+            const isFaded = activeIdx !== i
 
             return (
               <div
                 key={cat.id}
-                onMouseEnter={() => setHoveredIdx(i)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isActive}
+                onMouseEnter={() => setActiveIdx(i)}
+                onClick={() => setActiveIdx(i)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setActiveIdx(i)
+                  }
+                }}
                 style={{
                   position: 'relative',
-                  padding: '40px 0',
+                  padding: 'clamp(20px, 4vw, 40px) 0',
                   borderTop: i === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
                   borderBottom: '1px solid rgba(255,255,255,0.1)',
-                  cursor: 'crosshair',
-                  opacity: isFaded ? 0.3 : 1,
+                  cursor: 'pointer',
+                  opacity: isFaded ? 0.45 : 1,
                   transition: 'opacity 0.4s ease',
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '24px 40px'
+                  gap: '16px 24px'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 32, flex: '1 1 auto' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(16px, 3vw, 32px)', flex: '1 1 auto', minWidth: 0 }}>
                   <span style={{ 
                     fontFamily: 'var(--font-data)', 
                     fontSize: 'clamp(1rem, 2vw, 1.5rem)', 
                     fontWeight: 700, 
-                    color: isHovered ? cat.color : 'rgba(255,255,255,0.3)', 
+                    color: isActive ? cat.color : 'rgba(255,255,255,0.3)', 
                     transition: 'color 0.4s ease' 
                   }}>
                     {cat.num}
                   </span>
-                  <h3 style={{ 
+                  <h3 className="font-display" style={{ 
                     margin: 0, 
-                    fontFamily: 'var(--font-display)', 
-                    fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', 
+                    fontSize: 'clamp(1.25rem, 3vw, 2.5rem)', 
                     fontWeight: 400, 
                     letterSpacing: '-0.02em', 
-                    color: isHovered ? '#fff' : 'rgba(255,255,255,0.8)',
+                    color: isActive ? '#fff' : 'rgba(255,255,255,0.8)',
                     transition: 'color 0.4s ease, transform 0.4s ease',
-                    transform: isHovered ? 'translateX(10px)' : 'translateX(0px)',
+                    transform: isActive ? 'translateX(6px)' : 'translateX(0px)',
                   }}>
                     {cat.title}
                   </h3>
@@ -160,30 +170,31 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
 
                 {/* Expanding Content */}
                 <div style={{ 
-                  flex: '1 1 300px', 
+                  flex: '1 1 min(100%, 280px)', 
                   maxWidth: 480, 
+                  width: '100%',
                   display: 'grid', 
-                  gridTemplateRows: isHovered ? '1fr' : '0fr',
+                  gridTemplateRows: isActive ? '1fr' : '0fr',
                   transition: 'grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                   overflow: 'hidden'
                 }}>
                   <div style={{ minHeight: 0 }}>
                     <div style={{ 
-                      padding: '24px 32px', 
+                      padding: 'clamp(16px, 3vw, 24px) clamp(16px, 3vw, 32px)', 
                       margin: '12px 0 24px 0',
                       background: 'rgba(0,0,0,0.7)', 
                       backdropFilter: 'blur(20px)', 
                       borderRadius: 20, 
                       border: '1px solid rgba(255,255,255,0.1)',
                       boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-                      opacity: isHovered ? 1 : 0, 
+                      opacity: isActive ? 1 : 0, 
                       transition: 'opacity 0.3s ease 0.1s' 
                     }}>
-                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 16, color: '#fff', lineHeight: 1.6, marginBottom: 24, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 15, color: '#fff', lineHeight: 1.6, marginBottom: 24, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                         {cat.desc}
                       </p>
                       
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                         <span style={{ 
                           fontFamily: 'var(--font-data)', 
                           fontSize: 12, 
@@ -243,9 +254,9 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
         </div>
 
         {/* ── Bottom Section (Tags & ROI) ──────────────────────────────────────── */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(24px, 4vw, 40px)', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           
-          <div ref={tagsRef} className="reveal" style={{ flex: '1 1 400px', maxWidth: 600 }}>
+          <div ref={tagsRef} className="reveal" style={{ flex: '1 1 min(100%, 280px)', maxWidth: 600, minWidth: 0 }}>
             <p style={{ fontFamily: 'var(--font-data)', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 20 }}>
               Equipment Types We Cover
             </p>

@@ -1,4 +1,5 @@
 import { type FC, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import MediaItem, { type CommonMedia } from './MediaItem'
 import styles from './Lightbox.module.css'
 
@@ -38,7 +39,7 @@ const Lightbox: FC<LightboxProps> = ({ media, initialIndex, isOpen, onClose }) =
 
   const current = media[index]
 
-  return (
+  return createPortal(
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-label="Media viewer">
       <button type="button" className={styles.close} onClick={onClose} aria-label="Close lightbox">
         Close
@@ -64,7 +65,8 @@ const Lightbox: FC<LightboxProps> = ({ media, initialIndex, isOpen, onClose }) =
           </button>
         </div>
       ) : null}
-    </div>
+    </div>,
+    document.body,
   )
 }
 

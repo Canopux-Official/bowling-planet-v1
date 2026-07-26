@@ -1,56 +1,28 @@
 import type { FC } from 'react'
-import { theme } from '../../../theme'
 
 const STATS = [
-  { num: '17+', label: 'Years of Experience' },
-  { num: '21+', label: 'High-End Projects' },
-  { num: '700+', label: 'Game Options' },
-  { num: '32%', label: 'Avg. Annual ROI' },
-  { num: '₹0', label: 'Franchise Fees' },
+  { num: '17+', label: 'Years' },
+  { num: '21+', label: 'Projects' },
+  { num: '700+', label: 'Games' },
+  { num: '32%', label: 'Avg. ROI' },
+  { num: '₹0', label: 'Franchise fee' },
 ]
 
 const DistinctionStats: FC = () => (
-  <div
-    className="dist-stats-wrap"
-    style={{
-      background: theme.colors.surface,
-      borderTop: `1px solid ${theme.colors.border}`,
-      borderBottom: `1px solid ${theme.colors.border}`,
-      padding: '40px 28px',
-    }}
-  >
-    <div style={{
-      maxWidth: 1100,
-      margin: '0 auto',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      flexWrap: 'wrap',
-      gap: 32,
-    }}>
-      {STATS.map((s) => (
-        <div key={s.label} style={{ textAlign: 'center', flex: '1 1 140px' }}>
-          <div className="stat-num" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', display: 'block' }}>
-            {s.num}
-          </div>
-          <div style={{
-            fontSize: 12,
-            color: theme.colors.text3,
-            fontFamily: theme.typography.fontBody,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            fontWeight: 600,
-            marginTop: 6,
-          }}>
-            {s.label}
-          </div>
+  <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 sm:gap-3" aria-label="Company highlights">
+    {STATS.map((s) => (
+      <div
+        key={s.label}
+        className="rounded-xl border border-white/[0.08] bg-[#111118] px-3 py-3 text-center"
+      >
+        <div className="font-display text-xl font-extrabold tracking-tight text-[#5FC1D1] sm:text-2xl">
+          {s.num}
         </div>
-      ))}
-    </div>
-
-    <style>{`
-      @media (max-width: 600px) { .dist-stats-wrap { padding: 32px 20px !important; } }
-    `}</style>
+        <div className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#636366]">
+          {s.label}
+        </div>
+      </div>
+    ))}
   </div>
 )
 

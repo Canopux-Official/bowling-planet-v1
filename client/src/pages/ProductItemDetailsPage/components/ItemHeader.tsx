@@ -1,5 +1,4 @@
 import type { FC } from 'react'
-import styles from './ItemHeader.module.css'
 
 interface ItemHeaderProps {
   title: string
@@ -15,18 +14,26 @@ function formatPrice(price: number): string {
 }
 
 const ItemHeader: FC<ItemHeaderProps> = ({ title, description, price }) => (
-  <header className={styles.header}>
-    <div className={styles.titleRow}>
-      <h1 className={styles.title}>{title}</h1>
+  <header className="space-y-3">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+      Product detail
+    </p>
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <h1 className="font-display text-[clamp(1.4rem,2.8vw,1.9rem)] font-extrabold tracking-[-0.02em] leading-tight text-[#F5F5F7]">
+        {title}
+      </h1>
       {price !== undefined ? (
-        <div className={styles.priceBadge}>
-          <span className={styles.priceLabel}>Price</span>
-          <span className={styles.price}>{formatPrice(price)}</span>
+        <div className="rounded-xl border border-[#6DBD4E]/35 bg-[#6DBD4E]/10 px-3.5 py-2 text-right">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-[#6DBD4E]/80">
+            Price
+          </span>
+          <span className="text-base font-bold text-[#6DBD4E]">{formatPrice(price)}</span>
         </div>
       ) : null}
     </div>
-    {description ? <p className={styles.description}>{description}</p> : null}
-    <div className={styles.divider} aria-hidden="true" />
+    {description ? (
+      <p className="max-w-prose text-sm leading-relaxed text-[#A1A1A6]">{description}</p>
+    ) : null}
   </header>
 )
 

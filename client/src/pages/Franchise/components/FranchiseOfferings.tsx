@@ -37,26 +37,26 @@ const FranchiseOfferings: FC = () => {
     <section
       style={{
         background: theme.colors.void,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
       <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             Our Catalogue
           </div>
           <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            marginBottom: 16,
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
           }}>
-            700+ Global Attractions.
+            700+ global attractions
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 540, margin: '0 auto' }}>
-            We procure, install, and maintain the world's most advanced entertainment technology, delivering a true competitive edge to your facility.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+            Procure, install and maintain world-class entertainment technology.
           </p>
         </div>
 
@@ -65,8 +65,8 @@ const FranchiseOfferings: FC = () => {
           <div className="bento-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 16,
-            marginBottom: 48,
+            gap: 12,
+            marginBottom: 24,
           }}>
             {MAJOR_ATTRACTIONS.map((item) => {
               const isLarge = item.size === 'large'
@@ -78,8 +78,8 @@ const FranchiseOfferings: FC = () => {
                   key={item.id}
                   className={`bento-item ${item.size}`}
                   style={{
-                    padding: isWide ? '32px' : '32px',
-                    borderRadius: 20,
+                    padding: isWide ? '20px' : '20px',
+                    borderRadius: 16,
                     background: `linear-gradient(180deg, ${item.color}05, rgba(255,255,255,0.01))`,
                     border: `1px solid ${item.color}15`,
                     display: 'flex',
@@ -150,9 +150,9 @@ const FranchiseOfferings: FC = () => {
 
           {/* Supplementary Revenue Streams — Sleek Glowing Tags */}
           <div className="supplementary-revenue" style={{
-            padding: '48px',
+            padding: '24px 20px',
             background: 'linear-gradient(180deg, rgba(255,255,255,0.02), transparent)',
-            borderRadius: 24,
+            borderRadius: 16,
             border: `1px solid rgba(255,255,255,0.05)`,
             textAlign: 'center',
             position: 'relative',

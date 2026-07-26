@@ -4,91 +4,51 @@ import { motion } from 'framer-motion'
 const VideoShowcase: FC = () => {
   const containerRef = useRef<HTMLElement>(null)
 
-  // Parallax effect for the overlay content
-  // const { scrollYProgress } = useScroll({
-  //   target: containerRef,
-  //   offset: ['start end', 'end start']
-  // })
-  // const y = useTransform(scrollYProgress, [0, 1], [50, -50])
-
   return (
     <section
+      id="video-showcase"
       ref={containerRef}
-      style={{
-        background: '#000',
-        paddingTop: 100,
-        paddingBottom: 0,
-      }}
+      className="bg-black pt-[clamp(40px,7vw,100px)]"
     >
-      {/* ── Section Heading ──────────────────────────────────────── */}
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 24px', marginBottom: 64, textAlign: 'center' }}>
+      <div className="mx-auto mb-[clamp(20px,4vw,48px)] max-w-[1100px] px-4 text-center sm:px-6">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.8 }}
-          className="font-display"
-          style={{
-            fontSize: 'clamp(3rem, 5vw, 4.5rem)',
-            color: '#fff',
-            fontWeight: 400,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-          }}
+          className="font-display landing-section-heading text-[clamp(1.5rem,5vw,3.5rem)] leading-[1.12] tracking-[-0.02em]"
         >
-          Immersive Experiences,{' '}
-          <span style={{ fontStyle: 'italic', color: '#5FC1D1' }}>Engineered.</span>
+          <span className="block sm:inline">Immersive Experiences,</span>{' '}
+          <span className="block italic text-[#5FC1D1] sm:inline">Engineered.</span>
         </motion.h2>
       </div>
 
-      {/* ── Video Container ───────────────────────────────────────── */}
-      <div
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '80vh',
-          minHeight: 600,
-          overflow: 'hidden',
-          background: '#000',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute', inset: 0,
-            pointerEvents: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          aria-hidden="true"
-        >
+      {/* Responsive media frame — aspect-ratio avoids fixed vh blowouts on phones */}
+      <div className="relative mx-auto w-full max-w-[1600px] overflow-hidden bg-black">
+        <div className="relative aspect-[16/10] w-full sm:aspect-video md:aspect-[21/9] md:max-h-[70vh]">
           <motion.video
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.2 }}
             src="/showcase.mp4"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: 'brightness(0.9) contrast(1.1)' }}
+          />
+
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
             style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              filter: 'brightness(0.9) contrast(1.1)',
+              background:
+                'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,1) 100%)',
             }}
           />
         </div>
-
-        {/* ── Edge Gradients for smooth blending ─────────────────── */}
-        <div
-          style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,1) 100%)',
-            pointerEvents: 'none',
-          }}
-        />
       </div>
     </section>
   )

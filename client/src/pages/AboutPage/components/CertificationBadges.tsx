@@ -1,57 +1,64 @@
-import { type FC } from 'react'
-import { theme } from '../../../theme'
-import { useReveal } from '../../../hooks/useReveal'
+import type { FC } from 'react'
+import { Award, Globe2, Package } from 'lucide-react'
 
 const BADGES = [
-  { title: 'ISO 9001:2015 Certified', text: 'Quality management systems supporting consistent project delivery and documentation.', icon: '🏅', color: '#5FC1D1' },
-  { title: 'Proud IAAPA Member', text: 'Connected to global attractions standards, education and industry best practices.', icon: '🌐', color: '#6DBD4E' },
-  { title: 'Authorized Exporter', text: 'Structured sourcing and logistics pathways for international and domestic programmes.', icon: '📦', color: '#C084FC' },
+  {
+    title: 'ISO 9001:2015',
+    text: 'Quality systems for consistent project delivery.',
+    icon: Award,
+    color: '#5FC1D1',
+  },
+  {
+    title: 'IAAPA Member',
+    text: 'Aligned to global attractions standards.',
+    icon: Globe2,
+    color: '#6DBD4E',
+  },
+  {
+    title: 'Authorized Exporter',
+    text: 'Structured sourcing and logistics pathways.',
+    icon: Package,
+    color: '#5FC1D1',
+  },
 ]
 
-const CertificationBadges: FC = () => {
-  const headRef = useReveal()
-  const gridRef = useReveal()
-
-  return (
-    <section style={{ background: theme.colors.void, padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-      <div className="orb orb-teal" style={{ width: 400, height: 400, bottom: '-10%', right: '-5%', opacity: 0.4 }} />
-
-      <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>Credentials</div>
-          <h2 className="font-display text-metallic" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.5rem)', fontWeight: 800, letterSpacing: '-0.03em' }}>
-            Certifications & Memberships.
-          </h2>
-        </div>
-
-        <div ref={gridRef} className="reveal cert-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
-          {BADGES.map((badge) => (
-            <div
-              key={badge.title}
-              className="glass-card"
-              style={{
-                padding: '36px 32px',
-                borderRadius: 20,
-                position: 'relative',
-                overflow: 'hidden',
-                background: `linear-gradient(135deg, ${badge.color}08, rgba(255,255,255,0.02))`,
-                borderColor: `${badge.color}20`,
-              }}
-            >
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${badge.color}, transparent)` }} />
-              <div style={{ fontSize: 36, marginBottom: 20 }}>{badge.icon}</div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 700, color: theme.colors.text1, letterSpacing: '-0.02em', marginBottom: 12 }}>{badge.title}</h3>
-              <p style={{ color: theme.colors.text2, fontSize: 14, lineHeight: 1.65, fontFamily: theme.typography.fontBody }}>{badge.text}</p>
-            </div>
-          ))}
-        </div>
+const CertificationBadges: FC = () => (
+  <section aria-labelledby="about-certs-heading">
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+      <div>
+        <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+          Credentials
+        </p>
+        <h2 id="about-certs-heading" className="font-display text-lg font-bold text-[#F5F5F7]">
+          Certifications & memberships
+        </h2>
       </div>
+    </div>
 
-      <style>{`
-        @media (max-width: 900px) { .cert-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
-    </section>
-  )
-}
+    <div className="grid gap-3 sm:grid-cols-3">
+      {BADGES.map((badge) => {
+        const Icon = badge.icon
+        return (
+          <article
+            key={badge.title}
+            className="rounded-2xl border border-white/[0.1] bg-[#111118] p-4 transition-colors hover:border-[#5FC1D1]/35"
+            style={{
+              background: `linear-gradient(160deg, ${badge.color}12, #111118 55%)`,
+            }}
+          >
+            <div
+              className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border"
+              style={{ borderColor: `${badge.color}40`, color: badge.color, background: `${badge.color}15` }}
+            >
+              <Icon size={16} />
+            </div>
+            <h3 className="font-display text-[15px] font-bold text-[#F5F5F7]">{badge.title}</h3>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-[#A1A1A6]">{badge.text}</p>
+          </article>
+        )
+      })}
+    </div>
+  </section>
+)
 
 export default CertificationBadges

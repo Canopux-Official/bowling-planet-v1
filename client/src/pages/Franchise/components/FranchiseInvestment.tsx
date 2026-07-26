@@ -38,7 +38,7 @@ const FranchiseInvestment: FC<FranchiseInvestmentProps> = ({ tiers }) => {
       id="investment"
       style={{
         background: theme.colors.surface,
-        padding: '120px 28px',
+        padding: '40px 20px',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -46,20 +46,20 @@ const FranchiseInvestment: FC<FranchiseInvestmentProps> = ({ tiers }) => {
       <div className="orb orb-green" style={{ width: 500, height: 500, top: '-10%', left: '-5%' }} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-          <div className="label" style={{ justifyContent: 'center', marginBottom: 20 }}>
+        <div ref={headRef} className="reveal" style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div className="label" style={{ justifyContent: 'center', marginBottom: 8 }}>
             Investment Models
           </div>
           <h2 className="font-display text-metallic" style={{
-            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
             fontWeight: 800,
-            letterSpacing: '-0.04em',
-            marginBottom: 16,
+            letterSpacing: '-0.02em',
+            marginBottom: 8,
           }}>
-            Pick Your Scale, We'll Build Your Empire.
+            Choose your scale
           </h2>
-          <p style={{ color: theme.colors.text2, fontSize: 16, maxWidth: 540, margin: '0 auto' }}>
-            Six investment tiers designed for every ambition — from a neighbourhood game lounge to a metro mega-complex.
+          <p style={{ color: theme.colors.text2, fontSize: 14, maxWidth: 480, margin: '0 auto' }}>
+            Six tiers—from neighbourhood lounge to metro complex.
           </p>
         </div>
 
@@ -69,7 +69,7 @@ const FranchiseInvestment: FC<FranchiseInvestmentProps> = ({ tiers }) => {
           gap: 8,
           justifyContent: 'center',
           flexWrap: 'wrap',
-          marginBottom: 40,
+          marginBottom: 24,
         }}>
           {tiers.map((t, i) => (
             <button
@@ -113,15 +113,15 @@ const FranchiseInvestment: FC<FranchiseInvestmentProps> = ({ tiers }) => {
         <div
           className="glass-card investment-card"
           style={{
-            padding: '48px',
-            borderRadius: 24,
+            padding: '28px 20px',
+            borderRadius: 20,
             borderColor: `${tier.color}40`,
             boxShadow: `0 0 60px ${tier.color}15`,
             transition: 'all 0.35s ease',
           }}
         >
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20, marginBottom: 40 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
             <div>
               <div style={{ fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', color: tier.color, fontWeight: 700, fontFamily: theme.typography.fontBody, marginBottom: 8 }}>
                 {tier.name} Tier

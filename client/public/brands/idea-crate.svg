@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" role="img" aria-label="Idea Crate">
+  <rect x="4" y="12" width="24" height="24" rx="3" fill="none" stroke="#5FC1D1" stroke-width="2"/>
+  <path d="M16 18v8M12 22h8" stroke="#5FC1D1" stroke-width="2" stroke-linecap="round"/>
+  <text x="38" y="22" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#F5F5F7">IDEA</text>
+  <text x="38" y="38" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="14" font-weight="900" fill="#5FC1D1">CRATE</text>
+</svg>

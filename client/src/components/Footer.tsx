@@ -7,17 +7,17 @@ const NAV_COLS = [
   {
     heading: 'Company',
     links: [
-      { l: 'About',     path: '/about'     },
-      { l: 'Careers',   path: '/careers'   },
-      { l: 'Contact',   path: '/contact'          },
+      { l: 'About', path: '/about' },
+      { l: 'Careers', path: '/careers' },
+      { l: 'Contact', path: '/contact' },
     ],
   },
   {
     heading: 'Services',
     links: [
-      { l: 'Projects',   path: '/projects'  },
-      { l: 'Products',   path: '/products'  },
-      { l: 'Franchise',  path: '/franchise' },
+      { l: 'Projects', path: '/projects' },
+      { l: 'Products', path: '/products' },
+      { l: 'Franchise', path: '/franchise' },
     ],
   },
 ]
@@ -37,16 +37,16 @@ const Footer: FC = () => {
   };
 
   const SOCIALS = settings?.socials?.links || [
-    { platform: 'Facebook',  url: 'https://facebook.com' },
+    { platform: 'Facebook', url: 'https://facebook.com' },
     { platform: 'Instagram', url: 'https://instagram.com' },
-    { platform: 'LinkedIn',  url: 'https://linkedin.com' },
+    { platform: 'LinkedIn', url: 'https://linkedin.com' },
   ];
 
   return (
     <>
 
       {/* ── Footer ─────────────────────────────────────────── */}
-      <footer style={{ background: '#000000', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '64px 28px 40px' }}>
+      <footer style={{ background: '#000000', borderTop: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(40px, 8vw, 64px) clamp(16px, 4vw, 28px) clamp(28px, 5vw, 40px)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
 
           {/* Top row */}
@@ -56,7 +56,7 @@ const Footer: FC = () => {
             <div style={{ maxWidth: 260 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
                 <img src="/logo.avif" alt="Bowling Planet" style={{ height: 48, width: 'auto' }}
-                  onError={e => { const t = e.currentTarget; if (!t.dataset.fb2) { t.dataset.fb2='1'; t.src='/logo.avif' } }} />
+                  onError={e => { const t = e.currentTarget; if (!t.dataset.fb2) { t.dataset.fb2 = '1'; t.src = '/logo.avif' } }} />
                 <div>
                   <div style={{ fontFamily: '"Sora",sans-serif', fontWeight: 700, fontSize: 20, color: '#F5F5F7', letterSpacing: '-0.01em' }}>{companyData.name}</div>
                   <div className="label" style={{ fontSize: 10, marginBottom: 0 }}>FEC Consulting</div>
@@ -71,7 +71,7 @@ const Footer: FC = () => {
             <div className="footer-nav-cols" style={{ display: 'flex', gap: 64, flexWrap: 'wrap' }}>
               {NAV_COLS.map(col => (
                 <div key={col.heading}>
-                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#48484A', marginBottom: 20, fontFamily: 'Inter,sans-serif' }}>
+                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'white', marginBottom: 20, fontFamily: 'Inter,sans-serif' }}>
                     {col.heading}
                   </p>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -80,9 +80,9 @@ const Footer: FC = () => {
                         <Link
                           to={link.path}
                           onClick={() => logCTAEvent(`Footer Link: ${link.l}`)}
-                          style={{ textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: '"Sora",sans-serif', fontWeight: 600, fontSize: 14, color: '#48484A', padding: 0, transition: 'color 0.2s ease', letterSpacing: '-0.01em' }}
+                          style={{ textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: '"Sora",sans-serif', fontWeight: 600, fontSize: 14, color: 'white', padding: 0, transition: 'color 0.2s ease', letterSpacing: '-0.01em' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#86868B' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#48484A' }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
                         >
                           {link.l}
                         </Link>
@@ -95,7 +95,7 @@ const Footer: FC = () => {
 
             {/* Socials */}
             <div>
-              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#48484A', marginBottom: 20, fontFamily: 'Inter,sans-serif' }}>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'white', marginBottom: 20, fontFamily: 'Inter,sans-serif' }}>
                 Follow Us
               </p>
               <div style={{ display: 'flex', gap: 10 }}>

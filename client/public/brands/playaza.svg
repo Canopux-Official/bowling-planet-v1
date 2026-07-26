@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 48" role="img" aria-label="Playaza">
+  <path d="M8 24l10-10v20L8 24z" fill="#6DBD4E"/>
+  <circle cx="22" cy="24" r="10" fill="none" stroke="#6DBD4E" stroke-width="2"/>
+  <text x="40" y="32" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="22" font-weight="900" fill="#F5F5F7" letter-spacing="0.5">Playaza</text>
+</svg>
