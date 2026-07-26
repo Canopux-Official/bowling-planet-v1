@@ -5,7 +5,8 @@
  */
 
 import { type FC, useState, useEffect, useRef, useCallback } from 'react'
-import { Star } from 'lucide-react'
+import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '../../../hooks/useReducedMotion'
 import { getShowcaseTestimonials, type ITestimonialShowcase } from '../services'
 
@@ -137,123 +138,142 @@ const TestimonialCarousel: FC = () => {
   return (
     <div
       id="testimonials"
-      className="relative mx-auto mt-10 max-w-[900px] sm:mt-12"
+      className="relative mx-auto mt-20 max-w-[1100px] pb-12"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Dark panel — matches site theme, not the white reference design */}
+      {/* Top Label */}
+      <div className="flex justify-center mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#5FC1D1] backdrop-blur-md"
+        >
+          <Star size={14} fill="#5FC1D1" />
+          Partner Success Stories
+        </motion.div>
+      </div>
+
+      {/* Ambient background glow */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[800px] bg-gradient-to-r from-[#5FC1D1]/20 to-[#FFAA33]/10 blur-[140px] rounded-full pointer-events-none" />
+
       <div
-        className="relative overflow-hidden rounded-2xl border"
+        className="relative overflow-hidden rounded-[40px]"
         style={{
-          background: 'linear-gradient(165deg, rgba(95,193,209,0.1) 0%, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.03) 100%)',
-          borderColor: 'rgba(95,193,209,0.28)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 40px rgba(0,0,0,0.35)',
+          background: 'linear-gradient(145deg, rgba(30,30,35,0.6) 0%, rgba(15,15,20,0.8) 100%)',
+          backdropFilter: 'blur(40px)',
+          boxShadow: '0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 0 40px rgba(255,255,255,0.02)',
         }}
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-40"
-          style={{ background: 'radial-gradient(circle, rgba(95,193,209,0.25), transparent 70%)' }}
-        />
+        {/* Subtle Edge Light */}
+        <div className="absolute inset-0 rounded-[40px] border border-white/10 pointer-events-none mix-blend-overlay" />
 
-        <div className="relative z-[1] grid grid-cols-1 md:grid-cols-[1.05fr_1fr]">
-          {/* Left — quote + client info */}
-          <div className="flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9">
-            <div className="mb-2 text-3xl leading-none text-[#5FC1D1]/55">&ldquo;</div>
-
-            <p className="mb-6 max-w-[520px] text-[clamp(0.95rem,1.6vw,1.1rem)] font-normal leading-relaxed text-[#D8DCE3]">
-              {active.message}
-            </p>
-
-            <div className="flex items-center gap-3">
-              {active.clientImage?.url ? (
-                <img
-                  src={active.clientImage.url}
-                  alt={active.clientName}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-12 w-12 shrink-0 rounded-full border border-white/10 object-cover"
-                />
-              ) : (
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-[#5FC1D1]">
-                  {active.clientName?.[0]?.toUpperCase() || '?'}
+        <div className="relative z-[1] grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] min-h-[460px]">
+          
+          {/* Left: Content */}
+          <div className="flex flex-col justify-center px-8 py-14 sm:px-16 sm:py-20 relative">
+            <Quote 
+              size={180} 
+              className="absolute top-10 left-10 text-[#5FC1D1] opacity-5 pointer-events-none transform -rotate-12"
+            />
+            
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -30, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, x: 30, filter: 'blur(10px)' }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="relative z-10"
+              >
+                <div className="flex items-center gap-1.5 mb-8">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      size={20}
+                      fill={i < (active.rating || 5) ? '#FFAA33' : 'none'}
+                      color={i < (active.rating || 5) ? '#FFAA33' : 'rgba(255,255,255,0.1)'}
+                      className="drop-shadow-[0_0_8px_rgba(255,170,51,0.4)]"
+                    />
+                  ))}
                 </div>
-              )}
-              <div>
-                <div className="text-sm font-semibold text-[#5FC1D1]">{active.clientName}</div>
-                {roleLine && <div className="mt-0.5 text-xs text-[#8B93A0]">{roleLine}</div>}
-              </div>
-            </div>
 
-            {typeof active.rating === 'number' && active.rating > 0 && (
-              <div className="mt-4 flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    size={14}
-                    fill={i < (active.rating || 0) ? '#5FC1D1' : 'none'}
-                    color={i < (active.rating || 0) ? '#5FC1D1' : 'rgba(255,255,255,0.2)'}
-                  />
-                ))}
-              </div>
-            )}
+                <p className="font-display mb-12 text-[clamp(1.4rem,2.5vw,2rem)] font-light leading-tight text-white tracking-wide" style={{ textWrap: 'balance' }}>
+                  &ldquo;{active.message}&rdquo;
+                </p>
+
+                <div className="flex items-center gap-5">
+                  {active.clientImage?.url ? (
+                    <img
+                      src={active.clientImage.url}
+                      alt={active.clientName}
+                      loading="lazy"
+                      className="h-16 w-16 shrink-0 rounded-full border border-white/20 object-cover shadow-2xl"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#1E293B] to-[#0F172A] border border-white/10 text-xl font-bold text-white shadow-2xl">
+                      {active.clientName?.[0]?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xl font-bold text-white tracking-wide">{active.clientName}</div>
+                    {roleLine && <div className="text-sm font-semibold tracking-wider uppercase text-[#8B93A0] mt-1">{roleLine}</div>}
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Right — large showcase image */}
-          <div className="relative min-h-[220px] md:min-h-[320px]">
-            <img
-              src={sideImageUrl}
-              alt={active.project?.title || active.clientName}
-              loading="lazy"
-              decoding="async"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(to right, rgba(10,10,15,0.55) 0%, transparent 25%), linear-gradient(to top, rgba(10,10,15,0.55) 0%, transparent 35%)',
-              }}
-            />
+          {/* Right: Image */}
+          <div className="relative h-[350px] lg:h-auto overflow-hidden rounded-r-[40px] lg:rounded-l-none rounded-b-[40px]">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={sideImageUrl}
+                src={sideImageUrl}
+                alt="Showcase"
+                initial={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-r from-[rgba(15,15,20,0.9)] via-transparent to-transparent lg:from-[rgba(15,15,20,1)] opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[rgba(15,15,20,0.95)] via-[rgba(15,15,20,0.4)] to-transparent lg:hidden" />
           </div>
+
         </div>
 
-        <div className="relative z-[1] flex items-center justify-center gap-4 border-t border-white/10 px-5 py-4 sm:px-8">
-          <button
-            type="button"
-            onClick={() => go(-1)}
-            aria-label="Previous testimonial"
-            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-[#C9CFD8] transition-colors hover:border-[#5FC1D1]/50 hover:text-[#5FC1D1]"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
-          <div className="flex items-center gap-2">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Go to testimonial ${i + 1}`}
-                className={`h-2 cursor-pointer rounded-full border-0 transition-all ${
-                  i === index ? 'w-6 bg-[#5FC1D1]' : 'w-2 bg-white/20 hover:bg-white/35'
-                }`}
-              />
-            ))}
+        {/* Controls */}
+        <div className="absolute bottom-8 right-8 z-20 flex items-center gap-6">
+          <div className="hidden sm:flex items-center gap-3 mr-6">
+             {testimonials.map((_, i) => (
+               <button
+                 key={i}
+                 onClick={() => setIndex(i)}
+                 aria-label={`Go to slide ${i + 1}`}
+                 className={`h-1.5 rounded-full transition-all duration-500 ease-out ${i === index ? 'w-10 bg-[#FFAA33] shadow-[0_0_12px_rgba(255,170,51,0.6)]' : 'w-2 bg-white/20 hover:bg-white/50'}`}
+               />
+             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => go(1)}
-            aria-label="Next testimonial"
-            className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-[#C9CFD8] transition-colors hover:border-[#5FC1D1]/50 hover:text-[#5FC1D1]"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => go(-1)}
+              aria-label="Previous"
+              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
+            >
+              <ChevronLeft size={24} className="transition-transform group-hover:-translate-x-1" />
+            </button>
+            <button
+              onClick={() => go(1)}
+              aria-label="Next"
+              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
+            >
+              <ChevronRight size={24} className="transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
