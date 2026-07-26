@@ -128,7 +128,7 @@ export const CmsAnalyticsView: React.FC = () => {
       try {
         const res = await leadService.getAnalytics();
         setAnalyticsData(res?.data || null);
-      } catch (error) {
+      } catch {
         showToast('error', 'Failed to load analytics data');
       } finally {
         setLoading(false);

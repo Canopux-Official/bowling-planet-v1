@@ -31,12 +31,6 @@ const FranchiseHero: FC<FranchiseHeroProps> = ({ valueProps }) => (
         >
           Apply now →
         </a>
-        <a
-          href="#investment"
-          className="inline-flex cursor-pointer items-center rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-[#F5F5F7] transition-colors hover:border-[#5FC1D1]/40 hover:text-[#5FC1D1]"
-        >
-          Investment models
-        </a>
       </div>
     </div>
 

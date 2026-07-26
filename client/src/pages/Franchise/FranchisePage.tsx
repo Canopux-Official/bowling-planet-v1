@@ -53,27 +53,27 @@ const FranchisePage: FC = () => {
         }}
       />
 
-      <div className="mx-auto flex max-w-[1500px] flex-col pt-20 sm:pt-24 lg:grid lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)] lg:items-start">
-        {/* Mobile: after Advantage (order-2). Desktop: left sticky column */}
-        <aside className="order-2 border-y border-white/[0.08] lg:order-1 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-20 lg:z-20 lg:h-[calc(100vh-5rem)] lg:border-y-0 lg:border-r lg:border-white/[0.08]">
+      <div className="mx-auto flex max-w-[1500px] flex-col pt-20 sm:pt-24 lg:grid lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)] lg:items-start lg:gap-8 lg:px-4">
+        {/* Mobile: after Advantage (order-2). Desktop: left column */}
+        <aside className="order-2 border-y border-white/[0.08] lg:order-1 lg:col-start-1 lg:border-y-0 lg:border-white/[0.08] lg:sticky lg:top-24 lg:h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
           <RoiCalculatorSection compact panel />
         </aside>
 
         {/* Mobile first: intro + advantage */}
-        <div className="order-1 min-w-0 lg:order-2 lg:col-start-2 lg:row-start-1">
+        <div className="order-1 min-w-0 lg:order-2 lg:col-start-2">
           <FranchiseHero valueProps={data?.valueProps || []} />
           <FranchiseWhyUs />
         </div>
+      </div>
 
-        {/* Mobile last: remaining sections */}
-        <div className="order-3 min-w-0 lg:order-2 lg:col-start-2 lg:row-start-2">
-          <FranchiseInvestment tiers={data?.investmentTiers || []} />
-          <FranchiseProcess />
-          <FranchiseOfferings />
-          <FranchiseQualifications />
-          <FranchiseFAQ faqs={data?.faqs || []} />
-          <FranchiseApply />
-        </div>
+      {/* Full-width Remaining Sections */}
+      <div className="mx-auto mt-8 w-full">
+        <FranchiseOfferings />
+        <FranchiseInvestment tiers={data?.investmentTiers || []} />
+        <FranchiseProcess />
+        <FranchiseQualifications />
+        <FranchiseFAQ faqs={data?.faqs || []} />
+        <FranchiseApply />
       </div>
     </div>
   )

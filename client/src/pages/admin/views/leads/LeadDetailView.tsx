@@ -22,7 +22,7 @@ export const LeadDetailView: React.FC = () => {
       const leadData = res?.data || res;
       setLead(leadData);
       setStatus(leadData?.status || 'New');
-    } catch (err) {
+    } catch {
       showToast('error', 'Failed to load lead details');
       navigate('/admin/leads');
     } finally {
@@ -39,7 +39,7 @@ export const LeadDetailView: React.FC = () => {
     try {
       await leadService.updateStatus(id!, newStatus);
       showToast('success', 'Lead status updated');
-    } catch (err) {
+    } catch {
       showToast('error', 'Failed to update status');
       setStatus(lead.status); // revert
     }
@@ -51,7 +51,7 @@ export const LeadDetailView: React.FC = () => {
       await leadService.delete(id!);
       showToast('success', 'Lead deleted');
       navigate('/admin/leads');
-    } catch (err) {
+    } catch {
       showToast('error', 'Failed to delete lead');
     }
   };

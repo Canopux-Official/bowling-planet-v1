@@ -216,10 +216,10 @@ const JobsPage: FC = () => {
             className="h-full w-full object-cover object-[center_40%]"
           />
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 backdrop-blur-sm"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.8) 100%), radial-gradient(ellipse 95% 75% at 70% 35%, rgba(95,193,209,0.3), transparent 75%)',
+                'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.98) 100%), radial-gradient(ellipse 95% 75% at 70% 35%, rgba(95,193,209,0.15), transparent 75%)',
             }}
           />
         </div>

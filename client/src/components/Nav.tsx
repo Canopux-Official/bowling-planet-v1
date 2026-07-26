@@ -6,6 +6,7 @@ import { useLeadTracker } from '../context/LeadTrackerContext'
 const NAV_LINKS = [
   { label: 'Home',      path: '/'          },
   { label: 'About',     path: '/about'     },
+  { label: 'Services',  path: '/services'  },
   { label: 'Projects',  path: '/projects'  },
   { label: 'Products',  path: '/products'  },
   { label: 'Careers',   path: '/careers'   },

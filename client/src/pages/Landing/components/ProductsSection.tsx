@@ -62,7 +62,6 @@ const ATTRACTION_TAGS = [
 
 const ProductsSection: FC<{ data?: any }> = ({ data }) => {
   const titleRef = useReveal()
-  const tagsRef = useReveal()
   const { state, addToEnquiry, logCTAEvent } = useLeadTracker()
   const [activeIdx, setActiveIdx] = useState<number>(0)
 
@@ -146,7 +145,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
             viewport={{ once: true }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            style={{ flex: '0 0 auto', marginTop: 12 }}
+            style={{ flex: '1 1 auto', marginTop: 12 }}
           >
             <Link
               to="/products#roi"
@@ -154,18 +153,19 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '20px 40px',
+                gap: 10,
+                padding: 'clamp(12px, 1.5vw, 20px) clamp(20px, 3vw, 40px)',
                 borderRadius: 100,
                 background: 'linear-gradient(135deg, #FFAA33 0%, #FF8C00 100%)',
                 border: 'none',
                 color: '#000',
                 textDecoration: 'none',
                 fontFamily: 'var(--font-sans)',
-                fontSize: 18,
+                fontSize: 'clamp(14px, 1.2vw, 18px)',
                 fontWeight: 800,
                 boxShadow: '0 12px 32px rgba(255,170,51,0.4)',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                whiteSpace: 'nowrap',
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 48px rgba(255,170,51,0.6), inset 0 0 0 1px rgba(255,255,255,0.5)'
@@ -174,9 +174,9 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
                 (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 32px rgba(255,170,51,0.4)'
               }}
             >
-              <BarChart size={24} />
+              <BarChart size={20} />
               View Game ROI Models
-              <ArrowRight size={22} />
+              <ArrowRight size={18} />
             </Link>
           </motion.div>
         </div>
@@ -186,8 +186,8 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
           className="distribution-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0,1fr) minmax(380px, 460px)',
-            gap: 'clamp(32px, 6vw, 80px)',
+            gridTemplateColumns: 'minmax(0,1fr) minmax(340px, 440px)',
+            gap: 'clamp(24px, 5vw, 80px)',
             alignItems: 'center',
           }}
         >
@@ -306,7 +306,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                           <span style={{
                             fontFamily: 'var(--font-data)',
-                            fontSize: 12,
+                            fontSize: 'clamp(10px, 1.5vw, 12px)',
                             fontWeight: 700,
                             color: cat.color,
                             letterSpacing: '0.1em',
@@ -315,11 +315,11 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
                             alignItems: 'center',
                             gap: 8,
                             background: `rgba(${cat.rgb},0.12)`,
-                            padding: '8px 16px',
+                            padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 2.5vw, 16px)',
                             borderRadius: 100,
                             border: `1px solid rgba(${cat.rgb},0.22)`,
                           }}>
-                            <span style={{ fontSize: 16 }}>{cat.icon}</span>
+                            <span style={{ fontSize: 'clamp(14px, 2vw, 16px)' }}>{cat.icon}</span>
                             {cat.count}
                           </span>
 
@@ -331,14 +331,14 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
                             style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 24px',
+                              gap: 6,
+                              padding: 'clamp(8px, 1.5vw, 10px) clamp(16px, 2.5vw, 24px)',
                               borderRadius: 100,
                               border: '1px solid transparent',
                               background: isAdded(cat.id) ? 'rgba(255,255,255,0.1)' : '#fff',
                               color: isAdded(cat.id) ? '#fff' : '#000',
                               fontFamily: 'var(--font-sans)',
-                              fontSize: 14,
+                              fontSize: 'clamp(12px, 1.5vw, 14px)',
                               fontWeight: 700,
                               cursor: 'pointer',
                               transition: 'all 0.2s ease',
@@ -494,9 +494,12 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
       </div>
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .distribution-grid { grid-template-columns: 1fr !important; }
           .distribution-image-card { display: none !important; }
+        }
+        @media (max-width: 640px) {
+          .distribution-grid { gap: 16px !important; }
         }
       `}</style>
     </section>

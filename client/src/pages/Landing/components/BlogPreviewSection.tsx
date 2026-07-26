@@ -184,7 +184,7 @@ const BlogPreviewSection: FC = () => {
         console.log(res)
         if (!isMounted) return
         setPosts(res.blogs.map(mapBlogToCard))
-      } catch (err) {
+      } catch {
         if (!isMounted) return
         setHasError(true)
       } finally {

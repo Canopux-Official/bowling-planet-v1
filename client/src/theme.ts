@@ -64,8 +64,8 @@ export const theme = {
   },
 
   typography: {
-    fontDisplay: "'DM Serif Display', Georgia, serif",
-    fontBody: "'DM Sans', 'Inter', -apple-system, sans-serif",
+    fontDisplay: "'Plus Jakarta Sans', sans-serif",
+    fontBody: "'Plus Jakarta Sans', sans-serif",
     fontData: "'Sora', 'Plus Jakarta Sans', sans-serif",
   },
 

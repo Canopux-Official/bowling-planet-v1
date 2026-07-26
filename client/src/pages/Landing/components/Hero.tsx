@@ -60,6 +60,8 @@ const RotatingWord: FC<{ activities?: string[] }> = ({ activities = ACTIVITIES }
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
+        paddingRight: '0.15em',
+        paddingBottom: '0.1em',
       }}
     >
       {activeActivities[idx]}
@@ -154,7 +156,8 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 64,
+        paddingTop: 112,
+        paddingBottom: 'clamp(80px, 10vh, 120px)',
         background: '#000',
       }}
     >
@@ -220,12 +223,12 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
         style={{
           width: '100%',
           maxWidth: 1300,
-          padding: '0 24px',
+          padding: 'clamp(0px, 2vw, 0px) clamp(16px, 5vw, 32px)',
           position: 'relative',
           zIndex: 1,
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-          gap: 'clamp(32px, 6vw, 72px)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: 'clamp(28px, 5vw, 72px)',
           alignItems: 'center'
         }}
       >
@@ -239,7 +242,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: 24 }}
           >
             <div style={{
-              padding: '8px 20px',
+              padding: 'clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 20px)',
               borderRadius: 100,
               background: 'rgba(95,193,209,0.12)',
               border: '1px solid rgba(95,193,209,0.4)',
@@ -258,12 +261,13 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               />
               <span style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 11,
+                fontSize: 'clamp(9px, 2.5vw, 11px)',
                 fontWeight: 800,
-                letterSpacing: '0.18em',
+                letterSpacing: 'clamp(0.08em, 1.5vw, 0.18em)',
                 textTransform: 'uppercase',
                 color: '#F5F5F7',
-                textShadow: '0 0 12px rgba(95,193,209,0.8)'
+                textShadow: '0 0 12px rgba(95,193,209,0.8)',
+                whiteSpace: 'nowrap'
               }}>
                 India's Premier FEC Authority
               </span>
@@ -277,21 +281,21 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="font-display"
             style={{
-              fontSize: 'clamp(2rem, 4.5vw, 4rem)',
-              fontWeight: 400,
+              fontSize: 'clamp(1.75rem, 3.8vw, 3.25rem)',
+              fontWeight: 800,
               lineHeight: 1.08,
               letterSpacing: '-0.02em',
               marginBottom: 0,
             }}
           >
-            <span className="text-metallic" style={{ display: 'block', fontSize: '0.6em', marginBottom: -5 }}>Consulting & Setup For</span>
+            <span style={{ display: 'block', fontSize: '0.85em', marginBottom: 8, color: '#F5F5F7', letterSpacing: '-0.01em' }}>Consulting & Setup For</span>
             <span style={{
               display: 'flex',
-              height: 'clamp(2.4rem, 5vw, 4.5rem)',
+              height: 'clamp(2rem, 4.2vw, 3.8rem)',
               overflow: 'hidden',
               alignItems: 'center',
               justifyContent: 'flex-start',
-              fontStyle: 'italic',
+              paddingTop: 4,
             }}>
               <RotatingWord activities={activeActivities} />
             </span>
@@ -304,16 +308,20 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
             style={{
               fontFamily: 'var(--font-sans)',
-              color: 'rgba(245,245,247,0.6)',
+              color: 'rgba(255,255,255,0.7)',
               fontSize: 'clamp(1rem, 1.4vw, 1.15rem)',
               lineHeight: 1.7,
-              maxWidth: 540,
-              margin: '16px 0 32px 0',
+              maxWidth: 580,
+              margin: '20px 0 36px 0',
               fontWeight: 400,
             }}
           >
-            We design, equip, and operate world-class Family Entertainment Centers —
-            end-to-end consulting backed by 17+ years and 50+ venues across India.
+            Turn your space into a{' '}
+            <span style={{ color: '#FFAA33', fontWeight: 600 }}>
+              "thriving entertainment business"
+            </span>. We provide end-to-end setup, equipment, and operations backed by{' '}
+            <span style={{ color: '#FFAA33', fontWeight: 600 }}>17+ years</span> and{' '}
+            <span style={{ color: '#FFAA33', fontWeight: 600 }}>50+ venues</span> across India.
           </motion.p>
 
           {/* Activity chips row */}
@@ -358,22 +366,23 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            style={{ display: 'flex', gap: 14, justifyContent: 'flex-start', flexWrap: 'wrap' }}
+            className="hero-cta-row"
+            style={{ display: 'flex', gap: 12, justifyContent: 'flex-start', flexWrap: 'wrap', width: '100%' }}
           >
             <MagneticButton
-              className="btn btn-primary"
+              className="btn btn-primary hero-cta-btn"
               onClick={() => { logCTAEvent('Hero: Get Free Consultation'); navigate('/contact') }}
               aria-label="Get a free FEC consultation"
-              style={{ fontSize: 15, padding: '15px 32px' }}
+              style={{ fontSize: 'clamp(13px, 1.2vw, 15px)', padding: 'clamp(12px,1.5vw,15px) clamp(20px,2.5vw,32px)', flex: '1 1 auto', maxWidth: 280, textAlign: 'center', justifyContent: 'center' }}
             >
               Get Free Consultation
             </MagneticButton>
 
             <MagneticButton
-              className="btn btn-ghost"
+              className="btn btn-ghost hero-cta-btn"
               onClick={() => { logCTAEvent('Hero: Explore Our Work'); document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' }) }}
               aria-label="View our completed projects"
-              style={{ fontSize: 15, padding: '14px 32px' }}
+              style={{ fontSize: 'clamp(13px, 1.2vw, 15px)', padding: 'clamp(11px,1.4vw,14px) clamp(20px,2.5vw,32px)', flex: '1 1 auto', maxWidth: 280, textAlign: 'center', justifyContent: 'center' }}
             >
               Explore Our Work →
             </MagneticButton>
@@ -384,13 +393,13 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.9 }}
-            style={{ display: 'flex', gap: 24, justifyContent: 'flex-start', alignItems: 'center', marginTop: 48, flexWrap: 'wrap' }}
+            style={{ display: 'flex', gap: 16, justifyContent: 'flex-start', alignItems: 'center', marginTop: 'clamp(28px,4vw,48px)', flexWrap: 'wrap' }}
           >
             <div
               title="IAAPA Member"
               style={{
-                display: 'flex', alignItems: 'center', gap: 14,
-                padding: '12px 24px', borderRadius: 16,
+                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 14px)',
+                padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 24px)', borderRadius: 16,
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.2)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -412,16 +421,16 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               <img
                 src="/partners/iaapa.svg"
                 alt="IAAPA"
-                style={{ height: 28, width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block' }}
+                style={{ height: 'clamp(20px, 4vw, 28px)', width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block' }}
               />
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 12, letterSpacing: '0.1em' }}>Member<br />Certified</div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(8.5px, 1.5vw, 10px)', color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 'clamp(8px, 1.5vw, 12px)', letterSpacing: '0.1em' }}>Member<br />Certified</div>
             </div>
 
             <div
               title="ISO 9001:2015 Certified"
               style={{
-                display: 'flex', alignItems: 'center', gap: 14,
-                padding: '12px 24px', borderRadius: 16,
+                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 14px)',
+                padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 24px)', borderRadius: 16,
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.2)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -443,9 +452,9 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               <img
                 src="/partners/iso.svg"
                 alt="ISO"
-                style={{ height: 36, width: 'auto', objectFit: 'contain', display: 'block', borderRadius: 4 }}
+                style={{ height: 'clamp(26px, 5vw, 36px)', width: 'auto', objectFit: 'contain', display: 'block', borderRadius: 4 }}
               />
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 12, letterSpacing: '0.1em' }}>9001:2015<br />Certified</div>
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(8.5px, 1.5vw, 10px)', color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 'clamp(8px, 1.5vw, 12px)', letterSpacing: '0.1em' }}>9001:2015<br />Certified</div>
             </div>
           </motion.div>
         </div>
@@ -468,7 +477,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
             border: '1px solid rgba(255,255,255,0.05)',
             borderTop: '1px solid rgba(255,255,255,0.15)',
             borderRadius: 32,
-            padding: '48px 40px',
+            padding: 'clamp(24px, 5vw, 48px) clamp(20px, 4vw, 40px)',
             boxShadow: '0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)',
             width: '100%',
             maxWidth: 480,
@@ -485,7 +494,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               color: '#5FC1D1',
               textTransform: 'uppercase',
               letterSpacing: '0.15em',
-              marginBottom: 48,
+              marginBottom: 'clamp(24px, 4vw, 48px)',
               display: 'flex',
               alignItems: 'center',
               gap: 12
@@ -494,7 +503,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               End-to-End Solutions
             </h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 36, position: 'relative' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(20px, 3vw, 36px)', position: 'relative' }}>
               {/* Vertical timeline line */}
               <div style={{ position: 'absolute', left: 15, top: 24, bottom: 24, width: 2, background: 'linear-gradient(to bottom, rgba(95,193,209,0.3) 0%, rgba(109,189,78,0.3) 50%, rgba(155,81,224,0.3) 100%)', zIndex: 0 }} />
 
@@ -527,9 +536,9 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
                     <h4 style={{ 
                       fontFamily: 'var(--font-sans)', 
                       color: '#fff', 
-                      fontSize: 18, 
+                      fontSize: 'clamp(14px, 1.5vw, 18px)', 
                       fontWeight: 700, 
-                      margin: '0 0 8px 0',
+                      margin: '0 0 6px 0',
                       letterSpacing: '-0.01em'
                     }}>
                       {item.title}
@@ -538,7 +547,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
                       style={{ 
                         fontFamily: 'var(--font-sans)', 
                         color: 'rgba(255,255,255,0.5)', 
-                        fontSize: 15, 
+                        fontSize: 'clamp(12px, 1.2vw, 15px)', 
                         margin: 0, 
                         lineHeight: 1.6,
                         transition: 'color 0.3s ease'

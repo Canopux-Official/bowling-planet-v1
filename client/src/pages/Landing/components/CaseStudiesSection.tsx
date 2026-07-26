@@ -77,7 +77,7 @@ const TestimonialCarousel: FC = () => {
         const res = await getShowcaseTestimonials({ limit: 8 })
         if (!isMounted) return
         setTestimonials(res.data)
-      } catch (err) {
+      } catch {
         if (!isMounted) return
         setHasError(true)
       } finally {
@@ -172,7 +172,7 @@ const TestimonialCarousel: FC = () => {
         <div className="relative z-[1] grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] min-h-[460px]">
           
           {/* Left: Content */}
-          <div className="flex flex-col justify-center px-8 py-14 sm:px-16 sm:py-20 relative">
+          <div className="flex flex-col justify-center px-5 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-20 relative">
             <Quote 
               size={180} 
               className="absolute top-10 left-10 text-[#5FC1D1] opacity-5 pointer-events-none transform -rotate-12"
@@ -246,7 +246,7 @@ const TestimonialCarousel: FC = () => {
         </div>
 
         {/* Controls */}
-        <div className="absolute bottom-8 right-8 z-20 flex items-center gap-6">
+        <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 z-20 flex items-center gap-4 sm:gap-6">
           <div className="hidden sm:flex items-center gap-3 mr-6">
              {testimonials.map((_, i) => (
                <button
@@ -258,20 +258,22 @@ const TestimonialCarousel: FC = () => {
              ))}
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={() => go(-1)}
               aria-label="Previous"
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
+              className="group flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
             >
-              <ChevronLeft size={24} className="transition-transform group-hover:-translate-x-1" />
+              <ChevronLeft size={18} className="sm:hidden transition-transform group-hover:-translate-x-1" />
+              <ChevronLeft size={24} className="hidden sm:block transition-transform group-hover:-translate-x-1" />
             </button>
             <button
               onClick={() => go(1)}
               aria-label="Next"
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
+              className="group flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-black hover:scale-105"
             >
-              <ChevronRight size={24} className="transition-transform group-hover:translate-x-1" />
+              <ChevronRight size={18} className="sm:hidden transition-transform group-hover:translate-x-1" />
+              <ChevronRight size={24} className="hidden sm:block transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>
@@ -363,7 +365,7 @@ const CaseStudiesSection: FC = () => {
                 className="relative cursor-pointer overflow-hidden rounded-2xl border text-left"
                 style={{
                   flex: isActive ? '3.2 1 0%' : '0.85 1 0%',
-                  minHeight: isActive ? 280 : 88,
+                  minHeight: isActive ? 360 : 88,
                   borderColor: isActive ? 'rgba(95,193,209,0.45)' : 'rgba(255,255,255,0.1)',
                   boxShadow: isActive ? '0 0 28px rgba(95,193,209,0.18)' : 'none',
                   background: '#0A0A0F',
@@ -387,7 +389,7 @@ const CaseStudiesSection: FC = () => {
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 45%, transparent 80%)',
+                      'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.7) 45%, rgba(0,0,0,0.1) 80%, transparent 100%)',
                   }}
                 />
 
@@ -407,7 +409,7 @@ const CaseStudiesSection: FC = () => {
                   <h3 className="font-display mb-3 text-[clamp(1.6rem,3vw,2.4rem)] leading-none tracking-[-0.02em] text-[#F5F5F7]">
                     {study.metric}
                   </h3>
-                  <div className="grid gap-3 rounded-xl border border-white/10 bg-black/55 p-3 sm:grid-cols-2 sm:gap-4 sm:p-4">
+                  <div className="grid gap-3 rounded-xl border border-white/20 bg-black/80 p-3 sm:grid-cols-2 sm:gap-4 sm:p-4 backdrop-blur-md">
                     <div>
                       <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-white/45">
                         Challenge

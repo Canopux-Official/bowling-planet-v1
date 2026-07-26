@@ -114,10 +114,10 @@ const BaseProductDetailsPage: FC = () => {
               />
               {/* Tweaked gradient slightly to make sure text remains readable on taller images */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 backdrop-blur-sm"
                 style={{
                   background:
-                    'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 80%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.15), transparent 55%)',
+                    'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.95) 80%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.15), transparent 55%)',
                 }}
               />
             </div>
@@ -132,8 +132,8 @@ const BaseProductDetailsPage: FC = () => {
           )}
 
           {/* Added w-full to make sure content spans properly when aligned to the bottom */}
-          <div className="relative z-[1] flex w-full flex-wrap items-end justify-between gap-4">
-            <div className="min-w-0 flex-1">
+          <div className="relative z-[1] flex w-full flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="min-w-0 w-full sm:flex-1">
               <Link
                 to="/products"
                 className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-[#A1A1A6] transition-colors hover:text-[#5FC1D1]"
@@ -161,7 +161,7 @@ const BaseProductDetailsPage: FC = () => {
             <button
               type="button"
               onClick={() => addToEnquiry({ id: categoryId, type: 'product', title: data.title })}
-              className={`inline-flex self-end cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${isAdded
+              className={`inline-flex w-full sm:w-auto justify-center sm:self-end cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${isAdded
                   ? 'border-[#6DBD4E]/45 bg-[#6DBD4E]/10 text-[#6DBD4E]'
                   : 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1] hover:bg-[#5FC1D1]/20'
                 }`}
@@ -187,7 +187,7 @@ const BaseProductDetailsPage: FC = () => {
           </div>
 
           {sortedItems.length > 0 ? (
-            <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Products in category">
+            <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar" aria-label="Products in category">
               <button
                 type="button"
                 onClick={() => setActivePill(null)}

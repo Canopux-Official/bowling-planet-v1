@@ -160,7 +160,7 @@ export const CmsHomeView: React.FC = () => {
         setLiveData(formatted);
         setEditData(formatted);
       }
-    } catch (err) {
+    } catch {
       showToast('Failed to load home page data.', 'error');
     } finally {
       setLoading(false);
@@ -172,8 +172,8 @@ export const CmsHomeView: React.FC = () => {
     try {
       const response = await projectService.getAll({ page: 1, limit: 100 });
       if (response.success) setProjects(response.data.projects);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Failed to fetch projects');
     } finally {
       setProjectsLoading(false);
     }
@@ -191,7 +191,7 @@ export const CmsHomeView: React.FC = () => {
       setEditData(saved);
       setIsEditing(false);
       showToast('Home page updated successfully!', 'success');
-    } catch (err) {
+    } catch {
       showToast('Failed to save changes. Please try again.', 'error');
     } finally {
       setSaving(false);

@@ -13,6 +13,7 @@ const STEPS = [
     desc: 'Reach out to us. We\'ll schedule a detailed discovery call to understand your vision, location, and investment appetite.',
     icon: '💬',
     color: '#5FC1D1', // Teal
+    image: '/heroes/careers-hero-studio.png',
   },
   {
     num: 2,
@@ -20,6 +21,7 @@ const STEPS = [
     desc: 'We guide you through company registrations, trade licenses, and all government approvals — hassle-free.',
     icon: '📋',
     color: '#6DBD4E', // Green
+    image: '/about/founder_silhouette.png',
   },
   {
     num: 3,
@@ -27,6 +29,7 @@ const STEPS = [
     desc: 'Sign the Letter of Intent to formalise the partnership and kickstart our full consulting engagement.',
     icon: '✍️',
     color: '#FFAA33', // Orange
+    image: '/heroes/projects-hero-wireframe.png',
   },
   {
     num: 4,
@@ -34,6 +37,7 @@ const STEPS = [
     desc: 'Our experts analyse your site for foot traffic and deliver a detailed financial projection.',
     icon: '📍',
     color: '#C084FC', // Purple
+    image: '/heroes/blogs-hero-planning-studio.png',
   },
   {
     num: 5,
@@ -41,6 +45,7 @@ const STEPS = [
     desc: 'Finalise the agreement and make the last fee installment. Your business is officially launched.',
     icon: '🤝',
     color: '#F5C542', // Yellow
+    image: '/heroes/careers-hero-studio.png',
   },
   {
     num: 6,
@@ -48,6 +53,7 @@ const STEPS = [
     desc: 'Full onboarding: game operations, staff training, marketing setup, and a punch-list for a flawless launch.',
     icon: '🎓',
     color: '#FF5A5F', // Coral Red
+    image: '/franchise/f_arcade.png',
   },
   {
     num: 7,
@@ -55,6 +61,7 @@ const STEPS = [
     desc: 'Your entertainment destination opens its doors. We remain by your side for ongoing operations and growth.',
     icon: '🎉',
     color: '#5FC1D1', // Teal
+    image: '/about/about_hero_fec.png',
   },
 ]
 
@@ -107,79 +114,91 @@ const FranchiseProcess: FC = () => {
             return (
               <div 
                 key={step.num} 
-                className="glass-card" 
+                className="glass-card group" 
                 style={{ 
                   position: 'relative', 
                   overflow: 'hidden', 
-                  padding: '20px 16px', 
                   borderRadius: 16,
                   display: 'flex',
                   flexDirection: 'column',
                   borderTop: `1px solid ${step.color}40`,
-                  background: `linear-gradient(180deg, ${step.color}05, rgba(255,255,255,0.01))`,
-                  // Make the 7th card span 2 columns on desktop so the grid looks balanced (4 top row, 3 bottom row)
+                  background: '#0A0A0F',
                   gridColumn: isLast ? 'span 2' : 'span 1',
-                  textAlign: isLast ? 'center' : 'left',
-                  alignItems: isLast ? 'center' : 'flex-start',
+                  minHeight: 320,
                 }}
               >
-                {/* Giant watermark number */}
-                <div style={{
-                  position: 'absolute',
-                  top: -20, 
-                  right: isLast ? '50%' : -10,
-                  transform: isLast ? 'translateX(50%)' : 'none',
-                  fontSize: 160,
-                  fontWeight: 900,
-                  color: `${step.color}0A`,
-                  fontFamily: theme.typography.fontDisplay,
-                  lineHeight: 1,
-                  pointerEvents: 'none',
-                  userSelect: 'none',
-                  zIndex: 0,
-                }}>
-                  0{step.num}
+                {/* Top Image */}
+                <div className="relative w-full flex-grow overflow-hidden bg-black min-h-[140px]">
+                  <img src={step.image} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 </div>
 
-                {/* Content */}
-                <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ 
-                    width: 48, 
-                    height: 48, 
-                    borderRadius: 12, 
-                    background: `${step.color}1A`, 
-                    border: `1px solid ${step.color}33`,
-                    color: step.color,
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    fontSize: 20,
-                    marginBottom: 20,
+                {/* Bottom Content */}
+                <div style={{
+                  padding: '24px 20px',
+                  position: 'relative',
+                  zIndex: 10,
+                  background: '#0A0A0F',
+                  borderTop: `1px solid ${step.color}15`,
+                  textAlign: isLast ? 'center' : 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: isLast ? 'center' : 'flex-start',
+                }}>
+                  {/* Giant watermark number */}
+                  <div style={{
+                    position: 'absolute',
+                    top: -20, 
+                    right: isLast ? '50%' : 10,
+                    transform: isLast ? 'translateX(50%)' : 'none',
+                    fontSize: 120,
+                    fontWeight: 900,
+                    color: `${step.color}08`,
+                    fontFamily: theme.typography.fontDisplay,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                    zIndex: 0,
                   }}>
-                    {step.icon}
+                    0{step.num}
                   </div>
-                  
-                  <h3 className="font-display" style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: theme.colors.text1,
-                    letterSpacing: '-0.02em',
-                    marginBottom: 12,
-                  }}>
-                    <span style={{ color: step.color, marginRight: 6 }}>{step.num}.</span>
-                    {step.title}
-                  </h3>
-                  
-                  <p style={{
-                    color: theme.colors.text2,
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                    fontFamily: theme.typography.fontBody,
-                    flex: 1,
-                    maxWidth: isLast ? 400 : 'auto',
-                  }}>
-                    {step.desc}
-                  </p>
+
+                  <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: isLast ? 'center' : 'flex-start' }}>
+                    <div style={{ 
+                      width: 40, 
+                      height: 40, 
+                      borderRadius: 10, 
+                      background: `${step.color}1A`, 
+                      border: `1px solid ${step.color}33`,
+                      color: step.color,
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      fontSize: 18,
+                      marginBottom: 16,
+                    }}>
+                      {step.icon}
+                    </div>
+
+                    <h3 className="font-display" style={{
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: theme.colors.text1,
+                      letterSpacing: '-0.01em',
+                      marginBottom: 8,
+                    }}>
+                      {step.title}
+                    </h3>
+                    
+                    <p style={{
+                      fontSize: 13,
+                      color: theme.colors.text2,
+                      fontFamily: theme.typography.fontBody,
+                      lineHeight: 1.5,
+                      maxWidth: 280,
+                    }}>
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
               </div>
             )

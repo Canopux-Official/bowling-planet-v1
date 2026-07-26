@@ -96,33 +96,36 @@ const ForgotPasswordPage: FC = () => {
     <>
       <AuthOverlay loading={loading} />
 
-      <div style={{
+      <div className="flex flex-col lg:flex-row min-h-screen" style={{
         background: '#090b10',
         transition: 'background 0.5s ease',
-        minHeight: '100vh',
-        display: 'flex'
       }}>
 
         {/* ── Left Side: Brand ──────────────────────── */}
         <AuthHero role="SuperAdmin" type="login" />
 
         {/* ── Right Side: Form ──────────────────────── */}
-        <div className="auth-form-side" style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px',
-          position: 'relative',
+        <div className="auth-form-side flex-1 flex flex-col items-center justify-center p-6 relative" style={{
           background: `radial-gradient(circle at center, ${activeColorRgba} 0%, rgba(20,20,24,0.9) 60%, #000 100%)`,
         }}>
 
-          <div ref={containerRef} className="reveal" style={{
-            width: '100%',
-            maxWidth: 480,
-            padding: '48px',
-            borderRadius: 24,
+          {/* Mobile Logo (hidden on desktop) */}
+          <div className="auth-mobile-logo block lg:hidden text-center mb-10 mt-8">
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, textDecoration: 'none', marginBottom: 16 }}>
+              <img src="/logo.avif" alt="Bowling Planet" style={{ height: 52, width: 'auto' }} />
+              <span style={{
+                fontFamily: theme.typography.fontDisplay,
+                fontWeight: 800,
+                fontSize: 24,
+                letterSpacing: '-0.02em',
+                color: theme.colors.text1,
+              }}>
+                Bowling Planet
+              </span>
+            </Link>
+          </div>
+
+          <div ref={containerRef} className="reveal w-full max-w-[480px] p-6 md:p-12 rounded-3xl" style={{
             background: 'rgba(255,255,255,0.02)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -185,7 +188,7 @@ const ForgotPasswordPage: FC = () => {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
                   disabled={loading}
                 >
-                  {loading || !captchaToken ? 'Sending OTP...' : 'Send Recovery OTP'}
+                  {loading ? 'Sending OTP...' : 'Send Recovery OTP'}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: 24 }}>

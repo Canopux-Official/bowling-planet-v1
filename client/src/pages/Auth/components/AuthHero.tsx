@@ -12,14 +12,7 @@ export const AuthHero: React.FC<AuthHeroProps> = ({ role, type }) => {
   const activeColorRgba = role === 'SuperAdmin' ? 'rgba(95,193,209,0.2)' : 'rgba(74,222,128,0.2)';
 
   return (
-    <div className="auth-brand-side" style={{
-      flex: 1,
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '60px',
-      overflow: 'hidden',
+    <div className="auth-brand-side hidden lg:flex relative flex-1 flex-col justify-center p-[60px] overflow-hidden" style={{
       borderRight: `1px solid ${theme.colors.border}`,
     }}>
       {/* Brand Logo - Top Left */}

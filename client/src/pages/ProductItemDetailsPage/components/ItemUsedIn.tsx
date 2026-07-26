@@ -45,7 +45,7 @@ const ItemUsedIn: FC<ItemUsedInProps> = ({ usedIn }) => {
                 ) : null}
 
                 {rest.length > 0 ? (
-                  <div className="flex gap-2 overflow-x-auto">
+                  <div className="flex gap-2 overflow-x-auto hide-scrollbar">
                     {rest.map((media, i) => (
                       <div
                         key={`${media.url}-${i}`}

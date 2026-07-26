@@ -7,16 +7,16 @@ import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
 
 const MAJOR_ATTRACTIONS = [
-  { id: '01', label: 'Bowling Infrastructure', desc: 'Professional lanes, string pinsetters, and premium ball returns. The ultimate anchor attraction.', size: 'large', color: '#5FC1D1' }, // Teal
-  { id: '02', label: 'Arcade & Simulators', desc: 'Next-gen video cabinets and multiplayer racing simulators.', size: 'wide', color: '#6DBD4E' }, // Green
-  { id: '03', label: 'Virtual Reality', desc: 'Immersive free-roam arenas and interactive VR pods.', size: 'tall', color: '#5FC1D1' }, // Teal
-  { id: '04', label: 'Redemption', desc: 'Ticket-based skill games driving high replay value.', size: 'standard', color: '#FFAA33' }, // Orange
-  { id: '05', label: 'Prize Vending', desc: 'High-ROI automated merchandisers.', size: 'standard', color: '#C084FC' }, // Purple
-  { id: '06', label: 'Toddler Zones', desc: 'Safe, engaging soft play and interactive kiddie rides.', size: 'standard', color: '#6DBD4E' }, // Green
-  { id: '07', label: 'Carnival Attractions', desc: 'Classic midway games reimagined for modern FECs.', size: 'standard', color: '#FFAA33' }, // Orange
-  { id: '08', label: 'Cashless Systems', desc: 'End-to-end facility management and debit card readers.', size: 'wide', color: '#C084FC' }, // Purple
-  { id: '09', label: 'Pre-Owned Hardware', desc: 'Fully refurbished, certified premium machines.', size: 'standard', color: '#5FC1D1' }, // Teal
-  { id: '10', label: 'Spares & Support', desc: 'Lifetime operational backing and technical parts.', size: 'standard', color: '#6DBD4E' }, // Green
+  { id: '01', label: 'Bowling Infrastructure', desc: 'Professional lanes, string pinsetters, and premium ball returns. The ultimate anchor attraction.', size: 'large', color: '#5FC1D1', image: '/franchise/f_bowling.png' },
+  { id: '02', label: 'Arcade & Simulators', desc: 'Next-gen video cabinets and multiplayer racing simulators.', size: 'wide', color: '#6DBD4E', image: '/franchise/f_arcade.png' },
+  { id: '03', label: 'Virtual Reality', desc: 'Immersive free-roam arenas and interactive VR pods.', size: 'tall', color: '#5FC1D1', image: '/franchise/f_vr.png' },
+  { id: '04', label: 'Redemption', desc: 'Ticket-based skill games driving high replay value.', size: 'standard', color: '#FFAA33', image: '/franchise/f_redemption.png' },
+  { id: '05', label: 'Prize Vending', desc: 'High-ROI automated merchandisers.', size: 'standard', color: '#C084FC', image: '/franchise/f_vending.png' },
+  { id: '06', label: 'Toddler Zones', desc: 'Safe, engaging soft play and interactive kiddie rides.', size: 'standard', color: '#6DBD4E', image: '/about/gallery_trampoline.png' },
+  { id: '07', label: 'Carnival Attractions', desc: 'Classic midway games reimagined for modern FECs.', size: 'standard', color: '#FFAA33', image: '/about/gallery_lasertag.png' },
+  { id: '08', label: 'Cashless Systems', desc: 'End-to-end facility management and debit card readers.', size: 'wide', color: '#C084FC', image: '/about/gallery_arcade.png' },
+  { id: '09', label: 'Pre-Owned Hardware', desc: 'Fully refurbished, certified premium machines.', size: 'standard', color: '#5FC1D1', image: '/about/gallery_gokart.png' },
+  { id: '10', label: 'Spares & Support', desc: 'Lifetime operational backing and technical parts.', size: 'standard', color: '#6DBD4E', image: '/about/about_hero_fec.png' },
 ]
 
 const OTHER_HORIZONS = [
@@ -78,70 +78,71 @@ const FranchiseOfferings: FC = () => {
                   key={item.id}
                   className={`bento-item ${item.size}`}
                   style={{
-                    padding: isWide ? '20px' : '20px',
                     borderRadius: 16,
-                    background: `linear-gradient(180deg, ${item.color}05, rgba(255,255,255,0.01))`,
+                    background: '#0A0A0F',
                     border: `1px solid ${item.color}15`,
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between',
                     position: 'relative',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
+                    minHeight: isLarge ? 400 : (isTall ? 300 : 250),
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = `linear-gradient(180deg, ${item.color}0A, rgba(255,255,255,0.02))`;
                     (e.currentTarget as HTMLElement).style.borderColor = `${item.color}30`;
                     (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
                     (e.currentTarget as HTMLElement).style.boxShadow = `0 10px 30px ${item.color}10`;
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = `linear-gradient(180deg, ${item.color}05, rgba(255,255,255,0.01))`;
                     (e.currentTarget as HTMLElement).style.borderColor = `${item.color}15`;
                     (e.currentTarget as HTMLElement).style.transform = 'none';
                     (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                   }}
                 >
-                  {/* Subtle top accent line */}
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${item.color}, transparent)` }} />
-                  
-                  <div style={{ 
-                    fontFamily: theme.typography.fontDisplay,
-                    fontWeight: 400,
-                    fontSize: 14,
-                    color: item.color,
-                    marginBottom: 24,
-                    letterSpacing: '0.05em',
-                    opacity: 0.8
-                  }}>
-                    {item.id}
+                  <div className="relative w-full flex-grow overflow-hidden bg-black">
+                    <img src={item.image} alt={item.label} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>
+
+                  {/* Subtle top accent line */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${item.color}, transparent)`, zIndex: 10 }} />
                   
-                  <div>
-                    <div style={{
+                  <div style={{ padding: '20px', background: '#0A0A0F', position: 'relative', zIndex: 10, borderTop: `1px solid ${item.color}15` }}>
+                    <div style={{ 
                       fontFamily: theme.typography.fontDisplay,
                       fontWeight: 600,
-                      fontSize: isLarge ? 32 : (isWide ? 22 : 18),
-                      color: theme.colors.text1,
-                      lineHeight: 1.2,
-                      letterSpacing: '-0.02em',
-                      marginBottom: 10,
+                      fontSize: 12,
+                      color: item.color,
+                      marginBottom: 6,
+                      letterSpacing: '0.1em',
                     }}>
-                      {item.label}
+                      {item.id}
                     </div>
                     
-                    {/* Only show description on larger cards to keep small cards ultra-clean */}
-                    {(isLarge || isWide || isTall) && (
-                      <div style={{ 
-                        color: theme.colors.text2, 
-                        fontSize: 14, 
-                        fontFamily: theme.typography.fontBody,
-                        lineHeight: 1.6,
-                        maxWidth: isLarge ? '80%' : '100%'
+                    <div>
+                      <div style={{
+                        fontFamily: theme.typography.fontDisplay,
+                        fontWeight: 600,
+                        fontSize: isLarge ? 28 : (isWide ? 22 : 18),
+                        color: theme.colors.text1,
+                        lineHeight: 1.2,
+                        letterSpacing: '-0.02em',
+                        marginBottom: (isLarge || isWide || isTall) ? 10 : 0,
                       }}>
-                        {item.desc}
+                        {item.label}
                       </div>
-                    )}
+                      
+                      {/* Only show description on larger cards to keep small cards ultra-clean */}
+                      {(isLarge || isWide || isTall) && (
+                        <div style={{ 
+                          color: theme.colors.text2, 
+                          fontSize: 14, 
+                          fontFamily: theme.typography.fontBody,
+                          lineHeight: 1.6,
+                        }}>
+                          {item.desc}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

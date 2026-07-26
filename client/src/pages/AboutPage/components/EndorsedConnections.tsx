@@ -15,7 +15,7 @@ const EndorsedConnections: FC = () => (
   <section aria-labelledby="about-partners-heading" className="border-t border-white/[0.08] pt-10">
     <div className="mb-4 flex items-center gap-2">
       <Network size={16} className="text-[#5FC1D1]" />
-      <h2 id="about-partners-heading" className="font-display text-base font-bold text-[#F5F5F7]">
+      <h2 id="about-partners-heading" className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
         Industry network
       </h2>
     </div>

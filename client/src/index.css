@@ -23,7 +23,8 @@
   /* logo green */
   --teal-mid: #4AAFBF;
   --green-mid: #58A83E;
-  --amber: #FFAA33;  /* consulting authority accent */
+  --amber: #FFAA33;
+  /* consulting authority accent */
 
   /* ── Radiant Glows (for orbs) ─────────── */
   --glow-teal: rgba(95, 193, 209, 0.14);
@@ -43,10 +44,10 @@
   --border-chalk: rgba(0, 0, 0, 0.08);
 
   /* ── Typography ───────────────────────── */
-  --font-serif: 'DM Serif Display', Georgia, serif;
-  --font-sans: 'DM Sans', 'Inter', -apple-system, sans-serif;
-  --font-display: 'DM Serif Display', Georgia, serif;
-  --font-body: 'DM Sans', 'Inter', -apple-system, sans-serif;
+  --font-serif: 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
   --font-data: 'Sora', 'Plus Jakarta Sans', sans-serif;
 
   /* ── Easing ───────────────────────────── */
@@ -62,6 +63,7 @@
   unlayered CSS wins over @layer utilities in the cascade.
 */
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -96,7 +98,8 @@
     overflow-x: clip;
   }
 
-  img, video {
+  img,
+  video {
     max-width: 100%;
   }
 
@@ -126,107 +129,7 @@
   font-family: var(--font-serif);
 }
 
-/* Catalogue / listing / detail pages — Plus Jakarta Sans everywhere (incl. .font-display) */
-.products-catalogue,
-.products-catalogue .font-display,
-.products-catalogue .label,
-.products-catalogue button,
-.products-catalogue input,
-.products-catalogue select,
-.products-catalogue a,
-.products-catalogue p,
-.products-catalogue h1,
-.products-catalogue h2,
-.products-catalogue h3,
-.products-catalogue h4,
-.products-catalogue li,
-.products-catalogue span,
-.base-product-details-page,
-.base-product-details-page .font-display,
-.base-product-details-page .label,
-.base-product-details-page button,
-.base-product-details-page input,
-.base-product-details-page select,
-.base-product-details-page a,
-.base-product-details-page p,
-.base-product-details-page h1,
-.base-product-details-page h2,
-.base-product-details-page h3,
-.base-product-details-page h4,
-.base-product-details-page li,
-.base-product-details-page span,
-.product-item-details-page,
-.product-item-details-page .font-display,
-.product-item-details-page .label,
-.product-item-details-page button,
-.product-item-details-page input,
-.product-item-details-page select,
-.product-item-details-page a,
-.product-item-details-page p,
-.product-item-details-page h1,
-.product-item-details-page h2,
-.product-item-details-page h3,
-.product-item-details-page h4,
-.product-item-details-page li,
-.product-item-details-page span,
-.projects-catalogue,
-.projects-catalogue .font-display,
-.projects-catalogue .label,
-.projects-catalogue button,
-.projects-catalogue input,
-.projects-catalogue select,
-.projects-catalogue a,
-.projects-catalogue p,
-.projects-catalogue h1,
-.projects-catalogue h2,
-.projects-catalogue h3,
-.projects-catalogue h4,
-.projects-catalogue li,
-.projects-catalogue span,
-.project-details-page,
-.project-details-page .font-display,
-.project-details-page .label,
-.project-details-page button,
-.project-details-page input,
-.project-details-page select,
-.project-details-page a,
-.project-details-page p,
-.project-details-page h1,
-.project-details-page h2,
-.project-details-page h3,
-.project-details-page h4,
-.project-details-page li,
-.project-details-page span,
-.insights-catalogue,
-.insights-catalogue .font-display,
-.insights-catalogue .label,
-.insights-catalogue button,
-.insights-catalogue input,
-.insights-catalogue select,
-.insights-catalogue a,
-.insights-catalogue p,
-.insights-catalogue h1,
-.insights-catalogue h2,
-.insights-catalogue h3,
-.insights-catalogue h4,
-.insights-catalogue li,
-.insights-catalogue span,
-.jobs-catalogue,
-.jobs-catalogue .font-display,
-.jobs-catalogue .label,
-.jobs-catalogue button,
-.jobs-catalogue input,
-.jobs-catalogue select,
-.jobs-catalogue a,
-.jobs-catalogue p,
-.jobs-catalogue h1,
-.jobs-catalogue h2,
-.jobs-catalogue h3,
-.jobs-catalogue h4,
-.jobs-catalogue li,
-.jobs-catalogue span {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
+
 
 .font-sans {
   font-family: var(--font-sans);
@@ -253,7 +156,7 @@
 /* Match "Immersive Experiences" section-heading style across the home page */
 .landing-page .landing-section-heading {
   font-family: var(--font-serif) !important;
-  font-weight: 400 !important;
+  font-weight: 800 !important;
   color: #fff;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -527,8 +430,8 @@
   gap: 6px;
   width: 100%;
   padding: 12px;
-  background-color: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: #fff;
   font-size: 13px;
@@ -539,8 +442,8 @@
 }
 
 .btn-enquiry:hover {
-  background-color: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn-enquiry:active {
@@ -548,20 +451,28 @@
 }
 
 @keyframes popInBtn {
-  0% { transform: scale(0.9); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .btn-enquiry.added {
-  background-color: rgba(109,189,78,0.15);
+  background-color: rgba(109, 189, 78, 0.15);
   border-color: #6DBD4E;
   color: #6DBD4E;
   animation: popInBtn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .btn-enquiry.added:hover {
-  background-color: rgba(109,189,78,0.25);
+  background-color: rgba(109, 189, 78, 0.25);
   transform: scale(1.02);
 }
 
@@ -767,8 +678,15 @@
 
 /* ── Count-up animation (CSS only fallback) */
 @keyframes count-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Flip card ────────────────────────── */
@@ -873,6 +791,7 @@
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -992,7 +911,7 @@ body.nav-drawer-open .floating-widget {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   background: transparent;
   cursor: pointer;
   transition: all 0.3s var(--ease-out);
@@ -1002,15 +921,15 @@ body.nav-drawer-open .floating-widget {
 .section-nav-dot.active {
   background: var(--teal);
   border-color: var(--teal);
-  box-shadow: 0 0 8px rgba(95,193,209,0.6);
+  box-shadow: 0 0 8px rgba(95, 193, 209, 0.6);
   width: 8px;
   height: 20px;
   border-radius: 4px;
 }
 
 .section-nav-dot:hover:not(.active) {
-  border-color: rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* ═══════════════════════════════════════════
@@ -1184,4 +1103,22 @@ body.nav-drawer-open .floating-widget {
   .trusted-label {
     font-size: 10px !important;
   }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
 }

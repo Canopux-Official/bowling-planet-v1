@@ -141,10 +141,10 @@ const ProjectDetailsPage: FC = () => {
                 className="h-full w-full object-cover object-center"
               />
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 backdrop-blur-sm"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 48%, rgba(0,0,0,0.55) 100%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.2), transparent 55%)',
+                    'linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.85) 48%, rgba(0,0,0,0.75) 100%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.15), transparent 55%)',
                 }}
               />
             </div>
@@ -158,8 +158,8 @@ const ProjectDetailsPage: FC = () => {
             />
           )}
 
-          <div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
+          <div className="relative z-[1] flex w-full flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="min-w-0 w-full sm:flex-1">
               <Link
                 to="/projects"
                 className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-[#A1A1A6] transition-colors hover:text-[#5FC1D1]"
@@ -186,7 +186,7 @@ const ProjectDetailsPage: FC = () => {
             <button
               type="button"
               onClick={() => addToEnquiry({ id: projectId, type: 'project', title: project.title })}
-              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${
+              className={`inline-flex w-full sm:w-auto justify-center sm:justify-start cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${
                 isAdded
                   ? 'border-[#6DBD4E]/45 bg-[#6DBD4E]/10 text-[#6DBD4E]'
                   : 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1] hover:bg-[#5FC1D1]/20'
@@ -200,7 +200,7 @@ const ProjectDetailsPage: FC = () => {
 
         {/* Section pills */}
         {navItems.length > 0 ? (
-          <div className="mb-6 flex gap-2 overflow-x-auto pb-1" aria-label="Project sections">
+          <div className="mb-6 flex gap-2 overflow-x-auto pb-1 hide-scrollbar" aria-label="Project sections">
             {navItems.map((item) => (
               <a
                 key={item.id}

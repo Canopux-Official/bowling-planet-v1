@@ -55,7 +55,7 @@ const StatChip: FC<{
       onMouseLeave={() => setTilted(false)}
       style={{
         textAlign: 'center',
-        padding: 'clamp(20px, 4vw, 28px) clamp(12px, 3vw, 20px)',
+        padding: 'clamp(12px, 3vw, 28px) clamp(8px, 2vw, 20px)',
         flex: 1,
         minWidth: 0,
         borderRight: '1px solid rgba(255,255,255,0.1)',
@@ -77,7 +77,7 @@ const StatChip: FC<{
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: delay / 1000 }}
         style={{
           fontFamily: 'var(--font-data)',
-          fontSize: 'clamp(2rem, 4vw, 3rem)',
+          fontSize: 'clamp(1.75rem, 5vw, 3rem)',
           fontWeight: 800,
           letterSpacing: '-0.04em',
           color: '#F5F5F7',
@@ -93,7 +93,7 @@ const StatChip: FC<{
       </motion.div>
       <div style={{
         fontFamily: 'var(--font-sans)',
-        fontSize: 12,
+        fontSize: 'clamp(9.5px, 2.5vw, 12px)',
         fontWeight: 600,
         letterSpacing: '0.1em',
         textTransform: 'uppercase',

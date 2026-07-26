@@ -129,25 +129,18 @@ const SignupPage: FC = () => {
     <>
       <AuthOverlay loading={loading} message="Processing Request..." />
 
-      <div style={{ background: theme.colors.void, minHeight: '100vh', display: 'flex' }}>
+      <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: theme.colors.void }}>
 
         {/* ── Left Side: Brand (Desktop Only) ──────────────────────── */}
         <AuthHero role="Admin" type="signup" />
 
         {/* ── Right Side: Form ──────────────────────── */}
-        <div className="auth-form-side" style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px',
-          position: 'relative',
+        <div className="auth-form-side flex-1 flex flex-col items-center justify-center p-6 relative" style={{
           background: 'radial-gradient(circle at center, rgba(26,26,36,0.5) 0%, #000 100%)'
         }}>
 
           {/* Mobile Logo (hidden on desktop) */}
-          <div className="auth-mobile-logo" style={{ marginBottom: 40, display: 'none', textAlign: 'center' }}>
+          <div className="auth-mobile-logo block lg:hidden text-center mb-10 mt-8">
             <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, textDecoration: 'none', marginBottom: 16 }}>
               <img src="/logo.avif" alt="Bowling Planet" style={{ height: 52, width: 'auto' }} />
               <span style={{
@@ -172,11 +165,7 @@ const SignupPage: FC = () => {
             </div>
           </div>
 
-          <div ref={containerRef} className="reveal" style={{
-            width: '100%',
-            maxWidth: 480,
-            padding: '48px',
-            borderRadius: 24,
+          <div ref={containerRef} className="reveal w-full max-w-[480px] p-6 md:p-12 rounded-3xl" style={{
             background: 'rgba(255,255,255,0.02)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
@@ -293,7 +282,7 @@ const SignupPage: FC = () => {
                 }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
-                  disabled={loading || !captchaToken}
+                  disabled={loading}
                 >
                   {loading ? 'Creating...' : 'Create Account'}
                 </button>

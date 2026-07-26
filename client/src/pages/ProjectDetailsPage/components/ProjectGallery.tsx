@@ -40,7 +40,7 @@ const ProjectGallery: FC<ProjectGalleryProps> = ({ media }) => {
         </button>
 
         {media.length > 1 ? (
-          <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Select media">
+          <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar" role="tablist" aria-label="Select media">
             {media.map((item, i) => (
               <button
                 key={`${item.url}-${i}`}

@@ -67,18 +67,10 @@ const AboutSection: FC = () => {
 
         {/* ── Section Heading ──────────────────────────────────── */}
         <div ref={titleRef} className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '5px 14px', borderRadius: 100,
-            border: '1.5px solid rgba(95,193,209,0.3)',
-            background: 'rgba(95,193,209,0.08)',
-            marginBottom: 24,
-          }}>
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5FC1D1' }}>
-              About
-            </span>
-          </div>
-          <h2 className="font-display landing-section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)' }}>
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#5FC1D1]">
+            About
+          </p>
+          <h2 className="font-display landing-section-heading text-[clamp(1.75rem,3.5vw,2.75rem)]" style={{ margin: 0 }}>
             Our Story.
           </h2>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: 17, color: 'rgba(245,245,247,0.6)', marginTop: 16, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.7 }}>
@@ -209,8 +201,8 @@ const AboutSection: FC = () => {
                   </motion.div>
                 </div>
                 <div style={{ marginTop: 16, borderTop: '1px solid rgba(95,193,209,0.15)', paddingTop: 16 }}>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 14, color: '#F5F5F7' }}>Ranjith Pillai</p>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#5FC1D1', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Founder & Managing Director</p>
+                  <p className="font-display" style={{ fontSize: 18, color: '#F5F5F7', margin: 0, marginBottom: 4 }}>Ranjith Pillai</p>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#5FC1D1', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', margin: 0 }}>Founder & Managing Director</p>
                 </div>
               </div>
             </button>
@@ -230,9 +222,9 @@ const AboutSection: FC = () => {
                     transition: 'border-color 0.25s ease',
                   }}
                 >
-                  <div style={{ fontSize: 20, marginBottom: 8 }}>{vp.icon}</div>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 700, color: '#F5F5F7', marginBottom: 4 }}>{vp.title}</div>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'rgba(245,245,247,0.6)', lineHeight: 1.5 }}>{vp.desc}</div>
+                  <div style={{ fontSize: 24, marginBottom: 8 }}>{vp.icon}</div>
+                  <div className="font-display" style={{ fontSize: 18, color: '#F5F5F7', marginBottom: 4 }}>{vp.title}</div>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, color: 'rgba(245,245,247,0.7)', lineHeight: 1.6 }}>{vp.desc}</div>
                 </motion.div>
               ))}
             </div>

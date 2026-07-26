@@ -33,7 +33,7 @@ const ItemGallery: FC<ItemGalleryProps> = ({ thumbnail, gallery, title }) => {
       </button>
 
       {allMedia.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Select image">
+        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar" role="tablist" aria-label="Select image">
           {allMedia.map((media, i) => (
             <button
               key={`${media.url}-${i}`}

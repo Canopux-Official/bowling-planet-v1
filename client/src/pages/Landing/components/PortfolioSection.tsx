@@ -480,7 +480,7 @@ const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
         const res = await getAllProjects({ page: 1, limit: 4 })
         if (!isMounted) return
         setFetchedProjects(res.projects.map(mapProjectToCard))
-      } catch (err) {
+      } catch {
         if (!isMounted) return
         setHasError(true)
       } finally {
@@ -603,141 +603,186 @@ const PortfolioSection: FC<{ data?: { projectIds: any[] } }> = ({ data }) => {
         ) : filtered.length === 0 || !active ? (
           <p className="py-10 text-center text-sm text-[#86868B]">No projects in this category yet.</p>
         ) : (
-          <div
-            className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] lg:gap-5"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            {/* Project list */}
-            <div
-              className="flex max-h-[420px] flex-col gap-2 overflow-y-auto pr-1 lg:max-h-[480px]"
-              role="listbox"
-              aria-label="Projects"
-            >
-              <AnimatePresence mode="popLayout">
-                {filtered.map((project, i) => {
-                  const isActive = project.id === active.id
-                  return (
-                    <motion.button
-                      key={project.id}
-                      type="button"
-                      role="option"
-                      aria-selected={isActive}
-                      layout={!reduced}
-                      initial={reduced ? false : { opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.25, delay: reduced ? 0 : Math.min(i * 0.04, 0.2) }}
-                      onMouseEnter={() => setActiveId(project.id)}
-                      onFocus={() => setActiveId(project.id)}
-                      onClick={() => {
-                        setActiveId(project.id)
-                        openProject(project)
-                      }}
-                      className="group relative flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border px-3.5 py-3 text-left transition-colors duration-300"
-                      style={{
-                        borderColor: isActive ? 'rgba(95,193,209,0.45)' : 'rgba(255,255,255,0.1)',
-                        background: isActive ? 'rgba(95,193,209,0.1)' : 'rgba(17,17,24,0.9)',
-                      }}
-                    >
-                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#0A0A0F]">
-                        <ProjectImage
-                          src={project.image}
-                          alt=""
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 flex items-center gap-2">
-                          <span className="font-[family-name:var(--font-data)] text-[11px] font-bold tracking-wider text-[#5FC1D1]/80">
-                            {String(i + 1).padStart(2, '0')}
-                          </span>
-                          <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#A1A1A6]">
-                            {project.category}
-                          </span>
-                        </div>
-                        <h3
-                          className={`truncate text-[15px] font-bold leading-snug transition-colors ${
-                            isActive ? 'text-[#5FC1D1]' : 'text-[#F5F5F7] group-hover:text-[#5FC1D1]'
-                          }`}
-                        >
-                          {project.name}
-                        </h3>
-                        <p className="mt-0.5 flex items-center gap-1 text-xs text-[#86868B]">
-                          <MapPin size={11} />
-                          {project.location}
-                        </p>
-                      </div>
-                      <ArrowUpRight
-                        size={16}
-                        className={`shrink-0 transition-all duration-300 ${
-                          isActive
-                            ? 'text-[#5FC1D1] translate-x-0 opacity-100'
-                            : 'translate-x-1 text-white/30 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
-                        }`}
-                      />
-                      {isActive && (
-                        <motion.span
-                          layoutId={reduced ? undefined : 'portfolio-active-bar'}
-                          className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-[#5FC1D1]"
-                        />
-                      )}
-                    </motion.button>
-                  )
-                })}
-              </AnimatePresence>
-            </div>
-
-            {/* Preview stage */}
-            <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0F] sm:min-h-[340px] lg:min-h-[480px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.id}
-                  initial={reduced ? false : { opacity: 0, scale: 1.02 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.99 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute inset-0"
+          <>
+            {/* Mobile View: Horizontal Carousel */}
+            <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory lg:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {filtered.map((project) => (
+                <div 
+                  key={project.id} 
+                  className="relative flex-shrink-0 w-[85vw] sm:w-[320px] min-h-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0F] snap-center"
                 >
                   <ProjectImage
-                    src={active.image}
-                    alt={active.name}
-                    className="h-full w-full object-cover"
+                    src={project.image}
+                    alt={project.name}
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
+                  
+                  <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
                     <div className="mb-3 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-[#5FC1D1]/40 bg-[#5FC1D1]/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#5FC1D1]">
-                        {active.category}
+                      <span className="rounded-full border border-[#5FC1D1]/40 bg-[#5FC1D1]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#5FC1D1] backdrop-blur-md">
+                        {project.category}
                       </span>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] font-medium text-[#E8E8ED] backdrop-blur-sm">
-                        <MapPin size={11} />
-                        {active.location}
+                      <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[10px] font-medium text-[#E8E8ED] backdrop-blur-md">
+                        <MapPin size={10} />
+                        {project.location}
                       </span>
                     </div>
-                    <h3 className="font-display mb-2 text-[clamp(1.35rem,2.5vw,2rem)] font-bold leading-tight text-[#F5F5F7]">
-                      {active.name}
+                    <h3 className="font-display mb-2 text-2xl font-bold leading-tight text-[#F5F5F7]">
+                      {project.name}
                     </h3>
-                    {active.description && (
-                      <p className="mb-4 line-clamp-2 max-w-xl text-sm leading-relaxed text-white/70">
-                        {active.description}
-                      </p>
-                    )}
                     <button
                       type="button"
                       onClick={() => {
-                        logCTAEvent(`Portfolio: ${active.name}`)
-                        openProject(active)
+                        logCTAEvent(`Portfolio Mobile: ${project.name}`)
+                        openProject(project)
                       }}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#5FC1D1] px-4 py-2.5 text-sm font-bold text-black transition-transform hover:scale-[1.02]"
+                      className="mt-3 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-[#5FC1D1] px-4 py-2.5 text-xs font-bold text-black transition-transform hover:scale-[1.02]"
                     >
                       View project <ArrowRight size={14} />
                     </button>
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                </div>
+              ))}
             </div>
-          </div>
+
+            {/* Desktop View: Interactive List + Preview */}
+            <div
+              className="hidden lg:grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] gap-5"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+            >
+              {/* Project list */}
+              <div
+                className="flex max-h-[480px] flex-col gap-2 overflow-y-auto pr-1"
+                role="listbox"
+                aria-label="Projects"
+              >
+                <AnimatePresence mode="popLayout">
+                  {filtered.map((project, i) => {
+                    const isActive = project.id === active.id
+                    return (
+                      <motion.button
+                        key={project.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isActive}
+                        layout={!reduced}
+                        initial={reduced ? false : { opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.25, delay: reduced ? 0 : Math.min(i * 0.04, 0.2) }}
+                        onMouseEnter={() => setActiveId(project.id)}
+                        onFocus={() => setActiveId(project.id)}
+                        onClick={() => {
+                          setActiveId(project.id)
+                          openProject(project)
+                        }}
+                        className="group relative flex w-full cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border px-3.5 py-3 text-left transition-colors duration-300"
+                        style={{
+                          borderColor: isActive ? 'rgba(95,193,209,0.45)' : 'rgba(255,255,255,0.1)',
+                          background: isActive ? 'rgba(95,193,209,0.1)' : 'rgba(17,17,24,0.9)',
+                        }}
+                      >
+                        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#0A0A0F]">
+                          <ProjectImage
+                            src={project.image}
+                            alt=""
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center gap-2">
+                            <span className="font-[family-name:var(--font-data)] text-[11px] font-bold tracking-wider text-[#5FC1D1]/80">
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#A1A1A6]">
+                              {project.category}
+                            </span>
+                          </div>
+                          <h3
+                            className={`truncate text-[15px] font-bold leading-snug transition-colors ${
+                              isActive ? 'text-[#5FC1D1]' : 'text-[#F5F5F7] group-hover:text-[#5FC1D1]'
+                            }`}
+                          >
+                            {project.name}
+                          </h3>
+                          <p className="mt-0.5 flex items-center gap-1 text-xs text-[#86868B]">
+                            <MapPin size={11} />
+                            {project.location}
+                          </p>
+                        </div>
+                        <ArrowUpRight
+                          size={16}
+                          className={`shrink-0 transition-all duration-300 ${
+                            isActive
+                              ? 'text-[#5FC1D1] translate-x-0 opacity-100'
+                              : 'translate-x-1 text-white/30 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
+                          }`}
+                        />
+                        {isActive && (
+                          <motion.span
+                            layoutId={reduced ? undefined : 'portfolio-active-bar'}
+                            className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-[#5FC1D1]"
+                          />
+                        )}
+                      </motion.button>
+                    )
+                  })}
+                </AnimatePresence>
+              </div>
+
+              {/* Preview stage */}
+              <div className="relative min-h-[480px] overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0F]">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active.id}
+                    initial={reduced ? false : { opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.99 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0"
+                  >
+                    <ProjectImage
+                      src={active.image}
+                      alt={active.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-7">
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        <span className="rounded-full border border-[#5FC1D1]/40 bg-[#5FC1D1]/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#5FC1D1]">
+                          {active.category}
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] font-medium text-[#E8E8ED] backdrop-blur-sm">
+                          <MapPin size={11} />
+                          {active.location}
+                        </span>
+                      </div>
+                      <h3 className="font-display mb-2 text-[clamp(1.35rem,2.5vw,2rem)] font-bold leading-tight text-[#F5F5F7]">
+                        {active.name}
+                      </h3>
+                      {active.description && (
+                        <p className="mb-4 line-clamp-2 max-w-xl text-sm leading-relaxed text-white/70">
+                          {active.description}
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          logCTAEvent(`Portfolio: ${active.name}`)
+                          openProject(active)
+                        }}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#5FC1D1] px-4 py-2.5 text-sm font-bold text-black transition-transform hover:scale-[1.02]"
+                      >
+                        View project <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </section>

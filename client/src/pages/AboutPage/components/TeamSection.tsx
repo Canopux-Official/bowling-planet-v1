@@ -39,7 +39,7 @@ const TeamSection: FC = () => {
         <div>
           <div className="mb-1 flex items-center gap-2">
             <Users size={16} className="text-[#5FC1D1]" />
-            <h2 id="about-team-heading" className="font-display text-base font-bold text-[#F5F5F7]">
+            <h2 id="about-team-heading" className="font-display text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.02em] text-[#F5F5F7]">
               Leadership & team
             </h2>
           </div>

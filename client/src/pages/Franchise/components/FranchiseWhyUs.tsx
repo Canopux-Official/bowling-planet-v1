@@ -13,6 +13,7 @@ const PILLARS = [
     subtitle: 'Keep your equity. We earn through results, not entry barriers.',
     icon: '💎',
     color: '#6DBD4E', // Green
+    image: '/heroes/projects-hero-wireframe.png'
   },
   {
     id: 'feat-roi',
@@ -20,6 +21,7 @@ const PILLARS = [
     subtitle: 'Proven, data-driven financial performance across 21+ premium projects.',
     icon: '📈',
     color: '#5FC1D1', // Teal
+    image: '/about/about_hero_fec.png'
   },
   {
     id: 'feat-games',
@@ -27,6 +29,7 @@ const PILLARS = [
     subtitle: 'The largest, most diverse entertainment catalogue available in India.',
     icon: '🎮',
     color: '#C084FC', // Purple
+    image: '/about/gallery_arcade.png'
   },
   {
     id: 'feat-turnkey',
@@ -34,6 +37,7 @@ const PILLARS = [
     subtitle: 'From an empty site to your grand opening. We build it, you own it.',
     icon: '🏗️',
     color: '#FFAA33', // Orange
+    image: '/heroes/blogs-hero-planning-studio.png'
   },
 ]
 
@@ -91,12 +95,11 @@ const FranchiseWhyUs: FC = () => {
                 justifyContent: 'flex-end',
                 position: 'relative',
                 overflow: 'hidden',
-                minHeight: 160,
-                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                transition: 'all 0.3s ease',
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)';
-                (e.currentTarget as HTMLElement).style.borderColor = `${p.color}60`;
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                (e.currentTarget as HTMLElement).style.borderColor = `${p.color}40`;
                 (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 50px ${p.color}15`;
               }}
               onMouseLeave={e => {
@@ -105,6 +108,12 @@ const FranchiseWhyUs: FC = () => {
                 (e.currentTarget as HTMLElement).style.boxShadow = 'none';
               }}
             >
+              {/* Background Image with Gradient Overlay */}
+              <div className="absolute inset-0 z-0">
+                <img src={p.image} alt="" className="h-full w-full object-cover opacity-15 transition-transform duration-700 group-hover:scale-105 group-hover:opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/80 to-[#0A0A0F]/40" />
+              </div>
+
               {/* Giant Watermark Icon */}
               <div style={{
                 position: 'absolute',
@@ -117,6 +126,7 @@ const FranchiseWhyUs: FC = () => {
                 userSelect: 'none',
                 lineHeight: 1,
                 transform: 'rotate(-15deg)',
+                zIndex: 1,
               }}>
                 {p.icon}
               </div>
@@ -127,10 +137,11 @@ const FranchiseWhyUs: FC = () => {
                 top: 0, left: 0, right: 0, height: 4,
                 background: `linear-gradient(90deg, ${p.color}, transparent)`,
                 opacity: 0.8,
+                zIndex: 2,
               }} />
 
               {/* Text Content */}
-              <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ position: 'relative', zIndex: 10 }}>
                 <h3 className="font-display" style={{
                   fontSize: 'clamp(1.25rem, 2.5vw, 1.6rem)',
                   fontWeight: 800,

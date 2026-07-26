@@ -7,7 +7,7 @@ import { isMobile, osName, browserName } from 'react-device-detect';
 
 export interface EnquiryItem {
   id: string;
-  type: 'product' | 'franchise' | 'project' | 'general' | 'roi-report';
+  type: 'product' | 'franchise' | 'project' | 'general' | 'roi-report' | 'service';
   title: string;
   metadata?: Record<string, any>;
 }

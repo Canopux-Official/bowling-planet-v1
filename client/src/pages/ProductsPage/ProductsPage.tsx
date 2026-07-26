@@ -82,10 +82,10 @@ const ProductsPage: FC = () => {
             className="h-full w-full object-cover object-[center_35%]"
           />
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 backdrop-blur-sm"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.68) 42%, rgba(0,0,0,0.94) 100%), radial-gradient(ellipse 70% 55% at 75% 35%, rgba(95,193,209,0.16), transparent 58%)',
+                'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.98) 100%), radial-gradient(ellipse 70% 55% at 75% 35%, rgba(95,193,209,0.15), transparent 58%)',
             }}
           />
         </div>
