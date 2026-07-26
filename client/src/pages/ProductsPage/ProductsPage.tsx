@@ -76,7 +76,7 @@ const ProductsPage: FC = () => {
       <header className="relative overflow-hidden border-b border-white/[0.08]">
         <div className="absolute inset-0">
           <img
-            src="/heroes/products-hero-trampoline.png"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDl8jrKH8y262rBGnWZ1IVeoUA1c5HYEpJtisoKKVKr81om2DFq5OeQWA&s=10"
             alt=""
             aria-hidden
             className="h-full w-full object-cover object-[center_35%]"

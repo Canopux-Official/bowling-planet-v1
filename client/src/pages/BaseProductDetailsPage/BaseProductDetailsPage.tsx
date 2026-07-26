@@ -102,7 +102,8 @@ const BaseProductDetailsPage: FC = () => {
 
       <div className="mx-auto max-w-[1280px] px-5 pb-16 pt-24 sm:px-7 sm:pt-28">
         {/* Compact category bar — category thumbnail as backdrop */}
-        <div className="relative mb-5 overflow-hidden rounded-2xl border border-[#5FC1D1]/20 p-4 sm:p-5">
+        {/* Added min-h-[280px] sm:min-h-[340px] and flex items-end to position the text neatly at the bottom */}
+        <div className="relative mb-5 min-h-[240px] sm:min-h-[340px] flex items-end overflow-hidden rounded-2xl border border-[#5FC1D1]/20 p-4 sm:p-6">
           {data.thumbnail?.url ? (
             <div className="absolute inset-0">
               <img
@@ -111,11 +112,12 @@ const BaseProductDetailsPage: FC = () => {
                 aria-hidden
                 className="h-full w-full object-cover object-center"
               />
+              {/* Tweaked gradient slightly to make sure text remains readable on taller images */}
               <div
                 className="absolute inset-0"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 48%, rgba(0,0,0,0.55) 100%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.2), transparent 55%)',
+                    'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 80%), radial-gradient(ellipse 70% 80% at 15% 50%, rgba(95,193,209,0.15), transparent 55%)',
                 }}
               />
             </div>
@@ -129,7 +131,8 @@ const BaseProductDetailsPage: FC = () => {
             />
           )}
 
-          <div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
+          {/* Added w-full to make sure content spans properly when aligned to the bottom */}
+          <div className="relative z-[1] flex w-full flex-wrap items-end justify-between gap-4">
             <div className="min-w-0 flex-1">
               <Link
                 to="/products"
@@ -154,14 +157,14 @@ const BaseProductDetailsPage: FC = () => {
               </div>
             </div>
 
+            {/* Self-end keeps the button aligned nicely alongside the bottom-anchored text */}
             <button
               type="button"
               onClick={() => addToEnquiry({ id: categoryId, type: 'product', title: data.title })}
-              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${
-                isAdded
+              className={`inline-flex self-end cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-semibold backdrop-blur-md transition-colors ${isAdded
                   ? 'border-[#6DBD4E]/45 bg-[#6DBD4E]/10 text-[#6DBD4E]'
                   : 'border-[#5FC1D1]/45 bg-[#5FC1D1]/10 text-[#5FC1D1] hover:bg-[#5FC1D1]/20'
-              }`}
+                }`}
             >
               {isAdded ? <Check size={15} /> : <Plus size={15} />}
               {isAdded ? 'In enquiry' : 'Enquire category'}
@@ -188,11 +191,10 @@ const BaseProductDetailsPage: FC = () => {
               <button
                 type="button"
                 onClick={() => setActivePill(null)}
-                className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-                  activePill === null
+                className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${activePill === null
                     ? 'border-[#5FC1D1] bg-[#5FC1D1]/15 text-[#5FC1D1]'
                     : 'border-white/15 bg-[#111118] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#F5F5F7]'
-                }`}
+                  }`}
               >
                 All products
               </button>
@@ -201,11 +203,10 @@ const BaseProductDetailsPage: FC = () => {
                   key={item.slug}
                   type="button"
                   onClick={() => setActivePill(item.slug)}
-                  className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-                    activePill === item.slug
+                  className={`shrink-0 cursor-pointer rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${activePill === item.slug
                       ? 'border-[#5FC1D1] bg-[#5FC1D1]/15 text-[#5FC1D1]'
                       : 'border-white/15 bg-[#111118] text-[#A1A1A6] hover:border-[#5FC1D1]/40 hover:text-[#F5F5F7]'
-                  }`}
+                    }`}
                 >
                   {item.title}
                 </button>

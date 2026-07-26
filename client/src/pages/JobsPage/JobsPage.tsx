@@ -210,7 +210,7 @@ const JobsPage: FC = () => {
       <header className="relative overflow-hidden border-b border-white/[0.08]">
         <div className="absolute inset-0">
           <img
-            src="/heroes/careers-hero-studio.png"
+            src="https://t4.ftcdn.net/jpg/04/63/64/49/360_F_463644972_o0GOJQ7qnIk85UXnQHYPrqwjOE7JbSa6.jpg"
             alt=""
             aria-hidden
             className="h-full w-full object-cover object-[center_40%]"
@@ -219,7 +219,7 @@ const JobsPage: FC = () => {
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 45%, rgba(0,0,0,0.94) 100%), radial-gradient(ellipse 80% 60% at 70% 40%, rgba(95,193,209,0.18), transparent 60%)',
+                'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.8) 100%), radial-gradient(ellipse 95% 75% at 70% 35%, rgba(95,193,209,0.3), transparent 75%)',
             }}
           />
         </div>

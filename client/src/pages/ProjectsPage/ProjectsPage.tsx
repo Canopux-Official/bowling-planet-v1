@@ -68,7 +68,7 @@ const ProjectsPage: FC = () => {
       <header className="relative overflow-hidden border-b border-white/[0.08]">
         <div className="absolute inset-0">
           <img
-            src="/heroes/projects-hero-wireframe.png"
+            src="https://www.shutterstock.com/image-photo/banner-group-business-people-meeting-260nw-2527279181.jpg"
             alt=""
             aria-hidden
             className="h-full w-full object-cover object-center"
