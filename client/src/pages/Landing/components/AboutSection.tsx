@@ -1,229 +1,256 @@
-import { type FC } from 'react'
+/**
+ * AboutSection — Chalk/light section with scroll-scrubbed timeline,
+ * authority badges at top, and click-to-expand founder pull-quote.
+ */
+
+import { type FC, useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
+import { ChevronDown } from 'lucide-react'
+
+const TIMELINE = [
+  { year: '2006',  event: 'Ranjith Pillai begins career in India\'s cinema & FEC industry', icon: '◎' },
+  { year: '2012',  event: 'Leads operations for Cinemax & Inox FEC annexe rollouts',        icon: '◉' },
+  { year: '2017',  event: 'Consulting mandate for KidZania, Essel World, and Woop',          icon: '◉' },
+  { year: '2020',  event: 'Bowling Planet founded — full-stack FEC consulting firm',          icon: '⬤' },
+  { year: 'Today', event: '50+ venues across PAN-India & the Middle East',                   icon: '★' },
+]
+
+const VALUE_PROPS = [
+  { icon: '🎯', title: 'Industry Expertise',    desc: 'Deep operational knowledge, not just theory.'       },
+  { icon: '📊', title: 'Data-Driven Insights',  desc: 'Every decision backed by real footfall metrics.'    },
+  { icon: '💰', title: 'ROI-Focused',            desc: 'We measure success by your venue\'s profitability.' },
+  { icon: '⚙️', title: 'End-to-End',             desc: 'From layout design to grand opening and beyond.'    },
+  { icon: '🤝', title: 'Personalized',           desc: 'No cookie-cutter blueprints — ever.'               },
+  { icon: '🔄', title: 'Continuous Support',     desc: 'KPI monitoring and improvement after opening.'      },
+]
 
 const AboutSection: FC = () => {
-  const titleRef = useReveal()
-  const leftRef  = useReveal()
-  const rightRef = useReveal()
+  const titleRef  = useReveal()
+  const rightRef  = useReveal()
   const { logCTAEvent } = useLeadTracker()
+  const [quoteExpanded, setQuoteExpanded] = useState(false)
+
+  /* Scroll-scrubbed timeline */
+  const sectionRef = useRef<HTMLElement>(null)
+  const [timelineProgress, setTimelineProgress] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!sectionRef.current) return
+      const rect = sectionRef.current.getBoundingClientRect()
+      const windowH = window.innerHeight
+      // Progress: 0 when top of section hits bottom of viewport, 1 when bottom of section hits top
+      const progress = Math.max(0, Math.min(1, (windowH - rect.top) / (windowH + rect.height * 0.5)))
+      setTimelineProgress(progress)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const activeTimelineDots = Math.round(timelineProgress * TIMELINE.length)
 
   return (
     <section
       id="about"
-      style={{ background: '#000000', padding: '80px 28px 0px', position: 'relative', overflow: 'hidden' }}
+      ref={sectionRef}
+      
+      style={{ background: '#000', padding: '100px 28px', position: 'relative', overflow: 'hidden' }}
     >
-      {/* Background glow orbs */}
-      <div className="orb orb-teal"  style={{ width: 600, height: 600, top: '-15%', right: '-10%', opacity: 0.5 }} />
-      <div className="orb orb-green" style={{ width: 500, height: 500, bottom: '-10%', left: '-10%', opacity: 0.4 }} />
+      {/* Grid */}
+      <div aria-hidden="true" className="grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
-      {/* Subtle grid overlay */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)',
-        backgroundSize: '60px 60px',
-        pointerEvents: 'none',
-      }} />
+      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
 
-      <div style={{ maxWidth: 1320, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-
-        {/* ── Section Heading ───────────────────────────── */}
-        <div ref={titleRef} className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
-          <h2 className="font-display text-metallic" style={{
-            fontWeight: 800, fontSize: 'clamp(3rem, 6vw, 5rem)',
-            letterSpacing: '-0.04em', lineHeight: 1.05,
+        {/* ── Section Heading ──────────────────────────────────── */}
+        <div ref={titleRef} className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '5px 14px', borderRadius: 100,
+            border: '1.5px solid rgba(95,193,209,0.3)',
+            background: 'rgba(95,193,209,0.08)',
+            marginBottom: 24,
           }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5FC1D1' }}>
+              About
+            </span>
+          </div>
+          <h2 className="font-display" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', color: '#F5F5F7', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
             Our Story.
           </h2>
-          <div className="text-gradient-brand" style={{ fontSize: 'clamp(1.2rem, 2vw, 1.5rem)', fontWeight: 600, marginTop: 16 }}>
-            Seventeen years of industry mastery.
-          </div>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 17, color: 'rgba(245,245,247,0.6)', marginTop: 16, maxWidth: 480, margin: '16px auto 0', lineHeight: 1.7 }}>
+            Seventeen years of building India's entertainment industry, one venue at a time.
+          </p>
         </div>
 
-        {/* ── Two-col content ───────────────────────────── */}
-        <div
-          className="about-two-col"
-          style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 72, alignItems: 'start',
-        }}>
+        {/* ── Two-col: Timeline left + Copy right ─────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 72, alignItems: 'flex-start' }}>
 
-          {/* ── Left: Visual card ─────────────────────────── */}
-          <div ref={leftRef} className="reveal-left">
-            <div style={{ position: 'relative', maxWidth: 460, margin: '0 auto' }}>
+          {/* ── Left: Scroll-scrubbed timeline ─────────────────── */}
+          <div>
+            <div className="timeline-track" style={{ background: '#000', paddingLeft: 32, display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {/* Animated fill bar */}
+              <div
+                className="timeline-fill"
+                style={{ height: `${timelineProgress * 100}%`, maxHeight: '100%' }}
+              />
 
-              {/* Main card */}
-              <div style={{
-                width: '100%',
-                aspectRatio: '4/5',
-                borderRadius: 24,
-                overflow: 'hidden',
-                position: 'relative',
-                background: 'linear-gradient(160deg, rgba(95,193,209,0.08) 0%, rgba(0,0,0,0) 60%, rgba(109,189,78,0.06) 100%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-              }}>
-                {/* Top gradient bar */}
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-                  background: 'linear-gradient(90deg, #5FC1D1, #6DBD4E)',
-                  boxShadow: '0 0 20px rgba(95,193,209,0.4)',
-                }} />
-
-                {/* Interior dot-grid pattern */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
-                  backgroundSize: '28px 28px',
-                }} />
-
-                {/* Floating orb inside card */}
-                <div style={{
-                  position: 'absolute', top: '30%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 180, height: 180, borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(95,193,209,0.12) 0%, transparent 70%)',
-                  filter: 'blur(12px)',
-                }} />
-
-                {/* Center content — founder initials monogram */}
-                <div style={{
-                  position: 'absolute', top: '38%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  textAlign: 'center',
-                }}>
-                  <div style={{
-                    width: 100, height: 100, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(95,193,209,0.15), rgba(109,189,78,0.1))',
-                    border: '1px solid rgba(95,193,209,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px',
-                    boxShadow: '0 0 30px rgba(95,193,209,0.15), inset 0 0 20px rgba(95,193,209,0.05)',
-                  }}>
-                    <span style={{
-                      fontFamily: '"Sora", sans-serif', fontWeight: 800,
-                      fontSize: 32, letterSpacing: '-0.03em', color: '#5FC1D1',
-                    }}>RP</span>
+              {TIMELINE.map((item, i) => {
+                const isActive = i < activeTimelineDots
+                return (
+                  <div key={item.year} style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '20px 0', position: 'relative' }}>
+                    {/* Dot */}
+                    <div style={{
+                      position: 'absolute', left: -21, top: 24,
+                      width: 10, height: 10, borderRadius: '50%',
+                      background: isActive ? (i === TIMELINE.length - 1 ? '#FFAA33' : '#5FC1D1') : 'rgba(255,255,255,0.1)',
+                      border: `2px solid ${isActive ? (i === TIMELINE.length - 1 ? '#FFAA33' : '#5FC1D1') : 'rgba(255,255,255,0.1)'}`,
+                      boxShadow: isActive ? `0 0 12px ${i === TIMELINE.length - 1 ? 'rgba(255,170,51,0.5)' : 'rgba(95,193,209,0.5)'}` : 'none',
+                      transition: 'all 0.4s ease',
+                      zIndex: 1,
+                    }} />
+                    <div>
+                      <div style={{
+                        fontFamily: 'var(--font-data)',
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: isActive ? '#5FC1D1' : 'rgba(245,245,247,0.6)',
+                        letterSpacing: '0.05em',
+                        marginBottom: 4,
+                        transition: 'color 0.3s ease',
+                      }}>
+                        {item.year}
+                      </div>
+                      <p style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 14,
+                        color: isActive ? '#F5F5F7' : 'rgba(245,245,247,0.6)',
+                        lineHeight: 1.55,
+                        fontWeight: isActive ? 500 : 400,
+                        transition: 'color 0.3s ease',
+                      }}>
+                        {item.event}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Name plate */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  padding: '40px 28px 28px',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.97) 60%, transparent)',
-                }}>
-                  <p style={{
-                    fontFamily: '"Sora", sans-serif', fontWeight: 700, fontSize: 22,
-                    color: '#F5F5F7', letterSpacing: '-0.02em', marginBottom: 6,
-                  }}>
-                    Ranjith Pillai
-                  </p>
-                  <p style={{
-                    fontFamily: '"Sora", sans-serif', fontSize: 12, fontWeight: 500,
-                    letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5FC1D1',
-                    marginBottom: 16,
-                  }}>
-                    Founder & Managing Director
-                  </p>
-                  {/* Thin divider */}
-                  <div style={{ height: 1, background: 'linear-gradient(90deg, rgba(95,193,209,0.4), transparent)', marginBottom: 16 }} />
-                  <p style={{ fontSize: 13, color: '#86868B', lineHeight: 1.6 }}>
-                    17+ years shaping India's FEC &amp; cinema landscape
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating badge — Est. */}
-              <div style={{
-                position: 'absolute', top: -16, right: -16,
-                background: 'linear-gradient(135deg, #5FC1D1 0%, #4AAFBF 100%)',
-                color: '#000', padding: '10px 20px', borderRadius: 10,
-                fontFamily: '"Sora", sans-serif', fontWeight: 800, fontSize: 13,
-                letterSpacing: '0.05em', textTransform: 'uppercase',
-                boxShadow: '0 8px 32px rgba(95,193,209,0.4)',
-                animation: 'float 4s ease-in-out infinite',
-              }}>
-                Est. 2020
-              </div>
-
-
+                )
+              })}
             </div>
           </div>
 
-          {/* ── Right: Copy ───────────────────────────────── */}
-          <div ref={rightRef} className="reveal-right" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {/* ── Right: Copy ─────────────────────────────────────── */}
+          <div ref={rightRef} className="reveal-right" style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
 
-            {/* Pull quote */}
-            <div style={{
-              position: 'relative',
-              padding: '28px 28px 28px 32px',
-              borderRadius: 16,
-              background: 'rgba(95,193,209,0.04)',
-              border: '1px solid rgba(95,193,209,0.12)',
-              marginBottom: 36,
-            }}>
+            {/* Click-to-expand pull quote */}
+            <button
+              onClick={() => setQuoteExpanded(!quoteExpanded)}
+              aria-expanded={quoteExpanded}
+              style={{
+                textAlign: 'left',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                width: '100%',
+              }}
+            >
               <div style={{
-                position: 'absolute', top: 0, left: 0, bottom: 0, width: 3,
-                borderRadius: '3px 0 0 3px',
-                background: 'linear-gradient(to bottom, #5FC1D1, #6DBD4E)',
-              }} />
-              <p style={{
-                fontFamily: '"Sora", sans-serif', fontStyle: 'italic',
-                fontSize: 'clamp(1rem, 1.5vw, 1.15rem)', fontWeight: 600,
-                color: '#F5F5F7', lineHeight: 1.65, margin: 0,
-              }}>
-                "Great entertainment centers don't happen by accident. They are engineered —
-                with data, design, and seventeen years of hard-won insight."
-              </p>
-            </div>
-
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: '#86868B', marginBottom: 36 }}>
-              Bowling Planet was founded in 2020 by{' '}
-              <strong style={{ color: '#F5F5F7', fontWeight: 600 }}>Ranjith Pillai</strong>, a veteran
-              of India's family entertainment and cinema industries. His career spans some of the
-              country's most recognizable FEC and cinema brands — making him one of the most
-              experienced operators in the subcontinent.
-            </p>
-
-            {/* Brand columns */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, marginBottom: 40 }}>
-              {[
-                { title: 'FEC Track Record', color: '#5FC1D1', items: ['Woop', 'Shott', 'Idea Crate', 'Playaza', 'KidZania', 'Essel World'] },
-                { title: 'Cinema Industry',  color: '#6DBD4E', items: ['Cinemax', 'Inox', 'Roongta Group'] },
-              ].map(col => (
-                <div key={col.title} style={{
-                  padding: '20px', borderRadius: 12,
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.05)',
+                position: 'relative',
+                padding: '28px 28px 28px 32px',
+                borderRadius: 16,
+                background: 'rgba(95,193,209,0.05)',
+                border: '1px solid rgba(95,193,209,0.15)',
+                transition: 'all 0.25s ease',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(95,193,209,0.3)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(95,193,209,0.15)' }}
+              >
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, bottom: 0, width: 3,
+                  borderRadius: '3px 0 0 3px',
+                  background: 'linear-gradient(to bottom, #5FC1D1, #6DBD4E)',
+                }} />
+                <p style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontStyle: 'italic',
+                  fontSize: 'clamp(1rem, 1.5vw, 1.15rem)',
+                  color: '#F5F5F7',
+                  lineHeight: 1.65,
+                  margin: 0,
                 }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: col.color, marginBottom: 14 }}>
-                    {col.title}
-                  </p>
-                  {col.items.map(item => (
-                    <p key={item} style={{ fontSize: 14, color: '#86868B', lineHeight: 2, fontWeight: 400 }}>{item}</p>
-                  ))}
+                  "Great entertainment centers don't happen by accident. They are engineered —
+                  with data, design, and seventeen years of hard-won insight."
+                </p>
+                <AnimatePresence>
+                  {quoteExpanded && (
+                    <motion.p
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ fontFamily: 'var(--font-sans)', fontSize: 14, color: 'rgba(245,245,247,0.8)', lineHeight: 1.7, marginTop: 16, overflow: 'hidden' }}
+                    >
+                      Ranjith Pillai founded Bowling Planet in 2020 after two decades at the center of India's
+                      cinema and FEC expansion. He's advised on site selection, revenue modeling, and daily
+                      operations for some of the country's most recognizable entertainment brands — and now
+                      brings that full-stack expertise to every client engagement.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, color: '#5FC1D1' }}>
+                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}>
+                    {quoteExpanded ? 'Read less' : 'Read more'}
+                  </span>
+                  <motion.div animate={{ rotate: quoteExpanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                    <ChevronDown size={14} />
+                  </motion.div>
                 </div>
+                <div style={{ marginTop: 16, borderTop: '1px solid rgba(95,193,209,0.15)', paddingTop: 16 }}>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: 14, color: '#F5F5F7' }}>Ranjith Pillai</p>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#5FC1D1', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Founder & Managing Director</p>
+                </div>
+              </div>
+            </button>
+
+            {/* Value props grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {VALUE_PROPS.map(vp => (
+                <motion.div
+                  key={vp.title}
+                  whileHover={{ y: -3, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
+                  style={{
+                    padding: '18px 16px',
+                    borderRadius: 14,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    cursor: 'default',
+                    transition: 'border-color 0.25s ease',
+                  }}
+                >
+                  <div style={{ fontSize: 20, marginBottom: 8 }}>{vp.icon}</div>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 700, color: '#F5F5F7', marginBottom: 4 }}>{vp.title}</div>
+                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'rgba(245,245,247,0.6)', lineHeight: 1.5 }}>{vp.desc}</div>
+                </motion.div>
               ))}
             </div>
 
             <Link
               to="/about"
-              className="btn btn-ghost"
               onClick={() => logCTAEvent('Landing: Meet the Team')}
+              className="btn btn-ghost"
               aria-label="Meet the Bowling Planet team"
+              style={{ alignSelf: 'flex-start', color: '#F5F5F7', borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}
             >
               Meet the Team →
             </Link>
           </div>
         </div>
-
       </div>
     </section>
   )
 }
 
 export default AboutSection
-
-
