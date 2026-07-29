@@ -5,8 +5,9 @@
 import { type FC } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseProcess } from '../../../services/franchisePageApi'
 
-const STEPS = [
+const HARDCODED_STEPS = [
   {
     num: 1,
     title: 'Inquiry & Intro',
@@ -65,9 +66,26 @@ const STEPS = [
   },
 ]
 
-const FranchiseProcess: FC = () => {
+interface FranchiseProcessProps {
+  steps?: IFranchiseProcess[];
+}
+
+const FranchiseProcess: FC<FranchiseProcessProps> = ({ steps = [] }) => {
   const headRef = useReveal()
   const gridRef = useReveal()
+
+  // Map dynamic steps onto the hardcoded layout specs (num, icon, color)
+  const displaySteps = (steps.length > 0 ? steps : HARDCODED_STEPS).map((p, i) => {
+    const defaultSpec = HARDCODED_STEPS[i % HARDCODED_STEPS.length];
+    return {
+      num: i + 1,
+      title: p.title,
+      desc: p.desc,
+      icon: defaultSpec.icon,
+      color: defaultSpec.color,
+      image: 'image' in p && (p.image as any)?.url ? (p.image as any).url : ('image' in p && typeof p.image === 'string' ? p.image : defaultSpec.image),
+    };
+  });
 
   return (
     <section
@@ -109,8 +127,8 @@ const FranchiseProcess: FC = () => {
             gap: 12,
           }}
         >
-          {STEPS.map((step, idx) => {
-            const isLast = idx === STEPS.length - 1
+          {displaySteps.map((step, idx) => {
+            const isLast = idx === displaySteps.length - 1
             return (
               <div 
                 key={step.num} 

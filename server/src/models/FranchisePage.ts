@@ -27,10 +27,37 @@ export interface IFranchiseFAQ {
   a: string;
 }
 
+export interface IFranchiseWhyUs {
+  title: string;
+  subtitle: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseOffering {
+  label: string;
+  desc: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseProcess {
+  title: string;
+  desc: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseQualification {
+  title: string;
+  desc: string;
+}
+
 export interface IFranchisePage extends Document {
   valueProps: IFranchiseValueProp[];
   investmentTiers: IFranchiseInvestmentTier[];
   faqs: IFranchiseFAQ[];
+  whyUs: IFranchiseWhyUs[];
+  offerings: IFranchiseOffering[];
+  process: IFranchiseProcess[];
+  qualifications: IFranchiseQualification[];
 }
 
 const FranchiseValuePropSchema = new Schema<IFranchiseValueProp>({
@@ -60,11 +87,38 @@ const FranchiseFAQSchema = new Schema<IFranchiseFAQ>({
   a: { type: String, required: true },
 });
 
+const FranchiseWhyUsSchema = new Schema<IFranchiseWhyUs>({
+  title: { type: String, required: true },
+  subtitle: { type: String, required: true },
+  image: { url: String, public_id: String },
+});
+
+const FranchiseOfferingSchema = new Schema<IFranchiseOffering>({
+  label: { type: String, required: true },
+  desc: { type: String, required: true },
+  image: { url: String, public_id: String },
+});
+
+const FranchiseProcessSchema = new Schema<IFranchiseProcess>({
+  title: { type: String, required: true },
+  desc: { type: String, required: true },
+  image: { url: String, public_id: String },
+});
+
+const FranchiseQualificationSchema = new Schema<IFranchiseQualification>({
+  title: { type: String, required: true },
+  desc: { type: String, required: true },
+});
+
 const FranchisePageSchema = new Schema<IFranchisePage>(
   {
     valueProps: { type: [FranchiseValuePropSchema], default: [] },
     investmentTiers: { type: [FranchiseInvestmentTierSchema], default: [] },
     faqs: { type: [FranchiseFAQSchema], default: [] },
+    whyUs: { type: [FranchiseWhyUsSchema], default: [] },
+    offerings: { type: [FranchiseOfferingSchema], default: [] },
+    process: { type: [FranchiseProcessSchema], default: [] },
+    qualifications: { type: [FranchiseQualificationSchema], default: [] },
   },
   { timestamps: true }
 );

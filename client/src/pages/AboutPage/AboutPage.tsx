@@ -26,8 +26,8 @@ const STATS = [
 ]
 
 const CERTS = [
-  { title: 'ISO 9001:2015', sub: 'Quality certified', logo: '/partners/iso.svg' },
-  { title: 'IAAPA Member', sub: 'Global attractions', logo: '/partners/iaapa.svg' },
+  { title: 'ISO 9001:2015', sub: 'Quality certified', logo: '/iso.jpg' },
+  { title: 'IAAPA Member', sub: 'Global attractions', logo: '/iaapa.png' },
   { title: 'Authorized Exporter', sub: 'Sourcing & logistics', icon: Package },
 ]
 
@@ -95,7 +95,7 @@ const AboutPage: React.FC = () => {
       <div className="mx-auto max-w-[1200px] space-y-16 px-5 pb-16 pt-24 sm:space-y-24 sm:px-7 sm:pt-28">
         {/* Standard Intro */}
         <header className="mb-16 text-center max-w-3xl mx-auto pt-8 flex flex-col items-center">
-          <img src="/logo.png" alt="Bowling Planet" className="h-36 w-auto mb-6 sm:h-28" />
+          <img src="/logo.png" alt="Bowling Planet" className="h-44 w-auto mb-6 sm:h-36" />
           <h1 className="font-display text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-tight text-[#F5F5F7]">
             About Bowling Planet
           </h1>
@@ -118,9 +118,9 @@ const AboutPage: React.FC = () => {
                 key={c.title}
                 className="flex items-center gap-4 rounded-2xl border border-white/[0.06] bg-[#111118] px-6 py-4 shadow-lg"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#5FC1D1]/20 bg-[#5FC1D1]/5 text-[#5FC1D1]">
+                <div className="flex h-16 w-16 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-xl border border-[#5FC1D1]/20 bg-[#5FC1D1]/5 text-[#5FC1D1] overflow-hidden p-2 bg-white">
                   {'logo' in c && c.logo ? (
-                    <img src={c.logo} alt="" aria-hidden className="h-6 w-auto max-w-[32px] object-contain" />
+                    <img src={c.logo} alt="" aria-hidden className="h-full w-full object-contain" />
                   ) : 'icon' in c && c.icon ? (
                     <c.icon size={20} />
                   ) : null}

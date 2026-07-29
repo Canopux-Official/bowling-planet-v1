@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Users, FileText, MousePointerClick, TrendingUp } from 'lucide-react';
 import { theme } from '../../../../theme';
 import { leadService } from '../leads/lead.service';
 import { useToast } from '../../components/Toast';
+import { useQuery } from '@tanstack/react-query';
 
 
 const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
@@ -15,30 +16,29 @@ const statusColors: Record<string, { bg: string; text: string; dot: string }> = 
 
 export const DashboardView: React.FC = () => {
   const { showToast } = useToast();
-  const [leads, setLeads] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const res = await leadService.getAll();
-        setLeads(Array.isArray(res) ? res : res?.data || []);
-      } catch (error) {
-        showToast('error', 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchLeads();
-  }, [showToast]);
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: ['dashboard-leads'],
+    queryFn: async () => {
+      const res = await leadService.getAll();
+      return Array.isArray(res) ? res : res?.data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (error) {
+    showToast('error', 'Failed to load dashboard data');
+  }
+
+  const leads = data || [];
 
   const { pipelineCards, recentLeadsData, totalEvents } = useMemo(() => {
-    const newLeads = leads.filter(l => l.status === 'New').length;
-    const closedLeads = leads.filter(l => l.status === 'Closed').length;
+    const newLeads = leads.filter((l: any) => l.status === 'New').length;
+    const closedLeads = leads.filter((l: any) => l.status === 'Closed').length;
     // Conversion rate not needed here anymore, but keeping totalLeads check is fine
 
     let totalEvents = 0;
-    leads.forEach(l => {
+    leads.forEach((l: any) => {
       if (l.behavior?.eventLog) {
         totalEvents += l.behavior.eventLog.length;
       }
@@ -46,13 +46,13 @@ export const DashboardView: React.FC = () => {
 
     const pipelineCards = [
       { label: 'New Inquiries', value: newLeads.toString(), icon: Users, iconColor: '#3B82F6', iconBg: 'rgba(59,130,246,0.08)' },
-      { label: 'In Progress', value: leads.filter(l => l.status === 'In Progress').length.toString(), icon: FileText, iconColor: '#8B5CF6', iconBg: 'rgba(139,92,246,0.08)' },
-      { label: 'Contacted', value: leads.filter(l => l.status === 'Contacted').length.toString(), icon: MousePointerClick, iconColor: '#F59E0B', iconBg: 'rgba(245,158,11,0.08)' },
+      { label: 'In Progress', value: leads.filter((l: any) => l.status === 'In Progress').length.toString(), icon: FileText, iconColor: '#8B5CF6', iconBg: 'rgba(139,92,246,0.08)' },
+      { label: 'Contacted', value: leads.filter((l: any) => l.status === 'Contacted').length.toString(), icon: MousePointerClick, iconColor: '#F59E0B', iconBg: 'rgba(245,158,11,0.08)' },
       { label: 'Closed Won', value: closedLeads.toString(), icon: TrendingUp, iconColor: '#10B981', iconBg: 'rgba(16,185,129,0.08)' },
     ];
 
     const sortedLeads = [...leads].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    const topRecent = sortedLeads.slice(0, 4).map(l => ({
+    const topRecent = sortedLeads.slice(0, 4).map((l: any) => ({
       name: l.name || 'Anonymous',
       interest: l.inquiryType || 'General',
       time: new Date(l.createdAt).toLocaleDateString(),

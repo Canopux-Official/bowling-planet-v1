@@ -3,14 +3,36 @@ import { ShoppingBag, X, Send, Trash2, User, Phone, MapPin, Building2, Mail } fr
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { useLeadTracker } from '../context/LeadTrackerContext';
+import { useGlobalSettings } from '../context/GlobalSettingsContext';
 import { theme } from '../theme';
 import { apiClient } from '../services/apiClient';
 
 export const EnquiryCartWidget: React.FC = () => {
   const { state, isCartOpen, setIsCartOpen, removeFromEnquiry, updatePartialLead, logCTAEvent } = useLeadTracker();
+  const { settings } = useGlobalSettings();
+  const whatsappNumber = settings?.socials?.whatsappNumber || '919512545959';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingQuick, setIsProcessingQuick] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 300);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
 
   // Sync local component state with context's partial lead
   const [formData, setFormData] = useState({
@@ -111,9 +133,9 @@ export const EnquiryCartWidget: React.FC = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       if (whatsappWindow) {
-        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
       } else {
-        window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+        window.location.href = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
       }
       setIsCartOpen(false);
     }, 1000);
@@ -155,9 +177,9 @@ export const EnquiryCartWidget: React.FC = () => {
     setTimeout(() => {
       setIsProcessingQuick(false);
       if (whatsappWindow) {
-        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+        whatsappWindow.location.href = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
       } else {
-        window.location.href = `https://api.whatsapp.com/send?phone=919512545959&text=${encodedMessage}`;
+        window.location.href = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
       }
       setIsCartOpen(false);
     }, 800);
@@ -210,12 +232,12 @@ export const EnquiryCartWidget: React.FC = () => {
         onClick={() => setIsCartOpen(true)}
         style={{
           position: 'fixed',
-          bottom: '24px',
-          right: '24px',
+          bottom: 'clamp(16px, 4vw, 24px)',
+          right: 'clamp(16px, 4vw, 24px)',
           backgroundColor: theme.colors.teal,
           color: theme.colors.surface,
-          width: '60px',
-          height: '60px',
+          width: 'clamp(46px, 5vw, 52px)',
+          height: 'clamp(46px, 5vw, 52px)',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
@@ -224,11 +246,13 @@ export const EnquiryCartWidget: React.FC = () => {
           cursor: 'pointer',
           zIndex: 1000,
           border: 'none',
-          transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-          transform: isCartOpen ? 'scale(0)' : 'scale(1)',
+          transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease',
+          opacity: isScrolling && !isCartOpen ? 0 : 1,
+          pointerEvents: isScrolling && !isCartOpen ? 'none' : 'auto',
+          transform: isCartOpen ? 'scale(0)' : isScrolling ? 'scale(0.7) translateY(20px)' : 'scale(1) translateY(0)',
         }}
       >
-        <ShoppingBag size={24} />
+        <ShoppingBag size={22} />
         {itemCount > 0 && (
           <span style={{
             position: 'absolute',

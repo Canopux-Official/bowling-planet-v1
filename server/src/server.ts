@@ -36,6 +36,7 @@ import cloudinaryRoutes from './routes/cloudinary.routes';
 import homePageRoutes from './routes/homePage.routes';
 import globalSettingsRoutes from './routes/globalSettings.routes';
 import franchisePageRoutes from './routes/franchisePage.routes';
+import servicesPageRoutes from './routes/servicesPage.routes';
 import leadRoutes from './routes/lead.routes';
 import landingPageRoutes from './routes/landingPage.routes'
 import { apiSecretMiddleware } from './middleware/apiSecretMiddleware';
@@ -105,20 +106,24 @@ app.use(cookieParser());
 // ------------------------------------------------------------------
 app.set("trust proxy", 1); // Vercel sits behind a proxy layer
 
-// const globalLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 200,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: {
-//     success: false,
-//     message: "Too many requests. Please try again in 15 minutes.",
-//   },
-// });
+// SECURITY: Global rate limiter — 200 req / 15 min per IP across all routes.
+// Prevents DoS on every endpoint including DB-heavy sitemap generation and Cloudinary routes.
+// Skips /sitemap.xml and /robots.txt because:
+//   1. They are public crawler endpoints
+//   2. sitemap.xml has its own 1-hour in-memory cache (only runs 4 DB queries once per hour)
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip: (req) => req.path === '/sitemap.xml' || req.path === '/robots.txt',
+  message: {
+    success: false,
+    message: "Too many requests. Please try again in 15 minutes.",
+  },
+});
 
-
-
-// app.use(globalLimiter); // applied to every route
+app.use(globalLimiter); // applied to every route
 
 // ------------------------------------------------------------------
 // 6. DB MIDDLEWARE — connect before every request.
@@ -155,6 +160,7 @@ app.use('/cloudinary', cloudinaryRoutes);
 app.use('/homepage', homePageRoutes);
 app.use('/global-settings', globalSettingsRoutes);
 app.use('/franchise-page', franchisePageRoutes);
+app.use('/services-page', servicesPageRoutes);
 app.use('/leads', leadRoutes);
 app.use('/landing',landingPageRoutes)
 // ------------------------------------------------------------------
@@ -227,3 +233,4 @@ if (process.env.NODE_ENV !== "production" && process.env.VERCEL !== "1") {
 }
 
 export default app;
+ 

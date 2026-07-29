@@ -19,6 +19,7 @@ import { CmsTeamView } from './views/cms/team/CmsTeamView';
 import { CmsResourceView } from './views/cms/resources/CmsResourceView';
 import { BlogEditorPage } from './views/cms/blog/components/BlogEditorPage';
 import { MediaManagement } from './views/media/MediaManagement';
+import { CmsServicesView } from './views/cms/services/CmsServicesView';
 
 export default function AdminPage() {
   return (
@@ -56,6 +57,7 @@ export default function AdminPage() {
         <Route path="cms/resources" element={<CmsResourceView />} />
         <Route path="cms/settings" element={<CmsSettingsView />} />
         <Route path="cms/team" element={<CmsTeamView />} />
+        <Route path="cms/services" element={<CmsServicesView />} />
 
         {/* Placeholders for future views */}
         <Route path="media" element={<MediaManagement/>} />

@@ -5,6 +5,7 @@
 import { type FC, useState } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseQualification } from '../../../services/franchisePageApi'
 
 // Tag → color map
 const TAG_STYLES: Record<string, { bg: string; color: string }> = {
@@ -15,7 +16,7 @@ const TAG_STYLES: Record<string, { bg: string; color: string }> = {
   Mindset:       { bg: 'rgba(192,132,252,0.12)', color: '#C084FC' },
 }
 
-const QUALIFICATIONS = [
+const HARDCODED_QUALIFICATIONS = [
   {
     num: '01',
     title: 'Financial Readiness',
@@ -63,12 +64,27 @@ const QUALIFICATIONS = [
 
 const VISIBLE_DEFAULT = 4
 
-const FranchiseQualifications: FC = () => {
+interface FranchiseQualificationsProps {
+  qualifications?: IFranchiseQualification[];
+}
+
+const FranchiseQualifications: FC<FranchiseQualificationsProps> = ({ qualifications = [] }) => {
   const headRef = useReveal()
   const listRef = useReveal()
   const [expanded, setExpanded] = useState(false)
 
-  const visible = expanded ? QUALIFICATIONS : QUALIFICATIONS.slice(0, VISIBLE_DEFAULT)
+  // Map dynamic qualifications onto the hardcoded layout specs (num, tag)
+  const displayQualifications = (qualifications.length > 0 ? qualifications : HARDCODED_QUALIFICATIONS).map((p, i) => {
+    const defaultSpec = HARDCODED_QUALIFICATIONS[i % HARDCODED_QUALIFICATIONS.length];
+    return {
+      num: String(i + 1).padStart(2, '0'),
+      title: p.title,
+      desc: p.desc,
+      tag: defaultSpec.tag,
+    };
+  });
+
+  const visible = expanded ? displayQualifications : displayQualifications.slice(0, Math.min(VISIBLE_DEFAULT, displayQualifications.length))
 
   return (
     <section
@@ -227,7 +243,7 @@ const FranchiseQualifications: FC = () => {
               (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)';
             }}
           >
-            <span>{expanded ? 'See Less' : `See ${QUALIFICATIONS.length - VISIBLE_DEFAULT} More Qualifications`}</span>
+            <span>{expanded ? 'See Less' : `See ${Math.max(0, displayQualifications.length - VISIBLE_DEFAULT)} More Qualifications`}</span>
             <span style={{
               display: 'inline-block',
               transform: expanded ? 'rotate(180deg)' : 'none',

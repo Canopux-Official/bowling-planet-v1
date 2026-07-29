@@ -8,6 +8,8 @@
 import express from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 import { getUsedPublicIds } from '../utils/mediaUsage';
+import { authenticateJWT } from '../middleware/authMiddleware';
+import { requireRole } from '../middleware/roleMiddleware';
 
 // Configure Cloudinary with your credentials
 cloudinary.config({
@@ -17,6 +19,14 @@ cloudinary.config({
 });
 
 const router = express.Router();
+
+// SECURITY: All cloudinary management routes are admin-only operations.
+// Apply JWT auth + role check at the router level so every route below is protected.
+router.use(authenticateJWT, requireRole(['Admin', 'SuperAdmin']));
+
+// Allowlist of folders the CMS is permitted to write to.
+// Prevents path traversal into unexpected Cloudinary folders.
+const ALLOWED_FOLDERS = ['cms', 'projects', 'blogs', 'team', 'products', 'homepage', 'franchise', 'services', 'careers'];
 
 /**
  * GET /api/cloudinary/images
@@ -88,10 +98,25 @@ router.post('/upload', async (req, res) => {
       return res.status(400).json({ error: 'No file provided' });
     }
 
+    // SECURITY: Block URL-based uploads to prevent SSRF.
+    // Only base64 data URIs are accepted from the CMS client.
+    // This prevents an admin from pointing the uploader at internal network addresses.
+    if (typeof file === 'string' && !file.startsWith('data:image/')) {
+      return res.status(400).json({
+        error: 'Only base64 image data URIs are accepted. URL-based uploads are not permitted.',
+      });
+    }
+
+    // SECURITY: Restrict to allowlisted folders; fall back to 'cms' if unrecognised.
+    const safeFolder = typeof folder === 'string' && ALLOWED_FOLDERS.includes(folder) ? folder : 'cms';
+
     const uploadOptions: any = {
-      resource_type: 'auto',
-      folder: folder || 'cms',
+      // SECURITY: Use 'image' not 'auto'.
+      // 'auto' would accept executables, PDFs, SVGs-with-scripts, HTML, etc.
+      resource_type: 'image',
+      folder: safeFolder,
       overwrite: false,
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif'],
     };
 
     // Upload to Cloudinary
@@ -108,7 +133,7 @@ router.post('/upload', async (req, res) => {
     console.error('Upload error:', error);
     res.status(500).json({
       error: 'Upload failed',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: 'An error occurred during upload',
     });
   }
 });

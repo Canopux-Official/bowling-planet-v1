@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { globalSettingsApi, type GlobalSettingsData } from '../services/globalSettingsApi';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface GlobalSettingsContextProps {
   settings: GlobalSettingsData | null;
@@ -16,32 +17,33 @@ const GlobalSettingsContext = createContext<GlobalSettingsContextProps>({
 });
 
 export const GlobalSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<GlobalSettingsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchSettings = async () => {
-    try {
-      setLoading(true);
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: ['global-settings'],
+    queryFn: async () => {
       const res = await globalSettingsApi.getSettings();
       if (res.success && res.data) {
-        setSettings(res.data);
-      } else {
-        setError('Failed to load global settings');
+        return res.data;
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching global settings');
-    } finally {
-      setLoading(false);
-    }
+      throw new Error('Failed to load global settings');
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+  });
+
+  const refreshSettings = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['global-settings'] });
   };
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
   return (
-    <GlobalSettingsContext.Provider value={{ settings, loading, error, refreshSettings: fetchSettings }}>
+    <GlobalSettingsContext.Provider 
+      value={{ 
+        settings: data || null, 
+        loading, 
+        error: error ? error.message : null, 
+        refreshSettings 
+      }}
+    >
       {children}
     </GlobalSettingsContext.Provider>
   );

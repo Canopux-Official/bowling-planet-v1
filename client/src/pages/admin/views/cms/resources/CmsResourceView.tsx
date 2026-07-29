@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { theme } from '../../../../../theme';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye, Globe, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../../components/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { resourceService, type IResource } from './services';
 import { ResourceViewModal } from './components/ResourceViewModal';
 import { ResourceModal } from './components/ResourceModal';
@@ -11,46 +12,54 @@ import { ResourceModal } from './components/ResourceModal';
 export const CmsResourceView: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [resources, setResources] = useState<IResource[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [activeResource, setActiveResource] = useState<IResource | null>(null);
 
-  const fetchResources = async () => {
-    setLoading(true);
-    try {
+  const { data: resources = [], isLoading: loading } = useQuery({
+    queryKey: ['cms-resources'],
+    queryFn: async () => {
       const res = await resourceService.getAllAdmin({ limit: 50 });
-      setResources(res.data);
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to load resources');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { fetchResources(); }, []);
-
-  const handleDelete = async (resource: IResource) => {
-    if (!window.confirm(`Delete "${resource.title}"? This cannot be undone.`)) return;
-    try {
-      await resourceService.delete(resource._id);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return resourceService.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-resources'] });
       showToast('success', 'Resource deleted successfully');
-      fetchResources();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to delete resource');
     }
+  });
+
+  const handleDelete = (resource: IResource) => {
+    if (!window.confirm(`Delete "${resource.title}"? This cannot be undone.`)) return;
+    deleteMutation.mutate(resource._id);
   };
 
-  const handleTogglePublish = async (resource: IResource) => {
-    try {
-      const res = await resourceService.togglePublish(resource._id);
+  const togglePublishMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return resourceService.togglePublish(id);
+    },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['cms-resources'] });
       showToast('success', res.data.isPublished ? 'Resource published' : 'Resource unpublished');
-      fetchResources();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to update publish status');
     }
+  });
+
+  const handleTogglePublish = (resource: IResource) => {
+    togglePublishMutation.mutate(resource._id);
   };
 
   return (
@@ -104,7 +113,10 @@ export const CmsResourceView: React.FC = () => {
         resource={activeResource}
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onSaveSuccess={fetchResources}
+        onSaveSuccess={() => {
+          setEditModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['cms-resources'] });
+        }}
       />
       <ResourceViewModal
         resource={activeResource}

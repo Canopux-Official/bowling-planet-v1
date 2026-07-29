@@ -1,6 +1,7 @@
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC } from 'react'
 import SEO from '../../components/SEO'
 import { useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
 import ItemParentLink from './components/ItemParentLink'
@@ -12,39 +13,21 @@ import ItemUsedIn from './components/ItemUsedIn'
 import ItemPurchaseCTA from './components/ItemPurchaseCTA'
 import {
   getProductItemBySlug,
-  type IProductItem,
 } from './services/productItemDetailsApi'
 
 const ProductItemDetailsPage: FC = () => {
   const { itemSlug } = useParams<{ baseSlug: string; itemSlug: string }>()
   const resolvedSlug = itemSlug
-  const [item, setItem] = useState<IProductItem | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    if (!resolvedSlug) {
-      setError('Product not found.')
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await getProductItemBySlug(resolvedSlug)
-      setItem(data)
-    } catch {
-      setError('Unable to load this product.')
-      setItem(null)
-    } finally {
-      setLoading(false)
-    }
-  }, [resolvedSlug])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+  const { data: item, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['public-product-item-details', resolvedSlug],
+    queryFn: async () => {
+      if (!resolvedSlug) throw new Error('Product not found.')
+      return await getProductItemBySlug(resolvedSlug)
+    },
+    enabled: !!resolvedSlug,
+    staleTime: 5 * 60 * 1000,
+  })
 
   if (loading) {
     return (
@@ -58,8 +41,8 @@ const ProductItemDetailsPage: FC = () => {
     return (
       <div className="product-item-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <ErrorState
-          message={error ?? 'Product not found.'}
-          onRetry={() => void load()}
+          message={error ? error.message : 'Product not found.'}
+          onRetry={() => void refetch()}
         />
       </div>
     )

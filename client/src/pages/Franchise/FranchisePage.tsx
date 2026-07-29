@@ -3,7 +3,8 @@
  * Desktop: sticky ROI (left) + scrolling content (right)
  * Mobile: Hero → Advantage → ROI → rest
  */
-import { type FC, useEffect, useState } from 'react'
+import { type FC } from 'react'
+import { useEffect, useState } from 'react'
 import SEO from '../../components/SEO'
 import { franchisePageApi, type FranchisePageData } from '../../services/franchisePageApi'
 import FranchiseHero from './components/FranchiseHero'
@@ -62,16 +63,16 @@ const FranchisePage: FC = () => {
         {/* Mobile first: intro + advantage */}
         <div className="order-1 min-w-0 lg:order-2 lg:col-start-2">
           <FranchiseHero valueProps={data?.valueProps || []} />
-          <FranchiseWhyUs />
+          <FranchiseWhyUs pillars={data?.whyUs || []} />
         </div>
       </div>
 
       {/* Full-width Remaining Sections */}
       <div className="mx-auto mt-8 w-full">
-        <FranchiseOfferings />
+        <FranchiseOfferings offerings={data?.offerings || []} />
         <FranchiseInvestment tiers={data?.investmentTiers || []} />
-        <FranchiseProcess />
-        <FranchiseQualifications />
+        <FranchiseProcess steps={data?.process || []} />
+        <FranchiseQualifications qualifications={data?.qualifications || []} />
         <FranchiseFAQ faqs={data?.faqs || []} />
         <FranchiseApply />
       </div>

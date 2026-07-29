@@ -18,5 +18,9 @@ const RefreshTokenSchema: Schema = new Schema({
 }, { timestamps: true });
 
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// PERFORMANCE + SECURITY: Compound indexes covering all query patterns in token rotation.
+// Without these, every refresh is an O(n) scan over the entire tokens collection.
+RefreshTokenSchema.index({ userId: 1, tokenHash: 1, revoked: 1 }); // findOneAndUpdate (token lookup)
+RefreshTokenSchema.index({ userId: 1, revoked: 1 });                 // countDocuments + updateMany (session management)
 
 export default mongoose.model<IRefreshToken>('RefreshToken', RefreshTokenSchema);

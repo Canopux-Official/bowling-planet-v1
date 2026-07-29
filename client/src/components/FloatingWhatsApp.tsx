@@ -19,6 +19,26 @@ const FloatingWhatsApp: FC = () => {
       return () => clearTimeout(timer)
     }
   }, [])
+
+  const [isScrolling, setIsScrolling] = useState(false)
+
+  useEffect(() => {
+    let scrollTimeout: ReturnType<typeof setTimeout>
+
+    const handleScroll = () => {
+      setIsScrolling(true)
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false)
+      }, 300) // 300ms delay after scroll stops before reappearing
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(scrollTimeout)
+    }
+  }, [])
   
   // Default to placeholder if not loaded yet
   const whatsappNumber = settings?.socials?.whatsappNumber || '919876543210'
@@ -41,11 +61,11 @@ const FloatingWhatsApp: FC = () => {
       className="floating-widget"
       style={{
         position: 'fixed',
-        bottom: 24,
-        left: 24,
+        bottom: 'clamp(16px, 4vw, 24px)',
+        left: 'clamp(16px, 4vw, 24px)',
         zIndex: 9999,
-        width: 60,
-        height: 60,
+        width: 'clamp(46px, 5vw, 52px)',
+        height: 'clamp(46px, 5vw, 52px)',
         backgroundColor: '#25D366',
         borderRadius: '50%',
         display: 'flex',
@@ -53,21 +73,26 @@ const FloatingWhatsApp: FC = () => {
         justifyContent: 'center',
         boxShadow: '0 8px 24px rgba(37, 211, 102, 0.4)',
         cursor: 'pointer',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease, box-shadow 0.3s ease',
+        opacity: isScrolling ? 0 : 1,
+        pointerEvents: isScrolling ? 'none' : 'auto',
+        transform: isScrolling ? 'scale(0.7) translateY(20px)' : 'scale(1) translateY(0)',
       }}
       onMouseEnter={e => {
+        if (isScrolling) return
         e.currentTarget.style.transform = 'scale(1.1) translateY(-4px)'
         e.currentTarget.style.boxShadow = '0 12px 32px rgba(37, 211, 102, 0.5)'
       }}
       onMouseLeave={e => {
+        if (isScrolling) return
         e.currentTarget.style.transform = 'scale(1) translateY(0)'
         e.currentTarget.style.boxShadow = '0 8px 24px rgba(37, 211, 102, 0.4)'
       }}
     >
       <svg
         viewBox="0 0 24 24"
-        width="32"
-        height="32"
+        width="28"
+        height="28"
         fill="white"
         style={{ marginLeft: 2, marginTop: 2 }} // Optical alignment
       >

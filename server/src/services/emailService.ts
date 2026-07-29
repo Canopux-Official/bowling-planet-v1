@@ -10,6 +10,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * SECURITY: Escape HTML special characters in user-supplied strings before
+ * interpolating them into an HTML email body.
+ * Prevents stored XSS via email (an attacker submitting a <script> tag in a
+ * name/phone/businessDetails field, which then executes in an admin's mail client).
+ */
+const escHtml = (value: any): string => {
+  if (value === null || value === undefined) return 'N/A';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 const getEmailTemplate = (otp: string, isResend: boolean, purpose: 'signup' | 'reset-password' | 'login') => {
   let title = 'Verification Code';
   let subText = '';
@@ -81,7 +97,9 @@ export const sendOtpEmail = async (email: string, otp: string, purpose: 'signup'
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
+    // SECURITY: Only log the message ID — not info.response, which may contain
+    // queue metadata or OTP-adjacent identifiers depending on the SMTP provider.
+    console.log('[EmailService] OTP email dispatched. MessageId:', info.messageId);
   } catch (error) {
     console.error('Error sending OTP email:', error);
     throw new Error('Failed to send OTP email');
@@ -111,7 +129,7 @@ export const sendLeadNotification = async (leadData: any) => {
       enquiryDetails = `
       <h3>Enquiry Interests:</h3>
       <ul>
-        ${enquiryItems.map((item: any) => `<li>${item.title}</li>`).join('')}
+        ${enquiryItems.map((item: any) => `<li>${escHtml(item.title)}</li>`).join('')}
       </ul>`;
     }
 
@@ -123,24 +141,24 @@ export const sendLeadNotification = async (leadData: any) => {
         <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
           <tr style="background: #f0fdfa;">
             <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold; width: 30%;">Name</td>
-            <td style="padding: 10px; border: 1px solid #E5E7EB;">${name || 'N/A'}</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${escHtml(name)}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Phone</td>
-            <td style="padding: 10px; border: 1px solid #E5E7EB;">${phone || 'N/A'}</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${escHtml(phone)}</td>
           </tr>
           <tr style="background: #f0fdfa;">
             <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Email</td>
-            <td style="padding: 10px; border: 1px solid #E5E7EB;">${email || 'N/A'}</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${escHtml(email)}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">City</td>
-            <td style="padding: 10px; border: 1px solid #E5E7EB;">${city || 'N/A'}</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${escHtml(city)}</td>
           </tr>
           ${businessDetails ? `
           <tr style="background: #f0fdfa;">
             <td style="padding: 10px; border: 1px solid #E5E7EB; font-weight: bold;">Business Details</td>
-            <td style="padding: 10px; border: 1px solid #E5E7EB;">${businessDetails}</td>
+            <td style="padding: 10px; border: 1px solid #E5E7EB;">${escHtml(businessDetails)}</td>
           </tr>
           ` : ''}
         </table>
@@ -148,7 +166,7 @@ export const sendLeadNotification = async (leadData: any) => {
         ${enquiryDetails}
 
         <p style="margin-top: 30px; font-size: 12px; color: #9CA3AF;">
-          Source: ${utm?.source || 'Direct/Organic'} | Medium: ${utm?.medium || 'N/A'} <br/>
+          Source: ${escHtml(utm?.source || 'Direct/Organic')} | Medium: ${escHtml(utm?.medium || 'N/A')} <br/>
           <em>You can view the full lead details in the Admin Dashboard CRM.</em>
         </p>
       </div>

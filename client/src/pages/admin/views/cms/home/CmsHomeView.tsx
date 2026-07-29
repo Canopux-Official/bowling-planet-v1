@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { homePageApi, type HomePageData } from '../../../../../services/homePageApi';
-import { projectService, type IProject } from '../projects/services/index';
+import { projectService } from '../projects/services/index';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // ─── Style Constants (matching admin light theme) ────────────────────────────
 
@@ -89,7 +90,9 @@ const emptyData: HomePageData = {
   stats: { yearsOfExperience: '', productsAndEquip: '', projectsDelivered: '', citiesServed: '' },
   trustedBrands: [],
   featuredProjects: { projectIds: [] },
-  productInventory: { arcadeGamesCount: '', majorAttractionsCount: '', redemptionGamesCount: '' },
+  productCategories: [],
+  services: [],
+  caseStudies: [],
 };
 
 // ─── Section Header ───────────────────────────────────────────────────────────
@@ -132,73 +135,83 @@ const SectionHeader: React.FC<{
 
 export const CmsHomeView: React.FC = () => {
   const navigate = useNavigate();
-  const [liveData, setLiveData] = useState<HomePageData>(emptyData);
+  const queryClient = useQueryClient();
   const [editData, setEditData] = useState<HomePageData>(emptyData);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [projects, setProjects] = useState<IProject[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-  const [projectsLoading, setProjectsLoading] = useState(true);
+  
+  const [caseStudiesFiles, setCaseStudiesFiles] = useState<{ [index: number]: File }>({});
+  const [trustedBrandsFiles, setTrustedBrandsFiles] = useState<{ [index: number]: File }>({});
+  const [productCategoriesFiles, setProductCategoriesFiles] = useState<{ [index: number]: File }>({});
 
-  useEffect(() => { fetchData(); fetchProjects(); }, []);
+  const { data: liveData, isLoading: loading } = useQuery({
+    queryKey: ['cms-home-page'],
+    queryFn: async () => {
+      const res = await homePageApi.getHomePageData();
+      if (res) {
+        const pIds = (res.featuredProjects?.projectIds || []).map((p: any) =>
+          typeof p === 'string' ? p : p._id
+        );
+        return { ...res, featuredProjects: { projectIds: pIds } };
+      }
+      return emptyData;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: projectsData, isLoading: projectsLoading } = useQuery({
+    queryKey: ['projects', 'all'],
+    queryFn: async () => {
+      const response = await projectService.getAll({ page: 1, limit: 100 });
+      return response.success ? response.data.projects : [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const projects = projectsData || [];
+
+  // When liveData changes, or when entering edit mode, sync editData
+  useEffect(() => {
+    if (liveData && !isEditing) {
+      setEditData(liveData);
+    }
+  }, [liveData, isEditing]);
 
   const showToast = (msg: string, type: 'success' | 'error') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await homePageApi.getHomePageData();
-      if (res) {
-        const pIds = (res.featuredProjects?.projectIds || []).map((p: any) =>
-          typeof p === 'string' ? p : p._id
-        );
-        const formatted = { ...res, featuredProjects: { projectIds: pIds } };
-        setLiveData(formatted);
-        setEditData(formatted);
-      }
-    } catch {
-      showToast('Failed to load home page data.', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchProjects = async () => {
-    setProjectsLoading(true);
-    try {
-      const response = await projectService.getAll({ page: 1, limit: 100 });
-      if (response.success) setProjects(response.data.projects);
-    } catch {
-      console.error('Failed to fetch projects');
-    } finally {
-      setProjectsLoading(false);
-    }
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const res = await homePageApi.updateHomePageData(editData);
-      const pIds = (res.data?.featuredProjects?.projectIds || []).map((p: any) =>
-        typeof p === 'string' ? p : p._id
-      );
-      const saved = { ...(res.data || editData), featuredProjects: { projectIds: pIds } };
-      setLiveData(saved);
-      setEditData(saved);
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      const allFiles: { [key: string]: File } = {};
+      Object.entries(caseStudiesFiles).forEach(([idx, file]) => allFiles[`caseStudiesImage_${idx}`] = file);
+      Object.entries(trustedBrandsFiles).forEach(([idx, file]) => allFiles[`trustedBrandsImage_${idx}`] = file);
+      Object.entries(productCategoriesFiles).forEach(([idx, file]) => allFiles[`productCategoriesImage_${idx}`] = file);
+      
+      await homePageApi.updateHomePageData(editData, Object.keys(allFiles).length ? allFiles : undefined);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-home-page'] });
       setIsEditing(false);
-      showToast('Home page updated successfully!', 'success');
-    } catch {
-      showToast('Failed to save changes. Please try again.', 'error');
-    } finally {
-      setSaving(false);
+      setCaseStudiesFiles({});
+      setTrustedBrandsFiles({});
+      setProductCategoriesFiles({});
+      showToast('Home page saved successfully!', 'success');
+    },
+    onError: () => {
+      showToast('Failed to save changes.', 'error');
     }
-  };
+  });
 
-  const cancelEdit = () => { setEditData(liveData); setIsEditing(false); };
+  const handleSave = () => updateMutation.mutate();
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    if (liveData) setEditData(liveData);
+    setCaseStudiesFiles({});
+    setTrustedBrandsFiles({});
+    setProductCategoriesFiles({});
+  };
 
   // ── Edit data handlers ───────────────────────────────────────────────────
   const setActivity = (i: number, v: string) => {
@@ -210,20 +223,39 @@ export const CmsHomeView: React.FC = () => {
   const addActivity = () =>
     setEditData(p => ({ ...p, hero: { rotatingActivities: [...p.hero.rotatingActivities, ''] } }));
 
-  const setBrand = (i: number, v: string) => {
-    const b = [...editData.trustedBrands]; b[i] = v;
+  const setBrandName = (i: number, v: string) => {
+    const b = [...editData.trustedBrands]; 
+    b[i] = { ...b[i], name: v };
     setEditData(p => ({ ...p, trustedBrands: b }));
   };
-  const removeBrand = (i: number) =>
+  const removeBrand = (i: number) => {
     setEditData(p => ({ ...p, trustedBrands: p.trustedBrands.filter((_, x) => x !== i) }));
+    const newFiles = { ...trustedBrandsFiles }; delete newFiles[i]; setTrustedBrandsFiles(newFiles);
+  };
   const addBrand = () =>
-    setEditData(p => ({ ...p, trustedBrands: [...p.trustedBrands, ''] }));
+    setEditData(p => ({ ...p, trustedBrands: [...p.trustedBrands, { name: '' }] }));
+  const handleBrandFile = (i: number, file: File | null) => {
+    if (file) setTrustedBrandsFiles(prev => ({ ...prev, [i]: file }));
+    else { const newF = { ...trustedBrandsFiles }; delete newF[i]; setTrustedBrandsFiles(newF); }
+  };
 
   const setStat = (k: keyof HomePageData['stats'], v: string) =>
     setEditData(p => ({ ...p, stats: { ...p.stats, [k]: v } }));
 
-  const setInventory = (k: keyof HomePageData['productInventory'], v: string) =>
-    setEditData(p => ({ ...p, productInventory: { ...p.productInventory, [k]: v } }));
+  // --- Product Categories Handlers ---
+  const addProductCategory = () => setEditData(p => ({ ...p, productCategories: [...(p.productCategories || []), { title: '', desc: '', icon: '', count: '', color: '#000000' }] }));
+  const removeProductCategory = (i: number) => {
+    setEditData(p => ({ ...p, productCategories: (p.productCategories || []).filter((_, x) => x !== i) }));
+    const newFiles = { ...productCategoriesFiles }; delete newFiles[i]; setProductCategoriesFiles(newFiles);
+  };
+  const setProductCategoryField = (i: number, field: 'title' | 'desc' | 'icon' | 'count' | 'color', val: string) => {
+    const arr = [...(editData.productCategories || [])]; arr[i] = { ...arr[i], [field]: val };
+    setEditData(p => ({ ...p, productCategories: arr }));
+  };
+  const handleProductCategoryFile = (i: number, file: File | null) => {
+    if (file) setProductCategoriesFiles(prev => ({ ...prev, [i]: file }));
+    else { const newF = { ...productCategoriesFiles }; delete newF[i]; setProductCategoriesFiles(newF); }
+  };
 
   const toggleProject = (id: string) => {
     const current = editData.featuredProjects.projectIds;
@@ -235,6 +267,22 @@ export const CmsHomeView: React.FC = () => {
     }
   };
 
+
+  // --- Case Studies Handlers ---
+  const addCaseStudy = () => setEditData(p => ({ ...p, caseStudies: [...(p.caseStudies || []), { client: '', challenge: '', solution: '', result: '', metric: '' }] }));
+  const removeCaseStudy = (i: number) => {
+    setEditData(p => ({ ...p, caseStudies: (p.caseStudies || []).filter((_, x) => x !== i) }));
+    const newFiles = { ...caseStudiesFiles }; delete newFiles[i]; setCaseStudiesFiles(newFiles);
+  };
+  const setCaseStudyField = (i: number, field: 'client' | 'challenge' | 'solution' | 'result' | 'metric', val: string) => {
+    const arr = [...(editData.caseStudies || [])]; arr[i] = { ...arr[i], [field]: val };
+    setEditData(p => ({ ...p, caseStudies: arr }));
+  };
+  const handleCaseStudyFile = (i: number, file: File | null) => {
+    if (file) setCaseStudiesFiles(prev => ({ ...prev, [i]: file }));
+    else { const newF = { ...caseStudiesFiles }; delete newF[i]; setCaseStudiesFiles(newF); }
+  };
+
   // ─────────────────────────────────────────────────────────────────────────
 
   if (loading) return (
@@ -244,7 +292,7 @@ export const CmsHomeView: React.FC = () => {
     </div>
   );
 
-  const d = isEditing ? editData : liveData;
+  const d = (isEditing ? editData : liveData) || emptyData;
 
   return (
     <div style={{ paddingBottom: 80 }}>
@@ -296,24 +344,19 @@ export const CmsHomeView: React.FC = () => {
         <div style={{ display: 'flex', gap: 10 }}>
           {isEditing ? (
             <>
-              <button onClick={cancelEdit} style={{
-                padding: '10px 20px', borderRadius: 9, border: `1px solid ${theme.colors.adminBorder}`,
-                backgroundColor: theme.colors.adminSurface, color: theme.colors.adminText,
-                cursor: 'pointer', fontWeight: 600, fontSize: 14,
-                display: 'flex', alignItems: 'center', gap: 8,
-              }}>
+              <button onClick={handleCancel} style={{ padding: '10px 20px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`, backgroundColor: theme.colors.adminSurface, color: theme.colors.adminText, cursor: 'pointer', fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <X size={16} /> Cancel
               </button>
-              <button onClick={handleSave} disabled={saving} style={{
-                padding: '10px 22px', borderRadius: 9, border: 'none',
+              <button onClick={handleSave} disabled={updateMutation.isPending} style={{
+                padding: '10px 22px', borderRadius: '8px', border: 'none',
                 backgroundColor: theme.colors.prussianBlue, color: '#fff',
-                cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 14,
+                cursor: updateMutation.isPending ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 14,
                 display: 'flex', alignItems: 'center', gap: 8,
-                opacity: saving ? 0.75 : 1,
+                opacity: updateMutation.isPending ? 0.75 : 1,
                 boxShadow: '0 4px 12px rgba(3,13,26,0.15)',
               }}>
-                {saving ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={16} />}
-                {saving ? 'Saving…' : 'Save Changes'}
+                {updateMutation.isPending ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={16} />}
+                {updateMutation.isPending ? 'Saving…' : 'Save Changes'}
               </button>
             </>
           ) : (
@@ -441,26 +484,47 @@ export const CmsHomeView: React.FC = () => {
           subtitle="Client names scrolling in the marquee strip on the landing page."
         />
         {!isEditing ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
             {d.trustedBrands.length === 0
               ? <p style={{ color: theme.colors.adminTextMuted, fontSize: 14 }}>No brands configured yet.</p>
               : d.trustedBrands.map((b, i) => (
-                <span key={i} style={{ ...tagChip, backgroundColor: '#F0F9FF', border: '1px solid #BAE6FD', color: '#0C4A6E' }}>
-                  {b}
-                </span>
+                <div key={i} style={{ border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#F8FAFC' }}>
+                  {b.image?.url ? (
+                    <img src={b.image.url} alt={b.name} style={{ width: '100%', height: 60, objectFit: 'contain', marginBottom: 8 }} />
+                  ) : (
+                    <div style={{ width: '100%', height: 60, backgroundColor: '#E2E8F0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: theme.colors.adminTextLight, marginBottom: 8 }}>No image</div>
+                  )}
+                  <span style={{ fontSize: 14, fontWeight: 600, color: theme.colors.adminText }}>{b.name || 'Unnamed Brand'}</span>
+                </div>
               ))
             }
           </div>
         ) : (
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {editData.trustedBrands.map((b, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                <input style={input} value={b} onChange={e => setBrand(i, e.target.value)} placeholder="e.g. Fun City" />
-                <button onClick={() => removeBrand(i)} style={deleteBtn}><Trash2 size={16} /></button>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, backgroundColor: '#F8FAFC', position: 'relative' }}>
+                <button onClick={() => removeBrand(i)} style={{ position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: theme.colors.adminDanger, cursor: 'pointer' }}><Trash2 size={16} /></button>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Brand Name</label>
+                  <input style={input} value={b.name} onChange={e => setBrandName(i, e.target.value)} placeholder="e.g. Fun City" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Brand Logo</label>
+                  {trustedBrandsFiles[i] ? (
+                    <div style={{ fontSize: 13, color: theme.colors.prussianBlue }}>{trustedBrandsFiles[i].name} <button onClick={() => handleBrandFile(i, null)} style={{ border: 'none', background: 'none', color: theme.colors.adminDanger, cursor: 'pointer', marginLeft: 8 }}>Remove</button></div>
+                  ) : b.image?.url ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <img src={b.image.url} alt="" style={{ width: 60, height: 40, objectFit: 'contain', borderRadius: 4, backgroundColor: 'white' }} />
+                      <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleBrandFile(i, e.target.files[0])} style={{ fontSize: 13 }} />
+                    </div>
+                  ) : (
+                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleBrandFile(i, e.target.files[0])} style={{ fontSize: 13 }} />
+                  )}
+                </div>
               </div>
             ))}
             <button onClick={addBrand} style={addRowBtn}><Plus size={16} /> Add Brand</button>
-          </>
+          </div>
         )}
       </div>
 
@@ -555,49 +619,134 @@ export const CmsHomeView: React.FC = () => {
         )}
       </div>
 
-      {/* ─────────────── SECTION 5 — PRODUCT INVENTORY ─────────────── */}
+      {/* ─────────────── SECTION 5 — PRODUCT CATEGORIES ─────────────── */}
       <div style={card}>
         <SectionHeader
           icon={<Layers size={20} color={theme.colors.prussianBlue} />}
-          title="Product Inventory Metrics"
-          subtitle="Scale numbers displayed in the Products section (e.g. '200+ Titles')."
+          title="Product Categories"
+          subtitle="Manage the categories displayed in the Products section on the landing page."
         />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          {(
-            [
-              { key: 'arcadeGamesCount', label: 'Arcade Games', icon: '🕹', placeholder: 'e.g. 200+ Titles' },
-              { key: 'majorAttractionsCount', label: 'Major Attractions', icon: '🎳', placeholder: 'e.g. 30+ Categories' },
-              { key: 'redemptionGamesCount', label: 'Redemption Games', icon: '🎫', placeholder: 'e.g. 500+ SKUs' },
-            ] as const
-          ).map(({ key, label, icon, placeholder }) => (
-            <div key={key} style={metricCard(!isEditing)}>
-              {!isEditing ? (
-                <>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>{icon}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: theme.colors.adminText }}>{d.productInventory[key] || '—'}</div>
-                  <div style={{ fontSize: 12, color: theme.colors.adminTextMuted, marginTop: 4 }}>{label}</div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize: 22, marginBottom: 10 }}>{icon}</div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: theme.colors.adminTextMuted, marginBottom: 8 }}>{label}</label>
-                  <input
-                    style={input}
-                    value={editData.productInventory[key]}
-                    onChange={e => setInventory(key, e.target.value)}
-                    placeholder={placeholder}
-                  />
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+        {!isEditing ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {d.productCategories?.length === 0 && <p style={{ color: theme.colors.adminTextMuted, fontSize: 14 }}>No product categories added.</p>}
+            {d.productCategories?.map((cat, i) => (
+              <div key={i} style={{ border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                  <span style={{ fontSize: 24, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F1F5F9', borderRadius: 8 }}>{cat.icon}</span>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 16, color: cat.color }}>{cat.title || 'Untitled'}</div>
+                    <div style={{ fontSize: 13, color: theme.colors.adminTextMuted, fontWeight: 500 }}>{cat.count}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: theme.colors.adminTextMuted, marginBottom: 12 }}>{cat.desc}</div>
+                {cat.image?.url ? <img src={cat.image.url} alt="Category" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8 }} /> : <div style={{ width: '100%', height: 120, backgroundColor: '#f1f5f9', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: theme.colors.adminTextLight }}>No image</div>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {editData.productCategories?.map((cat, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 16, border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, backgroundColor: '#F8FAFC', position: 'relative' }}>
+                <button onClick={() => removeProductCategory(i)} style={{ position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: theme.colors.adminDanger, cursor: 'pointer' }}><Trash2 size={16} /></button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Title</label>
+                    <input style={input} value={cat.title} onChange={e => setProductCategoryField(i, 'title', e.target.value)} placeholder="e.g. Arcade & Video" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Count/Metric</label>
+                    <input style={input} value={cat.count} onChange={e => setProductCategoryField(i, 'count', e.target.value)} placeholder="e.g. 200+ Titles" />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Description</label>
+                    <input style={input} value={cat.desc} onChange={e => setProductCategoryField(i, 'desc', e.target.value)} placeholder="Short description..." />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Icon (Emoji)</label>
+                    <input style={input} value={cat.icon} onChange={e => setProductCategoryField(i, 'icon', e.target.value)} placeholder="🕹" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Theme Color (Hex)</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input type="color" value={cat.color || '#000000'} onChange={e => setProductCategoryField(i, 'color', e.target.value)} style={{ width: 40, height: 40, padding: 0, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
+                      <input style={{ ...input, flex: 1 }} value={cat.color} onChange={e => setProductCategoryField(i, 'color', e.target.value)} placeholder="#5FC1D1" />
+                    </div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Image</label>
+                    {productCategoriesFiles[i] ? <div style={{ fontSize: 13, color: theme.colors.prussianBlue }}>{productCategoriesFiles[i].name} <button onClick={() => handleProductCategoryFile(i, null)} style={{ border: 'none', background: 'none', color: theme.colors.adminDanger, cursor: 'pointer', marginLeft: 8 }}>Remove</button></div> : cat.image?.url ? <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><img src={cat.image.url} alt="" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} /><input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleProductCategoryFile(i, e.target.files[0])} style={{ fontSize: 13 }} /></div> : <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleProductCategoryFile(i, e.target.files[0])} style={{ fontSize: 13 }} />}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button onClick={addProductCategory} style={addRowBtn}><Plus size={16} /> Add Category</button>
+          </div>
+        )}
+      </div>
+
+
+      {/* ─────────────── SECTION 7 — CASE STUDIES ─────────────── */}
+      <div style={card}>
+        <SectionHeader
+          icon={<BarChart2 size={20} color={theme.colors.prussianBlue} />}
+          title="Case Studies"
+          subtitle="Manage the case studies highlighted on the landing page."
+        />
+        {!isEditing ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {d.caseStudies?.length === 0 && <p style={{ color: theme.colors.adminTextMuted, fontSize: 14 }}>No case studies added.</p>}
+            {d.caseStudies?.map((cs, i) => (
+              <div key={i} style={{ border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, padding: 16 }}>
+                <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4, color: theme.colors.adminText }}>{cs.client || 'Untitled'}</div>
+                <div style={{ fontSize: 13, color: theme.colors.adminTextMuted, marginBottom: 4 }}><b>Challenge:</b> {cs.challenge}</div>
+                <div style={{ fontSize: 13, color: theme.colors.adminTextMuted, marginBottom: 4 }}><b>Solution:</b> {cs.solution}</div>
+                <div style={{ fontSize: 13, color: theme.colors.prussianBlue, fontWeight: 600, marginBottom: 12 }}>{cs.metric}</div>
+                {cs.image?.url ? <img src={cs.image.url} alt="Case Study" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8 }} /> : <div style={{ width: '100%', height: 120, backgroundColor: '#f1f5f9', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: theme.colors.adminTextLight }}>No image</div>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {editData.caseStudies?.map((cs, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 16, border: `1px solid ${theme.colors.adminBorder}`, borderRadius: 12, backgroundColor: '#F8FAFC', position: 'relative' }}>
+                <button onClick={() => removeCaseStudy(i)} style={{ position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: theme.colors.adminDanger, cursor: 'pointer' }}><Trash2 size={16} /></button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Client / Project Name</label>
+                    <input style={input} value={cs.client} onChange={e => setCaseStudyField(i, 'client', e.target.value)} placeholder="Client name" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Metric / Result Highlight</label>
+                    <input style={input} value={cs.metric} onChange={e => setCaseStudyField(i, 'metric', e.target.value)} placeholder="e.g. +40% Revenue" />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Challenge</label>
+                    <input style={input} value={cs.challenge} onChange={e => setCaseStudyField(i, 'challenge', e.target.value)} placeholder="What was the challenge?" />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Solution</label>
+                    <input style={input} value={cs.solution} onChange={e => setCaseStudyField(i, 'solution', e.target.value)} placeholder="How did we solve it?" />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Detailed Result</label>
+                    <input style={input} value={cs.result} onChange={e => setCaseStudyField(i, 'result', e.target.value)} placeholder="Detailed outcome" />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, color: theme.colors.adminText }}>Image</label>
+                    {caseStudiesFiles[i] ? <div style={{ fontSize: 13, color: theme.colors.prussianBlue }}>{caseStudiesFiles[i].name} <button onClick={() => handleCaseStudyFile(i, null)} style={{ border: 'none', background: 'none', color: theme.colors.adminDanger, cursor: 'pointer', marginLeft: 8 }}>Remove</button></div> : cs.image?.url ? <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><img src={cs.image.url} alt="" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} /><input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleCaseStudyFile(i, e.target.files[0])} style={{ fontSize: 13 }} /></div> : <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleCaseStudyFile(i, e.target.files[0])} style={{ fontSize: 13 }} />}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button onClick={addCaseStudy} style={addRowBtn}><Plus size={16} /> Add Case Study</button>
+          </div>
+        )}
       </div>
 
       {/* ── Bottom CTA when editing ── */}
       {isEditing && (
         <div style={{
-          position: 'sticky', bottom: 24,
+          position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 100,
           display: 'flex', justifyContent: 'flex-end', gap: 12,
           backgroundColor: 'rgba(244,246,249,0.92)',
           backdropFilter: 'blur(8px)',
@@ -606,7 +755,7 @@ export const CmsHomeView: React.FC = () => {
           border: `1px solid ${theme.colors.adminBorder}`,
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
         }}>
-          <button onClick={cancelEdit} style={{
+          <button onClick={handleCancel} style={{
             padding: '10px 20px', borderRadius: 9, border: `1px solid ${theme.colors.adminBorder}`,
             backgroundColor: theme.colors.adminSurface, color: theme.colors.adminText,
             cursor: 'pointer', fontWeight: 600, fontSize: 14,
@@ -614,16 +763,16 @@ export const CmsHomeView: React.FC = () => {
           }}>
             <X size={16} /> Cancel
           </button>
-          <button onClick={handleSave} disabled={saving} style={{
+          <button onClick={handleSave} disabled={updateMutation.isPending} style={{
             padding: '10px 24px', borderRadius: 9, border: 'none',
             backgroundColor: theme.colors.prussianBlue, color: '#fff',
-            cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 14,
+            cursor: updateMutation.isPending ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 14,
             display: 'flex', alignItems: 'center', gap: 8,
-            opacity: saving ? 0.75 : 1,
+            opacity: updateMutation.isPending ? 0.75 : 1,
             boxShadow: '0 4px 12px rgba(3,13,26,0.15)',
           }}>
-            {saving ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={16} />}
-            {saving ? 'Saving…' : 'Save Changes'}
+            {updateMutation.isPending ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={16} />}
+            {updateMutation.isPending ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
       )}

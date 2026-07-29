@@ -74,7 +74,7 @@ const Nav: FC = () => {
       >
         <div style={{
           maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px, 4vw, 28px)',
-          height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          height: 96, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           gap: 12,
         }}>
 
@@ -95,7 +95,7 @@ const Nav: FC = () => {
               src="/logo.png"
               alt="Bowling Planet"
               style={{
-                height: 'clamp(52px, 6.9vw, 72px)', // increased from clamp(36px, 5vw, 52px)
+                height: 'clamp(64px, 8vw, 88px)', // increased from clamp(52px, 6.9vw, 72px)
                 width: 'auto',
                 flexShrink: 0,
                 objectFit: 'contain',

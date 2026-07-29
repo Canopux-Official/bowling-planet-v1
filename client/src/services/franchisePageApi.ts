@@ -27,11 +27,38 @@ export interface IFranchiseFAQ {
   a: string;
 }
 
+export interface IFranchiseWhyUs {
+  title: string;
+  subtitle: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseOffering {
+  label: string;
+  desc: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseProcess {
+  title: string;
+  desc: string;
+  image?: { url: string; public_id: string };
+}
+
+export interface IFranchiseQualification {
+  title: string;
+  desc: string;
+}
+
 export interface FranchisePageData {
   _id?: string;
   valueProps: IFranchiseValueProp[];
   investmentTiers: IFranchiseInvestmentTier[];
   faqs: IFranchiseFAQ[];
+  whyUs: IFranchiseWhyUs[];
+  offerings: IFranchiseOffering[];
+  process: IFranchiseProcess[];
+  qualifications: IFranchiseQualification[];
 }
 
 export const franchisePageApi = {
@@ -43,10 +70,12 @@ export const franchisePageApi = {
     return res;
   },
 
-  updateFranchisePageData: async (data: Partial<FranchisePageData>): Promise<{ success: boolean; data: FranchisePageData }> => {
+  updateFranchisePageData: async (data: Partial<FranchisePageData> | FormData): Promise<{ success: boolean; data: FranchisePageData }> => {
+    const isFormData = data instanceof FormData;
     const res = await apiClient('/franchise-page', {
       method: 'PUT',
-      body: JSON.stringify(data),
+      headers: isFormData ? {} : undefined, // apiClient handles FormData headers automatically
+      body: isFormData ? data : JSON.stringify(data),
     });
     return res;
   }

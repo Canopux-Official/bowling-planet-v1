@@ -1,5 +1,7 @@
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
+import { FaLink } from 'react-icons/fa'
+import { SocialIcon } from 'react-social-icons'
 import { useGlobalSettings } from '../context/GlobalSettingsContext'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 
@@ -42,6 +44,21 @@ const Footer: FC = () => {
     { platform: 'LinkedIn', url: 'https://linkedin.com' },
   ];
 
+  const getPlatformIcon = (platform: string) => {
+    const p = platform.toLowerCase();
+    
+    // Map platform names to react-social-icons network strings
+    let network = p;
+    if (p.includes('facebook')) network = 'facebook';
+    else if (p.includes('instagram')) network = 'instagram';
+    else if (p.includes('linkedin')) network = 'linkedin';
+    else if (p.includes('twitter') || p.includes('x')) network = 'x';
+    else if (p.includes('youtube')) network = 'youtube';
+    else return <FaLink size={24} color="#6B7280" />;
+
+    return <SocialIcon network={network} style={{ height: 26, width: 26 }} />;
+  };
+
   return (
     <>
 
@@ -55,7 +72,7 @@ const Footer: FC = () => {
             {/* Brand */}
             <div style={{ maxWidth: 260 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
-                <img src="/logo.png" alt="Bowling Planet" style={{ height: 56, width: 'auto' }}
+                <img src="/logo.png" alt="Bowling Planet" style={{ height: 80, width: 'auto' }}
                   onError={e => { const t = e.currentTarget; if (!t.dataset.fb2) { t.dataset.fb2 = '1'; t.src = '/logo.avif' } }} />
 
               </div>
@@ -110,7 +127,7 @@ const Footer: FC = () => {
                     onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(95,193,209,0.4)'; el.style.color = '#5FC1D1'; el.style.background = 'rgba(95,193,209,0.07)' }}
                     onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,255,255,0.08)'; el.style.color = '#48484A'; el.style.background = 'transparent' }}
                   >
-                    {s.platform.substring(0, 2).toUpperCase()}
+                    {getPlatformIcon(s.platform)}
                   </a>
                 ))}
               </div>

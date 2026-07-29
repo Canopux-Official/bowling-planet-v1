@@ -1,13 +1,12 @@
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC } from 'react'
 import SEO from '../../components/SEO'
 import { Link, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import Loader from '../../components/common/Loader'
 import ErrorState from '../../components/common/ErrorState'
 import {
   getBlogBySlug,
   getRelatedBlogs,
-  type BlogListItem,
-  type IBlog,
 } from './services/blogDetailsApi'
 import BlogHeader from './components/BlogHeader'
 import BlogCoverImage from './components/BlogCoverImage'
@@ -17,39 +16,23 @@ import styles from './BlogDetailsPage.module.css'
 
 const BlogDetailsPage: FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const [blog, setBlog] = useState<IBlog | null>(null)
-  const [related, setRelated] = useState<BlogListItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    if (!slug) {
-      setError('Blog not found.')
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-    try {
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['public-blog-details', slug],
+    queryFn: async () => {
+      if (!slug) throw new Error('Blog not found.');
       const [detail, relatedItems] = await Promise.all([
         getBlogBySlug(slug),
         getRelatedBlogs(slug),
-      ])
-      setBlog(detail)
-      setRelated(relatedItems)
-    } catch {
-      setError('Unable to load this blog.')
-      setBlog(null)
-      setRelated([])
-    } finally {
-      setLoading(false)
-    }
-  }, [slug])
+      ]);
+      return { blog: detail, related: relatedItems };
+    },
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  })
 
-  useEffect(() => {
-    void load()
-  }, [load])
+  const blog = data?.blog || null;
+  const related = data?.related || [];
 
   if (loading) {
     return (
@@ -64,8 +47,8 @@ const BlogDetailsPage: FC = () => {
       <main className={styles.page}>
         <div className={styles.missing}>
           <ErrorState
-            message={error ?? 'Blog not found.'}
-            onRetry={error ? () => void load() : undefined}
+            message={error ? error.message : 'Blog not found.'}
+            onRetry={error ? () => void refetch() : undefined}
           />
           <p>
             <Link to="/blog">Back to insights</Link>

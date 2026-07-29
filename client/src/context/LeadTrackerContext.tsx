@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Check } from 'lucide-react';
 
 import { isMobile, osName, browserName } from 'react-device-detect';
 
@@ -85,8 +83,27 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const saved = localStorage.getItem('bp_lead_tracker');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // If they have saved data, they are a returning visitor for this session
-        return { ...parsed, isReturningVisitor: true };
+        // SECURITY: Validate the restored object's shape before merging into state.
+        // A browser extension or XSS payload could write a crafted value to localStorage
+        // and use it to inject a malicious sessionId or pollute the event log.
+        // We validate the minimum required fields; any malformed data is discarded.
+        const isValidShape =
+          typeof parsed === 'object' &&
+          parsed !== null &&
+          !Array.isArray(parsed) &&
+          // sessionId must be a valid UUID v4 (or the sess_ fallback format) — not an arbitrary string
+          (typeof parsed.sessionId === 'string' &&
+            (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(parsed.sessionId) ||
+              /^sess_[a-z0-9]{10,30}$/i.test(parsed.sessionId)));
+
+        if (!isValidShape) {
+          // Data is corrupted or tampered — clear it and start fresh
+          localStorage.removeItem('bp_lead_tracker');
+          return initialState;
+        }
+
+        // Merge against initialState so any new fields added to the schema have safe defaults
+        return { ...initialState, ...parsed, isReturningVisitor: true };
       }
     } catch (e) {
       console.error('Failed to parse lead tracker state from local storage', e);
@@ -95,8 +112,6 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   });
 
   const location = useLocation();
-  const [animationData, setAnimationData] = useState<{ item: EnquiryItem | null; id: number }>({ item: null, id: 0 });
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   // PERFORMANCE: Debounce localStorage writes — prevents synchronous blocking on every state change
@@ -112,12 +127,6 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [state]);
 
-  // Cleanup animation timer on unmount to prevent state updates on unmounted component
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
 
   // Capture UTM parameters from URL on initial load or route change
   useEffect(() => {
@@ -158,13 +167,7 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
 
     if (wasAdded) {
-      const newId = Date.now();
-      setAnimationData({ item, id: newId });
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        setAnimationData((prev) => (prev.id === newId ? { item: null, id: 0 } : prev));
-        setIsCartOpen(true);
-      }, 2500);
+      setIsCartOpen(true);
 
       // We cannot call logCTAEvent here easily if they are both useCallbacks without deps, 
       // but logCTAEvent uses setState(prev), so it's fine to just define it above or inline.
@@ -257,66 +260,6 @@ export const LeadTrackerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }}
     >
       {children}
-
-      <AnimatePresence>
-        {animationData.item && (
-          <motion.div
-            key={animationData.id}
-            initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-30%' }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              x: '-50%',
-              y: '-50%',
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.4,
-              x: '40vw',
-              y: '45vh',
-            }}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 25,
-              mass: 1,
-            }}
-            className="fixed top-1/2 left-1/2 z-[9999] pointer-events-none flex flex-col items-center justify-center bg-white/95 backdrop-blur-xl p-8 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.2)] border border-bp-blue/20 overflow-hidden min-w-[280px]"
-          >
-            {/* Background animated gradient glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-bp-blue/10 to-transparent opacity-50" />
-            
-            <div className="relative w-20 h-20 bg-gradient-to-br from-bp-blue to-blue-400 rounded-2xl flex items-center justify-center mb-4 text-white shadow-xl shadow-bp-blue/30 transform rotate-[-5deg]">
-              <ShoppingBag size={40} />
-              <motion.div
-                initial={{ scale: 0, rotate: -45 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
-                className="absolute -bottom-3 -right-3 bg-gradient-to-br from-green-400 to-green-600 rounded-full p-1.5 shadow-lg shadow-green-500/30 border-2 border-white"
-              >
-                <Check size={20} strokeWidth={4} />
-              </motion.div>
-            </div>
-            
-            <motion.h3 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent text-center"
-            >
-              Added to Enquiry!
-            </motion.h3>
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-sm font-medium text-gray-500 mt-2 max-w-[240px] text-center truncate"
-            >
-              {animationData.item.title}
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </LeadTrackerContext.Provider>
   );
 };

@@ -15,8 +15,6 @@ const SECTIONS = [
   { id: 'case-studies', label: 'Case Studies'  },
   { id: 'products',     label: 'Products'      },
   { id: 'blog',         label: 'Blog'          },
-  { id: 'franchise',    label: 'Franchise'     },
-  { id: 'careers',      label: 'Careers'       },
 ]
 
 const SectionProgressNav: FC = () => {

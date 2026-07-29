@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { theme } from '../../../../../theme';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../../components/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { baseProductService, type IBaseProduct } from './services';
 import { BaseProductViewModal } from './components/BaseProductViewModal';
 import { BaseProductModal } from './components/BaseProductModal';
@@ -12,36 +13,37 @@ import { BaseProductModal } from './components/BaseProductModal';
 export const CmsProductsView: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [products, setProducts] = useState<IBaseProduct[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [activeProduct, setActiveProduct] = useState<IBaseProduct | null>(null);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
+  const { data: products = [], isLoading: loading } = useQuery({
+    queryKey: ['cms-products'],
+    queryFn: async () => {
       const res = await baseProductService.getAll({ limit: 50 });
-      setProducts(res.data);
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { fetchProducts(); }, []);
-
-  const handleDelete = async (product: IBaseProduct) => {
-    if (!window.confirm(`Delete "${product.title}" and all its variants? This cannot be undone.`)) return;
-    try {
-      await baseProductService.delete(product._id);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return baseProductService.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-products'] });
       showToast('success', 'Base product deleted successfully');
-      fetchProducts();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to delete base product');
     }
+  });
+
+  const handleDelete = (product: IBaseProduct) => {
+    if (!window.confirm(`Delete "${product.title}" and all its variants? This cannot be undone.`)) return;
+    deleteMutation.mutate(product._id);
   };
 
   return (
@@ -88,7 +90,10 @@ export const CmsProductsView: React.FC = () => {
         product={activeProduct}
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onSaveSuccess={fetchProducts}
+        onSaveSuccess={() => {
+          setEditModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['cms-products'] });
+        }}
       />
       <BaseProductViewModal
         product={activeProduct}

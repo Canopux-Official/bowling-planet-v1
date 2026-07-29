@@ -10,15 +10,34 @@ export interface IHomePage extends Document {
     projectsDelivered: string;
     citiesServed: string;
   };
-  trustedBrands: string[];
+  trustedBrands: {
+    name: string;
+    image?: { url: string; public_id: string };
+  }[];
   featuredProjects: {
     projectIds: mongoose.Types.ObjectId[];
   };
-  productInventory: {
-    arcadeGamesCount: string;
-    majorAttractionsCount: string;
-    redemptionGamesCount: string;
-  };
+  productCategories: {
+    title: string;
+    desc: string;
+    icon: string;
+    count: string;
+    color: string;
+    image?: { url: string; public_id: string };
+  }[];
+  services: {
+    title: string;
+    subtitle: string;
+    image?: { url: string; public_id: string };
+  }[];
+  caseStudies: {
+    client: string;
+    challenge: string;
+    solution: string;
+    result: string;
+    metric: string;
+    image?: { url: string; public_id: string };
+  }[];
 }
 
 const HomePageSchema: Schema = new Schema(
@@ -32,14 +51,53 @@ const HomePageSchema: Schema = new Schema(
       projectsDelivered: { type: String, default: '50+' },
       citiesServed: { type: String, default: '10+' },
     },
-    trustedBrands: { type: [String], default: [] },
+    trustedBrands: {
+      type: [
+        {
+          name: String,
+          image: { url: String, public_id: String },
+        },
+      ],
+      default: [],
+    },
     featuredProjects: {
       projectIds: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
     },
-    productInventory: {
-      arcadeGamesCount: { type: String, default: '200+ Titles' },
-      majorAttractionsCount: { type: String, default: '30+ Categories' },
-      redemptionGamesCount: { type: String, default: '500+ SKUs' },
+    productCategories: {
+      type: [
+        {
+          title: String,
+          desc: String,
+          icon: String,
+          count: String,
+          color: String,
+          image: { url: String, public_id: String },
+        },
+      ],
+      default: [],
+    },
+    services: {
+      type: [
+        {
+          title: String,
+          subtitle: String,
+          image: { url: String, public_id: String },
+        },
+      ],
+      default: [],
+    },
+    caseStudies: {
+      type: [
+        {
+          client: String,
+          challenge: String,
+          solution: String,
+          result: String,
+          metric: String,
+          image: { url: String, public_id: String },
+        },
+      ],
+      default: [],
     },
   },
   { timestamps: true }

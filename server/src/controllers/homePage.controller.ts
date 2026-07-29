@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { HomePage } from '../models/HomePage';
 import mongoose from 'mongoose';
+import { uploadMedia, deleteMedia } from '../utils/cloudinary';
 
 // Simple in-memory cache
+// Note: Cleared on server restart or PUT requests
 let cachedHomePageData: any = null;
 
 export const getHomePageData = async (req: Request, res: Response): Promise<void> => {
@@ -34,7 +36,62 @@ export const getHomePageData = async (req: Request, res: Response): Promise<void
 
 export const updateHomePageData = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updatePayload = req.body;
+    let updatePayload = { ...req.body };
+
+    // Parse JSON arrays/objects if they come from FormData
+    if (typeof updatePayload.hero === 'string') updatePayload.hero = JSON.parse(updatePayload.hero);
+    if (typeof updatePayload.stats === 'string') updatePayload.stats = JSON.parse(updatePayload.stats);
+    if (typeof updatePayload.trustedBrands === 'string') updatePayload.trustedBrands = JSON.parse(updatePayload.trustedBrands);
+    if (typeof updatePayload.featuredProjects === 'string') updatePayload.featuredProjects = JSON.parse(updatePayload.featuredProjects);
+    if (typeof updatePayload.productCategories === 'string') updatePayload.productCategories = JSON.parse(updatePayload.productCategories);
+    if (typeof updatePayload.services === 'string') updatePayload.services = JSON.parse(updatePayload.services);
+    if (typeof updatePayload.caseStudies === 'string') updatePayload.caseStudies = JSON.parse(updatePayload.caseStudies);
+
+    // Fetch the existing data to cleanup old images if replaced
+    const existingData = await HomePage.findOne();
+
+    // Process image uploads
+    if (req.files && Array.isArray(req.files)) {
+      for (const file of req.files) {
+        if (file.fieldname.startsWith('servicesImage_')) {
+          const idx = parseInt(file.fieldname.split('_')[1], 10);
+          if (updatePayload.services?.[idx]) {
+            const oldPublicId = existingData?.services?.[idx]?.image?.public_id;
+            if (oldPublicId) await deleteMedia(oldPublicId).catch(() => {});
+            
+            const uploaded = await uploadMedia(file.buffer, { folder: 'homepage/services' });
+            updatePayload.services[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
+          }
+        } else if (file.fieldname.startsWith('caseStudiesImage_')) {
+          const idx = parseInt(file.fieldname.split('_')[1], 10);
+          if (updatePayload.caseStudies?.[idx]) {
+            const oldPublicId = existingData?.caseStudies?.[idx]?.image?.public_id;
+            if (oldPublicId) await deleteMedia(oldPublicId).catch(() => {});
+            
+            const uploaded = await uploadMedia(file.buffer, { folder: 'homepage/casestudies' });
+            updatePayload.caseStudies[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
+          }
+        } else if (file.fieldname.startsWith('trustedBrandsImage_')) {
+          const idx = parseInt(file.fieldname.split('_')[1], 10);
+          if (updatePayload.trustedBrands?.[idx]) {
+            const oldPublicId = existingData?.trustedBrands?.[idx]?.image?.public_id;
+            if (oldPublicId) await deleteMedia(oldPublicId).catch(() => {});
+            
+            const uploaded = await uploadMedia(file.buffer, { folder: 'homepage/trustedbrands' });
+            updatePayload.trustedBrands[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
+          }
+        } else if (file.fieldname.startsWith('productCategoriesImage_')) {
+          const idx = parseInt(file.fieldname.split('_')[1], 10);
+          if (updatePayload.productCategories?.[idx]) {
+            const oldPublicId = existingData?.productCategories?.[idx]?.image?.public_id;
+            if (oldPublicId) await deleteMedia(oldPublicId).catch(() => {});
+            
+            const uploaded = await uploadMedia(file.buffer, { folder: 'homepage/productcategories' });
+            updatePayload.productCategories[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
+          }
+        }
+      }
+    }
 
     // 1. Ensure we only have one document. We use findOneAndUpdate without filtering by ID 
     // because there should only be a single singleton document.

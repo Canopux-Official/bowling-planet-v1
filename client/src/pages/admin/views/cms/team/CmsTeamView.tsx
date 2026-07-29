@@ -1,45 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { theme } from '../../../../../theme';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { teamService, type ITeamMember } from './services';
 import { useToast } from '../../../components/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { teamService, type ITeamMember } from './services';
 import { TeamMemberViewModal } from './components/TeamMemberViewModal';
 import { TeamMemberModal } from './components/TeamMemberModal';
 
 export const CmsTeamView: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [members, setMembers] = useState<ITeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [activeMember, setActiveMember] = useState<ITeamMember | null>(null);
 
-  const fetchMembers = async () => {
-    setLoading(true);
-    try {
+  const { data: members = [], isLoading: loading } = useQuery({
+    queryKey: ['cms-team'],
+    queryFn: async () => {
       const res = await teamService.getAll();
-      setMembers(res.data);
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to load team members');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { fetchMembers(); }, []);
-
-  const handleDelete = async (member: ITeamMember) => {
-    if (!window.confirm(`Remove "${member.name}" from the team page? This cannot be undone.`)) return;
-    try {
-      await teamService.delete(member._id);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return teamService.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-team'] });
       showToast('success', 'Team member deleted successfully');
-      fetchMembers();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to delete team member');
     }
+  });
+
+  const handleDelete = (member: ITeamMember) => {
+    if (!window.confirm(`Remove "${member.name}" from the team page? This cannot be undone.`)) return;
+    deleteMutation.mutate(member._id);
   };
 
   return (
@@ -85,7 +87,10 @@ export const CmsTeamView: React.FC = () => {
         member={activeMember}
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onSaveSuccess={fetchMembers}
+        onSaveSuccess={() => {
+          setEditModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['cms-team'] });
+        }}
       />
       <TeamMemberViewModal
         member={activeMember}

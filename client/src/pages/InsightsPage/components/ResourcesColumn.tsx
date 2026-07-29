@@ -1,11 +1,10 @@
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Loader from '../../../components/common/Loader'
 import ErrorState from '../../../components/common/ErrorState'
 import EmptyState from '../../../components/common/EmptyState'
 import {
   getPublishedResources,
-  type IPaginationMeta,
-  type IResource,
   type ResourceType,
 } from '../services/resourcesApi'
 import ResourceCard from './ResourcesColumn/ResourceCard'
@@ -15,52 +14,35 @@ import styles from './ResourcesColumn.module.css'
 const RESOURCE_TYPES: ResourceType[] = ['pdf', 'video', 'tool', 'link', 'guide']
 
 const ResourcesColumn: FC = () => {
-  const [resources, setResources] = useState<IResource[]>([])
-  const [categories, setCategories] = useState<string[]>([]) // Derived state from loaded data
-  const [meta, setMeta] = useState<IPaginationMeta>({
-    page: 1,
-    limit: 4,
-    total: 0,
-    totalPages: 0,
-  })
   const [category, setCategory] = useState('')
   const [type, setType] = useState<ResourceType | ''>('')
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await getPublishedResources({
+  const { data: allCategories } = useQuery({
+    queryKey: ['public-resources-categories'],
+    queryFn: async () => {
+      const data = await getPublishedResources({ page: 1, limit: 100 })
+      return Array.from(new Set(data.resources.map((r) => r.category))).sort()
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['public-resources', page, category, type],
+    queryFn: async () => {
+      return await getPublishedResources({
         page,
         limit: 4,
         category: category || undefined,
         type: type || undefined,
       })
-      
-      setResources(data.resources)
-      setMeta(data.meta)
+    },
+    staleTime: 5 * 60 * 1000,
+  })
 
-      // Dynamically extract unique categories from the fetched data array if not filtering
-      // This prevents the category dropdown from shrinking to only 1 item when a category filter is active
-      if (!category) {
-        const uniqueCategories = Array.from(
-          new Set(data.resources.map((r) => r.category))
-        ).sort()
-        setCategories(uniqueCategories)
-      }
-    } catch {
-      setError('Unable to load resources.')
-    } finally {
-      setLoading(false)
-    }
-  }, [page, category, type])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+  const categories = allCategories || []
+  const resources = data?.resources || []
+  const meta = data?.meta || { page: 1, limit: 4, total: 0, totalPages: 0 }
 
   return (
     <section className={styles.column} aria-labelledby="resources-heading">
@@ -114,13 +96,13 @@ const ResourcesColumn: FC = () => {
         </div>
       </div>
 
-      {loading ? <Loader label="Loading resources…" /> : null}
-      {error ? <ErrorState message={error} onRetry={() => void load()} /> : null}
-      {!loading && !error && resources.length === 0 ? (
+      {isLoading ? <Loader label="Loading resources…" /> : null}
+      {error ? <ErrorState message="Unable to load resources." onRetry={() => void refetch()} /> : null}
+      {!isLoading && !error && resources.length === 0 ? (
         <EmptyState message="No published resources found." />
       ) : null}
 
-      {!loading && !error && resources.length > 0 ? (
+      {!isLoading && !error && resources.length > 0 ? (
         <>
           <div className={styles.list}>
             {resources.map((resource) => (

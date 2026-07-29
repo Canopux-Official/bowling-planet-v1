@@ -58,7 +58,10 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
     // 1. Cross-Device Deduplication: Find existing lead by Session OR Email OR Phone
     let existingLead = null;
     const searchConditions = [];
-    if (sessionId) searchConditions.push({ sessionId });
+    // SECURITY: Validate sessionId is a proper UUID before using it as a lookup key.
+    // An attacker could supply a known sessionId to overwrite another lead's record.
+    const isValidSessionId = sessionId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId);
+    if (isValidSessionId) searchConditions.push({ sessionId });
     if (email) searchConditions.push({ email });
     if (phone) searchConditions.push({ phone });
 
@@ -147,7 +150,10 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
       sendLeadNotification(savedLead).catch(console.error);
     }
 
-    res.status(201).json({ success: true, data: savedLead });
+    // SECURITY: Return only a minimal acknowledgement to the public caller.
+    // Never expose the full lead document — it contains IP address, device fingerprint,
+    // behavioral eventLog, and sessionId that could be used to correlate/spoof future requests.
+    res.status(201).json({ success: true, data: { id: savedLead?._id } });
   } catch (error: unknown) {
     // SECURITY: Log full error internally, never expose to client
     console.error('[LeadController] createLead error:', getErrorMessage(error));
@@ -188,7 +194,9 @@ export const savePartialLead = async (req: Request, res: Response): Promise<void
     // 1. Cross-Device Deduplication: Find existing lead by Session OR Email OR Phone
     let existingLead = null;
     const searchConditions = [];
-    if (sessionId) searchConditions.push({ sessionId });
+    // SECURITY: Validate sessionId is a proper UUID before using it as a lookup key.
+    const isValidSessionId = sessionId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId);
+    if (isValidSessionId) searchConditions.push({ sessionId });
     if (email) searchConditions.push({ email });
     if (phone) searchConditions.push({ phone });
 
@@ -296,15 +304,43 @@ export const getLeads = async (req: Request, res: Response): Promise<void> => {
       filter.isPartial = req.query.isPartial === 'true';
     }
     
+    const andConditions: any[] = [];
+
+    if (req.query.contactInfo === 'no_contact') {
+      andConditions.push({ 
+        $and: [
+          { $or: [{ phone: { $exists: false } }, { phone: '' }, { phone: null }, { phone: 'Not Provided' }] },
+          { $or: [{ email: { $exists: false } }, { email: '' }, { email: null }] }
+        ] 
+      });
+    } else if (req.query.contactInfo === 'has_contact') {
+      andConditions.push({ 
+        $or: [
+          { phone: { $exists: true, $nin: ['', null, 'Not Provided'] } },
+          { email: { $exists: true, $nin: ['', null] } }
+        ] 
+      });
+    }
+
     // Search filter across multiple text fields
     if (req.query.search) {
-      const searchRegex = { $regex: req.query.search as string, $options: 'i' };
-      filter.$or = [
-        { name: searchRegex },
-        { email: searchRegex },
-        { phone: searchRegex },
-        { city: searchRegex }
-      ];
+      // SECURITY: Escape regex special characters before passing to MongoDB.
+      // An unescaped ReDoS pattern like ((a+)+)b causes CPU spin on the DB node.
+      const rawSearch = (req.query.search as string).slice(0, 100); // hard length cap
+      const escaped = rawSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = { $regex: escaped, $options: 'i' };
+      andConditions.push({
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+          { phone: searchRegex },
+          { city: searchRegex }
+        ]
+      });
+    }
+
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
 
     const [leads, total] = await Promise.all([

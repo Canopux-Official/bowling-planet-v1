@@ -1,77 +1,44 @@
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Loader from '../../../components/common/Loader'
 import ErrorState from '../../../components/common/ErrorState'
 import EmptyState from '../../../components/common/EmptyState'
 import Tag from '../../../components/common/Tag'
 import {
   getPublishedBlogs,
-  type BlogListItem,
-  type IPaginationMeta,
 } from '../services/blogsApi'
 import BlogCard from './BlogsColumn/BlogCard'
 import BlogsPagination from './BlogsColumn/BlogsPagination'
 import styles from './BlogsColumn.module.css'
 
 const BlogsColumn: FC = () => {
-  const [blogs, setBlogs] = useState<BlogListItem[]>([])
-  const [meta, setMeta] = useState<IPaginationMeta>({
-    page: 1,
-    limit: 4,
-    total: 0,
-    totalPages: 0,
-  })
   const [tag, setTag] = useState('')
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  const [availableTags, setAvailableTags] = useState<string[]>([])
+  const { data: tagsData } = useQuery({
+    queryKey: ['public-blogs-tags'],
+    queryFn: async () => {
+      const data = await getPublishedBlogs({ page: 1, limit: 100 })
+      return Array.from(new Set(data.blogs.flatMap((b) => b.tags))).sort()
+    },
+    staleTime: 5 * 60 * 1000,
+  })
 
-  // Load once on mount, unfiltered and unpaginated (within reason), purely
-  // to build the tag filter list. There's no dedicated tags endpoint on the
-  // backend yet — if one gets added, replace this with that call.
-  useEffect(() => {
-    let cancelled = false
-
-    const loadTags = async () => {
-      try {
-        const data = await getPublishedBlogs({ page: 1, limit: 100 })
-        if (cancelled) return
-        const tags = Array.from(new Set(data.blogs.flatMap((b) => b.tags))).sort()
-        setAvailableTags(tags)
-      } catch {
-        // Non-critical — filter bar just won't populate. Main list load
-        // below still runs and will surface its own error state.
-      }
-    }
-
-    void loadTags()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await getPublishedBlogs({
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['public-blogs', page, tag],
+    queryFn: async () => {
+      return await getPublishedBlogs({
         page,
         limit: 4,
         tag: tag || undefined,
       })
-      setBlogs(data.blogs)
-      setMeta(data.meta)
-    } catch {
-      setError('Unable to load blogs.')
-    } finally {
-      setLoading(false)
-    }
-  }, [page, tag])
+    },
+    staleTime: 5 * 60 * 1000,
+  })
 
-  useEffect(() => {
-    void load()
-  }, [load])
+  const availableTags = tagsData || []
+  const blogs = data?.blogs || []
+  const meta = data?.meta || { page: 1, limit: 4, total: 0, totalPages: 0 }
 
   return (
     <section className={styles.column} aria-labelledby="blogs-heading">
@@ -102,13 +69,13 @@ const BlogsColumn: FC = () => {
         ))}
       </div>
 
-      {loading ? <Loader label="Loading blogs…" /> : null}
-      {error ? <ErrorState message={error} onRetry={() => void load()} /> : null}
-      {!loading && !error && blogs.length === 0 ? (
+      {isLoading ? <Loader label="Loading blogs…" /> : null}
+      {error ? <ErrorState message="Unable to load blogs." onRetry={() => void refetch()} /> : null}
+      {!isLoading && !error && blogs.length === 0 ? (
         <EmptyState message="No published blogs found." />
       ) : null}
 
-      {!loading && !error && blogs.length > 0 ? (
+      {!isLoading && !error && blogs.length > 0 ? (
         <>
           <div className={styles.list}>
             {blogs.map((blog) => (

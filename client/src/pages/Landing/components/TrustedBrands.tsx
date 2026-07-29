@@ -63,7 +63,7 @@ const BrandModal: FC<{ brand: BrandInfo; onClose: () => void }> = ({ brand, onCl
           <img
             src={brand.logo}
             alt={brand.name}
-            className="mb-3 h-10 w-auto max-w-[200px] object-contain object-left"
+            className="mb-4 h-16 sm:h-20 w-auto max-w-[250px] object-contain object-left drop-shadow-lg"
           />
         ) : (
           <h3 className="mb-2 font-display text-[clamp(1.35rem,4vw,1.75rem)] font-normal leading-tight text-[#F5F5F7]">
@@ -95,8 +95,8 @@ const BrandCard: FC<{
     onClick={onClick}
     className={`flex cursor-pointer flex-col items-start justify-center rounded-2xl border border-white/[0.08] bg-white/[0.03] text-left transition-[transform,border-color,background] duration-300 hover:-translate-y-0.5 hover:border-[#5FC1D1]/40 hover:bg-white/[0.05] ${
       compact
-        ? 'min-h-[96px] w-full p-3.5 sm:p-4'
-        : 'h-auto min-h-[110px] w-[min(260px,78vw)] shrink-0 px-5 py-4'
+        ? 'min-h-[80px] w-full p-3 sm:p-3.5'
+        : 'h-auto min-h-[100px] w-[min(220px,70vw)] shrink-0 px-4 py-4'
     }`}
   >
     <div className="mb-2 flex items-center gap-2">
@@ -112,13 +112,15 @@ const BrandCard: FC<{
       </span>
     </div>
     {brand.logo ? (
-      <img
-        src={brand.logo}
-        alt={brand.name}
-        className={`w-auto object-contain object-left ${
-          compact ? 'h-8 max-w-[140px] sm:h-9 sm:max-w-[160px]' : 'h-10 max-w-[180px] sm:h-11 sm:max-w-[200px]'
-        }`}
-      />
+      <div className="flex flex-1 w-full items-center">
+        <img
+          src={brand.logo}
+          alt={brand.name}
+          className={`w-auto max-w-full object-contain object-left drop-shadow-md ${
+            compact ? 'h-[60px] sm:h-[70px]' : 'h-[80px] sm:h-[100px]'
+          }`}
+        />
+      </div>
     ) : (
       <span
         className={`font-[family-name:var(--font-data)] font-extrabold leading-snug tracking-[-0.02em] text-white ${
@@ -131,21 +133,23 @@ const BrandCard: FC<{
   </button>
 )
 
-const TrustedBrands: FC<{ data?: string[] }> = ({ data }) => {
+const TrustedBrands: FC<{ data?: { name: string, image?: { url: string, public_id: string } }[] }> = ({ data }) => {
   const ref = useReveal()
   const [selected, setSelected] = useState<BrandInfo | null>(null)
 
   const activeBrands: BrandInfo[] =
     data && data.length > 0
       ? data.map(
-          (name) =>
-            BRANDS.find((b) => b.name === name) || {
-              name,
-              note: 'Trusted partner.',
-              year: '',
-              category: 'FEC',
-              logo: '',
-            },
+          (dbBrand) => {
+            const hardcodedBrand = BRANDS.find((b) => b.name === dbBrand.name);
+            return {
+              name: dbBrand.name,
+              note: hardcodedBrand ? hardcodedBrand.note : 'Trusted partner.',
+              year: hardcodedBrand ? hardcodedBrand.year : '',
+              category: hardcodedBrand ? hardcodedBrand.category : 'FEC',
+              logo: dbBrand.image?.url || (hardcodedBrand ? hardcodedBrand.logo : ''),
+            };
+          }
         )
       : BRANDS
 
@@ -207,27 +211,39 @@ const TrustedBrands: FC<{ data?: string[] }> = ({ data }) => {
               className="pointer-events-none absolute bottom-0 right-0 top-0 z-[2] w-24 bg-gradient-to-l from-black to-transparent xl:w-36"
             />
 
-            {rows.map((row, rowIdx) => (
-              <div
-                key={rowIdx}
-                className="flex w-max gap-5"
-                style={{
-                  animation:
-                    rowIdx % 2 === 0
-                      ? `trusted-marquee-left ${34 + rowIdx * 4}s linear infinite`
-                      : `trusted-marquee-right ${36 + rowIdx * 3}s linear infinite`,
-                }}
-              >
-                {[...row, ...row, ...row, ...row].map((brand, i) => (
-                  <BrandCard
-                    key={`r${rowIdx}-${i}`}
-                    brand={brand}
-                    i={i + rowIdx * 10}
-                    onClick={() => setSelected(brand)}
-                  />
-                ))}
-              </div>
-            ))}
+            {rows.map((row, rowIdx) => {
+              // Ensure the repeating block has enough items to span wide screens
+              let repeatBlock = [...row];
+              while (repeatBlock.length < 15) {
+                repeatBlock = [...repeatBlock, ...row];
+              }
+              
+              return (
+                <div
+                  key={rowIdx}
+                  className="flex w-max"
+                  style={{
+                    animation:
+                      rowIdx % 2 === 0
+                        ? `trusted-marquee-left ${30 + rowIdx * 5}s linear infinite`
+                        : `trusted-marquee-right ${35 + rowIdx * 5}s linear infinite`,
+                  }}
+                >
+                  {[0, 1].map((blockIdx) => (
+                    <div key={blockIdx} className="flex shrink-0 gap-5 pr-5">
+                      {repeatBlock.map((brand, i) => (
+                        <BrandCard
+                          key={`r${rowIdx}-b${blockIdx}-${i}`}
+                          brand={brand}
+                          i={i + rowIdx * 10}
+                          onClick={() => setSelected(brand)}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </div>
 

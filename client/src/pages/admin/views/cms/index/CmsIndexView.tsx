@@ -33,6 +33,13 @@ const cmsCards = [
     tag: 'Catalog'
   },
   { 
+    title: 'Services Page', 
+    description: 'Manage the standalone services pages content and options.', 
+    icon: FolderKanban, 
+    path: '/admin/cms/services',
+    tag: 'Core'
+  },
+  { 
     title: 'Projects', 
     description: 'Upload project gallery photos and detail pages.', 
     icon: FolderKanban, 

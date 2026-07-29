@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { franchisePageApi, type FranchisePageData } from '../../../../../services/franchisePageApi';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ─── Style Constants (matching admin light theme) ─────────────────────────────
 
@@ -111,6 +112,7 @@ const SectionHeader: React.FC<{
 
 const CmsFranchiseView: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [data, setData] = useState<FranchisePageData | null>(null);
   const [liveData, setLiveData] = useState<FranchisePageData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -153,6 +155,7 @@ const CmsFranchiseView: React.FC = () => {
         setData(response.data);
         setLiveData(response.data);
         setIsEditing(false);
+        queryClient.invalidateQueries({ queryKey: ['cms-franchise-page'] });
         showToast('Franchise page updated successfully!', 'success');
       }
     } catch (error) {

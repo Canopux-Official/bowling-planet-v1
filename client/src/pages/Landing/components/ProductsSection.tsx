@@ -11,48 +11,7 @@ import { useReveal } from '../../../hooks/useReveal'
 import { useLeadTracker } from '../../../context/LeadTrackerContext'
 import { Plus, Check, ArrowRight, BarChart } from 'lucide-react'
 
-const CATEGORIES = [
-  {
-    id: 'arcade', num: '01',
-    title: 'Arcade & Video',
-    desc: 'Latest-generation skill, racing, and video arcade machines. From classic redemption to immersive 4D experiences.',
-    icon: '🕹',
-    count: '200+ Titles',
-    color: '#5FC1D1',
-    rgb: '95,193,209',
-    image: '/products/Arcade_Games_Calicut.avif',
-  },
-  {
-    id: 'major', num: '02',
-    title: 'Major Attractions',
-    desc: 'Headline centrepieces — bowling lanes, VR arenas, trampoline parks, mini golf, go-kart tracks, cricket simulators, and rope courses.',
-    icon: '🎳',
-    count: '30+ Categories',
-    color: '#6DBD4E',
-    rgb: '109,189,78',
-    image: '/products/Bowling_Lane_Dubai.avif',
-  },
-  {
-    id: 'redemption', num: '03',
-    title: 'Redemption Games',
-    desc: 'High-engagement ticket-based games with proven repeat-visit ROI. Data-backed selection to maximise in-venue spend.',
-    icon: '🎫',
-    count: '500+ SKUs',
-    color: '#FFAA33',
-    rgb: '255,170,51',
-    image: '/products/Softplay_Ahemdabad.avif',
-  },
-  {
-    id: 'outdoor', num: '04',
-    title: 'Outdoor & Adventure',
-    desc: 'Large scale outdoor equipment, ziplines, and adventure park structural builds designed for high-throughput and safety.',
-    icon: '🧗',
-    count: '15+ Types',
-    color: '#C084FC',
-    rgb: '192,132,252',
-    image: '/products/Softplay_New_Delhi.avif',
-  },
-]
+
 
 const ATTRACTION_TAGS = [
   'Bowling Lanes', 'VR Gaming', 'Mini Golf', 'Trampoline Parks',
@@ -67,14 +26,25 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
 
   const isAdded = (id: string) => state.enquiryCart.some(item => item.id === id)
 
-  const activeCategories = [
-    { ...CATEGORIES[0], count: data?.arcadeGamesCount || CATEGORIES[0].count },
-    { ...CATEGORIES[1], count: data?.majorAttractionsCount || CATEGORIES[1].count },
-    { ...CATEGORIES[2], count: data?.redemptionGamesCount || CATEGORIES[2].count },
-    CATEGORIES[3],
-  ]
+  // Helper to convert hex to rgb
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : '255,255,255';
+  };
 
-  const activeCat = activeCategories[activeIdx]
+  const activeCategories = data?.productCategories?.length ? data.productCategories.map((cat: any, i: number) => ({
+    id: `cat-${i}`,
+    num: String(i + 1).padStart(2, '0'),
+    title: cat.title,
+    desc: cat.desc,
+    icon: cat.icon,
+    count: cat.count,
+    color: cat.color || '#ffffff',
+    rgb: hexToRgb(cat.color || '#ffffff'),
+    image: cat.image?.url || '',
+  })) : [];
+
+  const activeCat = activeCategories[activeIdx] || { rgb: '255,255,255', image: '', title: '', id: 'empty' }
 
   return (
     <section
@@ -83,7 +53,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
     >
       {/* Ambient glow behind everything */}
       <AnimatePresence>
-        {activeCategories.map((cat, i) =>
+        {activeCategories.map((cat: any, i: number) =>
           activeIdx === i ? (
             <motion.div
               key={cat.id + '-ambient'}
@@ -193,7 +163,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
         >
           {/* Left: category list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {activeCategories.map((cat, i) => {
+            {activeCategories.map((cat: any, i: number) => {
               const isActive = activeIdx === i
 
               return (

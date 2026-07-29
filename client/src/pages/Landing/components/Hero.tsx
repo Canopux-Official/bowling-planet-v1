@@ -156,7 +156,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 112,
+        paddingTop: 128,
         paddingBottom: 'clamp(80px, 10vh, 120px)',
         background: '#000',
       }}
@@ -399,7 +399,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               title="IAAPA Member"
               style={{
                 display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 14px)',
-                padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 24px)', borderRadius: 16,
+                padding: 'clamp(4px, 1vw, 8px) clamp(8px, 2vw, 16px)', borderRadius: 16,
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.2)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -419,9 +419,9 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               }}
             >
               <img
-                src="/partners/iaapa.svg"
+                src="/iaapa.png"
                 alt="IAAPA"
-                style={{ height: 'clamp(20px, 4vw, 28px)', width: 'auto', maxWidth: 110, objectFit: 'contain', display: 'block' }}
+                style={{ height: 'clamp(40px, 8vw, 56px)', width: 'auto', maxWidth: 200, objectFit: 'contain', display: 'block' }}
               />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(8.5px, 1.5vw, 10px)', color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 'clamp(8px, 1.5vw, 12px)', letterSpacing: '0.1em' }}>Member<br />Certified</div>
             </div>
@@ -430,7 +430,7 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               title="ISO 9001:2015 Certified"
               style={{
                 display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 14px)',
-                padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 3vw, 24px)', borderRadius: 16,
+                padding: 'clamp(4px, 1vw, 8px) clamp(8px, 2vw, 16px)', borderRadius: 16,
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.2)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
@@ -450,9 +450,9 @@ const Hero: FC<{ data?: { rotatingActivities: string[] } }> = ({ data }) => {
               }}
             >
               <img
-                src="/partners/iso.svg"
+                src="/iso.jpg"
                 alt="ISO"
-                style={{ height: 'clamp(26px, 5vw, 36px)', width: 'auto', objectFit: 'contain', display: 'block', borderRadius: 4 }}
+                style={{ height: 'clamp(44px, 9vw, 64px)', width: 'auto', objectFit: 'contain', display: 'block', borderRadius: 4 }}
               />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(8.5px, 1.5vw, 10px)', color: '#fff', fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.3, borderLeft: '2px solid rgba(255,255,255,0.4)', paddingLeft: 'clamp(8px, 1.5vw, 12px)', letterSpacing: '0.1em' }}>9001:2015<br />Certified</div>
             </div>

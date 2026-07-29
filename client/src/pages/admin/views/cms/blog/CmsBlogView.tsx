@@ -1,54 +1,63 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { theme } from '../../../../../theme';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye, Globe, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { blogService, type IBlog } from './services';
 import { BlogPreviewModal } from './components/BlogPreviewModal';
 import { useToast } from '../../../components/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 
 export const CmsBlogView: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [blogs, setBlogs] = useState<IBlog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [activeBlog, setActiveBlog] = useState<IBlog | null>(null);
 
-  const fetchBlogs = async () => {
-    setLoading(true);
-    try {
+  const { data: blogs = [], isLoading: loading } = useQuery({
+    queryKey: ['cms-blogs'],
+    queryFn: async () => {
       const res = await blogService.getAllAdmin({ limit: 50 });
-      setBlogs(res.data);
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to load blogs');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => { fetchBlogs(); }, []);
-
-  const handleDelete = async (blog: IBlog) => {
-    if (!window.confirm(`Delete "${blog.title}"? This cannot be undone.`)) return;
-    try {
-      await blogService.delete(blog._id);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return blogService.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-blogs'] });
       showToast('success', 'Blog deleted successfully');
-      fetchBlogs();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to delete blog');
     }
+  });
+
+  const handleDelete = (blog: IBlog) => {
+    if (!window.confirm(`Delete "${blog.title}"? This cannot be undone.`)) return;
+    deleteMutation.mutate(blog._id);
   };
 
-  const handleTogglePublish = async (blog: IBlog) => {
-    try {
-      const res = await blogService.togglePublish(blog._id);
+  const togglePublishMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return blogService.togglePublish(id);
+    },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['cms-blogs'] });
       showToast('success', res.data.isPublished ? 'Blog published' : 'Blog unpublished');
-      fetchBlogs();
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       showToast('error', err.message || 'Failed to update publish status');
     }
+  });
+
+  const handleTogglePublish = (blog: IBlog) => {
+    togglePublishMutation.mutate(blog._id);
   };
 
   return (

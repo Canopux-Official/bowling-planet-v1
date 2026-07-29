@@ -284,7 +284,19 @@ const TestimonialCarousel: FC = () => {
 
 const HOVER_DELAY_MS = 200
 
-const CaseStudiesSection: FC = () => {
+interface CaseStudiesSectionProps {
+  data?: {
+    _id?: string;
+    client: string;
+    challenge: string;
+    solution: string;
+    result: string;
+    metric: string;
+    image?: { url: string; public_id: string };
+  }[];
+}
+
+const CaseStudiesSection: FC<CaseStudiesSectionProps> = ({ data }) => {
   const [activeIdx, setActiveIdx] = useState(0)
   const [paused, setPaused] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -311,13 +323,24 @@ const CaseStudiesSection: FC = () => {
 
   useEffect(() => () => clearHoverTimer(), [clearHoverTimer])
 
+  // Use CMS data if available, otherwise fallback to hardcoded
+  const caseStudies = data && data.length > 0 ? data.map((cs, i) => ({
+    id: cs._id || `cs-${i}`,
+    client: cs.client,
+    challenge: cs.challenge,
+    solution: cs.solution,
+    result: cs.result,
+    metric: cs.metric,
+    image: cs.image?.url || FALLBACK_SIDE_IMAGE,
+  })) : CASE_STUDIES;
+
   useEffect(() => {
-    if (reduced || paused) return
+    if (reduced || paused || caseStudies.length === 0) return
     const timer = setInterval(() => {
-      setActiveIdx((i) => (i + 1) % CASE_STUDIES.length)
+      setActiveIdx((i) => (i + 1) % caseStudies.length)
     }, 5500)
     return () => clearInterval(timer)
-  }, [reduced, paused])
+  }, [reduced, paused, caseStudies.length])
 
   return (
     <section
@@ -352,7 +375,7 @@ const CaseStudiesSection: FC = () => {
             clearHoverTimer()
           }}
         >
-          {CASE_STUDIES.map((study, i) => {
+          {caseStudies.map((study, i) => {
             const isActive = activeIdx === i
             return (
               <button

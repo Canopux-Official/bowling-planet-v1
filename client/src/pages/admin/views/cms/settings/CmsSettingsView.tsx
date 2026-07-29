@@ -7,6 +7,18 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { globalSettingsApi, type GlobalSettingsData } from '../../../../../services/globalSettingsApi';
+import { SocialIcon } from 'react-social-icons';
+
+// ─── Helper for Social Icons ───────────────────────────────────────────
+const getNetworkString = (platform: string) => {
+  const p = platform.toLowerCase();
+  if (p.includes('facebook')) return 'facebook';
+  if (p.includes('instagram')) return 'instagram';
+  if (p.includes('linkedin')) return 'linkedin';
+  if (p.includes('twitter') || p.includes('x')) return 'x';
+  if (p.includes('youtube')) return 'youtube';
+  return 'sharethis';
+};
 
 // ─── Style Constants (matching admin light theme) ────────────────────────────
 
@@ -297,8 +309,8 @@ const CmsSettingsView: React.FC = () => {
               ) : (
                 data.socials.links.map((link, idx) => (
                   <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '8px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', fontWeight: 600, fontSize: '12px' }}>
-                      {link.platform.substring(0, 2).toUpperCase()}
+                    <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <SocialIcon network={getNetworkString(link.platform)} style={{ height: 32, width: 32 }} />
                     </div>
                     <div>
                       <div style={{ fontSize: '14px', fontWeight: 600, color: '#0F172A' }}>{link.platform}</div>

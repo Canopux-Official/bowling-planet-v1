@@ -4,14 +4,27 @@ import { theme } from '../../../../theme';
 import { User, Mail, Shield, Key, LogOut, X as XIcon, Loader2, Check } from 'lucide-react';
 import { authApi } from '../../../Auth/services/authApi';
 import { useToast } from '../../components/Toast';
-import { Turnstile } from '@marsidev/react-turnstile'
+import { Turnstile } from '@marsidev/react-turnstile';
+import { useMutation } from '@tanstack/react-query';
 
 export const ProfileView: React.FC = () => {
   const { user, logout, login } = useAuth();
   const { showToast } = useToast();
 
   const [name, setName] = useState(user?.name || '');
-  const [isSavingName, setIsSavingName] = useState(false);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (newName: string) => authApi.updateProfile({ name: newName }),
+    onSuccess: (res) => {
+      if (user) {
+        login({ ...user, name: res.user.name });
+      }
+      showToast('success', 'Profile updated successfully');
+    },
+    onError: (err: any) => {
+      showToast('error', err.message || 'Failed to update profile');
+    }
+  });
 
   // Password Reset Modal State
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -21,24 +34,6 @@ export const ProfileView: React.FC = () => {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-
-  const handleSaveProfile = async () => {
-    if (!name.trim()) return showToast('error', 'Name cannot be empty');
-    if (name === user?.name) return; // No changes
-
-    setIsSavingName(true);
-    try {
-      const res = await authApi.updateProfile({ name });
-      if (user) {
-        login({ ...user, name: res.user.name }); // update context user
-      }
-      showToast('success', 'Profile updated successfully');
-    } catch (err: any) {
-      showToast('error', err.message || 'Failed to update profile');
-    } finally {
-      setIsSavingName(false);
-    }
-  };
 
   const handleRequestPasswordReset = async () => {
     if (!user?.email) return;
@@ -213,18 +208,21 @@ export const ProfileView: React.FC = () => {
               <LogOut size={16} /> Sign Out
             </button>
 
-            <button
-              onClick={handleSaveProfile}
-              disabled={isSavingName || name === user?.name || !name.trim()}
-              style={{
-                padding: '8px 24px', borderRadius: '8px', border: 'none',
-                backgroundColor: (isSavingName || name === user?.name || !name.trim()) ? '#9CA3AF' : theme.colors.prussianBlue,
-                color: '#fff', cursor: (isSavingName || name === user?.name || !name.trim()) ? 'not-allowed' : 'pointer',
-                fontSize: '14px', fontWeight: 600,
-                display: 'flex', alignItems: 'center', gap: '8px'
-              }}>
-              {isSavingName ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
-            </button>
+              <button 
+                onClick={() => updateProfileMutation.mutate(name)} 
+                disabled={name === user?.name || updateProfileMutation.isPending}
+                style={{ 
+                  padding: '8px 16px', borderRadius: '8px', 
+                  border: 'none', backgroundColor: theme.colors.prussianBlue, 
+                  color: '#fff', fontSize: '13px', fontWeight: 600, 
+                  cursor: (name === user?.name || updateProfileMutation.isPending) ? 'not-allowed' : 'pointer',
+                  opacity: (name === user?.name || updateProfileMutation.isPending) ? 0.6 : 1,
+                  display: 'flex', alignItems: 'center', gap: '8px'
+                }}
+              >
+                {updateProfileMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                Save Changes
+              </button>
           </div>
 
         </div>
@@ -327,3 +325,5 @@ export const ProfileView: React.FC = () => {
     </div>
   );
 };
+
+export default ProfileView;

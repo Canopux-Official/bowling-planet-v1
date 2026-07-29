@@ -22,5 +22,8 @@ const OtpSchema: Schema = new Schema({
 // TTL index to automatically remove expired OTPs (plus some padding time e.g., 24 hours after expiry)
 // We will set expireAfterSeconds to 0 so it expires exactly at `expiresAt`.
 OtpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// PERFORMANCE: Compound index supports verifyOtp query:
+// { userId, purpose, isUsed: false, expiresAt: { $gt: now } } sorted by expiresAt desc
+OtpSchema.index({ userId: 1, purpose: 1, isUsed: 1, expiresAt: -1 });
 
 export default mongoose.model<IOtp>('Otp', OtpSchema);

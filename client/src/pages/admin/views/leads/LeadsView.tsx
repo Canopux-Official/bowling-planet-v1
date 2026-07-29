@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, Filter, Eye, Trash2, Smartphone, Monitor, Loader2, ChevronDown, MessageCircle } from 'lucide-react';
 import { theme } from '../../../../theme';
 import { useNavigate } from 'react-router-dom';
 import { leadService } from './lead.service';
 import { useToast } from '../../components/Toast';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
 const getStatusColor = (status: string) => {
   switch(status) {
@@ -19,17 +20,15 @@ export const LeadsView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [contactFilter, setContactFilter] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
-  const [leads, setLeads] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [isContactFilterOpen, setIsContactFilterOpen] = useState(false);
   
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const filterRef = useRef<HTMLDivElement>(null);
+  const contactFilterRef = useRef<HTMLDivElement>(null);
 
   // Debounce search term
   useEffect(() => {
@@ -37,47 +36,45 @@ export const LeadsView: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const fetchLeads = useCallback(async (pageNum: number, isAppending: boolean) => {
-    if (!isAppending) setLoading(true);
-    else setLoadingMore(true);
+  const fetchLeadsPage = async ({ pageParam = 1 }) => {
+    const res = await leadService.getAll({ 
+      page: pageParam, 
+      limit: 20, 
+      status: statusFilter, 
+      contactInfo: contactFilter === 'No Contact Info' ? 'no_contact' : (contactFilter === 'Has Contact Info' ? 'has_contact' : 'All'),
+      search: debouncedSearch 
+    });
+    return {
+      data: res.data || [],
+      nextPage: pageParam < (res.pagination?.pages || 1) ? pageParam + 1 : undefined
+    };
+  };
 
-    try {
-      const res = await leadService.getAll({ 
-        page: pageNum, 
-        limit: 20, 
-        status: statusFilter, 
-        search: debouncedSearch 
-      });
-      
-      const newLeads = res.data || [];
-      const pagination = res.pagination || { pages: 1 };
-      
-      if (isAppending) {
-        setLeads(prev => [...prev, ...newLeads]);
-      } else {
-        setLeads(newLeads);
-      }
-      
-      setHasMore(pageNum < pagination.pages);
-      setPage(pageNum);
-    } catch (err) {
-      showToast('error', 'Failed to load leads');
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [statusFilter, debouncedSearch, showToast]);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status
+  } = useInfiniteQuery({
+    queryKey: ['leads', statusFilter, contactFilter, debouncedSearch],
+    queryFn: fetchLeadsPage,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage
+  });
 
-  // Initial fetch or filter/search change
-  useEffect(() => {
-    fetchLeads(1, false);
-  }, [fetchLeads]);
+  const leads = useMemo(() => {
+    return data ? data.pages.flatMap(page => page.data) : [];
+  }, [data]);
 
-  // Close filter dropdown when clicking outside
+  // Close filter dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
         setIsFilterOpen(false);
+      }
+      if (contactFilterRef.current && !contactFilterRef.current.contains(event.target as Node)) {
+        setIsContactFilterOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -90,17 +87,36 @@ export const LeadsView: React.FC = () => {
     try {
       await leadService.delete(id);
       showToast('success', 'Lead deleted');
-      fetchLeads(1, false);
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     } catch (err) {
       showToast('error', 'Failed to delete lead');
     }
   };
 
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchLeads(page + 1, true);
+  const handleLoadMore = useCallback(() => {
+    if (!isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
     }
-  };
+  }, [isFetchingNextPage, hasNextPage, fetchNextPage]);
+
+  // Infinite Scroll Observer
+  const observerTarget = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+    
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [handleLoadMore]);
 
   return (
     <div>
@@ -173,6 +189,49 @@ export const LeadsView: React.FC = () => {
               </div>
             )}
           </div>
+          
+          <div style={{ position: 'relative' }} ref={contactFilterRef}>
+            <button 
+              onClick={() => setIsContactFilterOpen(!isContactFilterOpen)}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px', 
+                padding: '8px 16px', borderRadius: '8px', border: `1px solid ${theme.colors.adminBorder}`, 
+                backgroundColor: theme.colors.adminSurface, color: '#4B5563', cursor: 'pointer',
+                fontSize: '14px', fontWeight: 500
+              }}>
+              <Filter size={16} /> 
+              {contactFilter === 'All' ? 'Contact Info' : contactFilter}
+              <ChevronDown size={14} style={{ opacity: 0.6 }} />
+            </button>
+            
+            {isContactFilterOpen && (
+              <div style={{ 
+                position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                backgroundColor: theme.colors.adminSurface, border: `1px solid ${theme.colors.adminBorder}`,
+                borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                width: '180px', zIndex: 10
+              }}>
+                <div style={{ padding: '8px 12px', fontSize: '12px', fontWeight: 600, color: theme.colors.adminTextMuted, textTransform: 'uppercase', borderBottom: `1px solid ${theme.colors.adminBorder}` }}>
+                  Filter by Contact
+                </div>
+                {['All', 'Has Contact Info', 'No Contact Info'].map(status => (
+                  <div 
+                    key={status}
+                    onClick={() => { setContactFilter(status); setIsContactFilterOpen(false); }}
+                    style={{ 
+                      padding: '10px 16px', fontSize: '14px', color: theme.colors.adminText,
+                      cursor: 'pointer', backgroundColor: contactFilter === status ? '#F3F4F6' : 'transparent',
+                      fontWeight: contactFilter === status ? 600 : 400
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#F3F4F6'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = contactFilter === status ? '#F3F4F6' : 'transparent'}
+                  >
+                    {status}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -190,12 +249,12 @@ export const LeadsView: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
+              {status === 'pending' ? (
                 <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}><Loader2 size={24} className="animate-spin" style={{ margin: '0 auto' }} /></td></tr>
               ) : leads.length === 0 ? (
                 <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: theme.colors.adminTextMuted }}>No leads found matching your criteria.</td></tr>
               ) : (
-                leads.map((lead) => {
+                leads.map((lead: any) => {
                   const statusColors = getStatusColor(lead.status);
                   const isReturning = lead.behavior?.isReturningVisitor;
                   const locString = lead.city ? lead.city : '-';
@@ -217,10 +276,11 @@ export const LeadsView: React.FC = () => {
                           {lead.name || 'Unknown'} 
                           {lead.device?.isMobile === true ? <Smartphone size={14} color="#6B7280" /> : <Monitor size={14} color="#6B7280" />}
                           {isReturning && <span style={{ fontSize: '10px', backgroundColor: '#F3F4F6', padding: '2px 6px', borderRadius: '4px', color: '#4B5563' }}>Returning</span>}
+                          {(!lead.phone || lead.phone === 'Not Provided') && !lead.email && <span style={{ fontSize: '10px', backgroundColor: '#FEE2E2', padding: '2px 6px', borderRadius: '4px', color: '#991B1B', fontWeight: 700 }}>No Contact Info</span>}
                         </div>
                       </td>
                       <td style={{ padding: '16px 24px' }}>
-                        {lead.phone ? (
+                        {lead.phone && lead.phone !== 'Not Provided' ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {lead.phone.split(',').map((phoneStr: any, idx: any) => {
                               const trimmedPhone = phoneStr.trim();
@@ -300,12 +360,12 @@ export const LeadsView: React.FC = () => {
           </table>
         </div>
         
-        {/* Load More Section */}
-        {hasMore && !loading && (
-          <div style={{ padding: '16px', display: 'flex', justifyContent: 'center', borderTop: `1px solid ${theme.colors.adminBorder}` }}>
+        {/* Infinite Scroll / Load More Section */}
+        {hasNextPage && (
+          <div ref={observerTarget} style={{ padding: '24px', display: 'flex', justifyContent: 'center', borderTop: `1px solid ${theme.colors.adminBorder}` }}>
             <button
               onClick={handleLoadMore}
-              disabled={loadingMore}
+              disabled={isFetchingNextPage}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
                 padding: '8px 24px', borderRadius: '9999px',
@@ -313,12 +373,12 @@ export const LeadsView: React.FC = () => {
                 backgroundColor: theme.colors.adminBg,
                 color: theme.colors.adminText,
                 fontSize: '13px', fontWeight: 600,
-                cursor: loadingMore ? 'not-allowed' : 'pointer',
+                cursor: isFetchingNextPage ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s'
               }}
             >
-              {loadingMore ? <Loader2 size={16} className="animate-spin" /> : null}
-              {loadingMore ? 'Loading...' : 'Load More Leads'}
+              {isFetchingNextPage ? <Loader2 size={16} className="animate-spin" /> : null}
+              {isFetchingNextPage ? 'Loading More...' : 'Load More Leads'}
             </button>
           </div>
         )}

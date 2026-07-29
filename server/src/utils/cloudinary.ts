@@ -83,9 +83,10 @@ export const deleteMultiple = async (
 ): Promise<void> => {
   const ids = publicIds.filter(Boolean) as string[];
   if (!ids.length) return;
-  await cloudinary.uploader.destroy(ids as unknown as string, { resource_type: resourceType });
-  // Note: for bulk cleanup of many ids, prefer cloudinary.api.delete_resources(ids) instead —
-  // uploader.destroy is meant for one id at a time.
+  // FIXED: cloudinary.api.delete_resources is the correct bulk-delete API (up to 100 IDs per call).
+  // uploader.destroy is designed for a SINGLE publicId — passing an array to it via
+  // `as unknown as string` silently failed and left orphaned assets in storage.
+  await cloudinary.api.delete_resources(ids, { resource_type: resourceType });
 };
 
 // ------------------------------------------------------------------

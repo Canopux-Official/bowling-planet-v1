@@ -5,8 +5,9 @@
 import { type FC } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseWhyUs } from '../../../services/franchisePageApi'
 
-const PILLARS = [
+const HARDCODED_PILLARS = [
   {
     id: 'feat-zero',
     title: 'Zero Franchise Fees.',
@@ -41,9 +42,26 @@ const PILLARS = [
   },
 ]
 
-const FranchiseWhyUs: FC = () => {
+interface FranchiseWhyUsProps {
+  pillars?: IFranchiseWhyUs[];
+}
+
+const FranchiseWhyUs: FC<FranchiseWhyUsProps> = ({ pillars = [] }) => {
   const headRef = useReveal()
   const gridRef = useReveal()
+
+  // Map dynamic pillars onto the hardcoded layout specs (id, icon, color)
+  const displayPillars = (pillars.length > 0 ? pillars : HARDCODED_PILLARS).map((p, i) => {
+    const defaultSpec = HARDCODED_PILLARS[i % HARDCODED_PILLARS.length];
+    return {
+      id: defaultSpec.id,
+      title: p.title,
+      subtitle: p.subtitle,
+      icon: defaultSpec.icon,
+      color: defaultSpec.color,
+      image: 'image' in p && (p.image as any)?.url ? (p.image as any).url : ('image' in p && typeof p.image === 'string' ? p.image : defaultSpec.image),
+    };
+  });
 
   return (
     <section
@@ -81,7 +99,7 @@ const FranchiseWhyUs: FC = () => {
             gap: 20,
           }}
         >
-          {PILLARS.map((p) => (
+          {displayPillars.map((p) => (
             <div
               key={p.id}
               className={`bento-card ${p.id}`}

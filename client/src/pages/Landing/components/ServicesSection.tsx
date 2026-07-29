@@ -80,25 +80,45 @@ const PILLARS: Pillar[] = [
   },
 ]
 
-const ServicesSection: FC = () => {
+interface ServicesSectionProps {
+  data?: {
+    title: string;
+    subtitle: string;
+    image?: { url: string; public_id: string };
+  }[];
+}
+
+const ServicesSection: FC<ServicesSectionProps> = ({ data }) => {
   const titleRef = useReveal()
   const { logCTAEvent } = useLeadTracker()
   const navigate = useNavigate()
   const [active, setActive] = useState('pre-opening')
   const [paused, setPaused] = useState(false)
 
+  // Merge CMS data with hardcoded structural data
+  const pillars = PILLARS.map((p, index) => {
+    const cmsItem = data?.[index];
+    if (!cmsItem) return p;
+    return {
+      ...p,
+      title: cmsItem.title || p.title,
+      desc: cmsItem.subtitle || p.desc,
+      image: cmsItem.image?.url || p.image,
+    };
+  });
+
   useEffect(() => {
     if (paused) return
     const interval = setInterval(() => {
       setActive((prev) => {
-        const currentIndex = PILLARS.findIndex((p) => p.id === prev)
-        return PILLARS[(currentIndex + 1) % PILLARS.length].id
+        const currentIndex = pillars.findIndex((p) => p.id === prev)
+        return pillars[(currentIndex + 1) % pillars.length].id
       })
-    }, 5500) // Slightly longer to appreciate the image
+    }, 5500)
     return () => clearInterval(interval)
-  }, [paused])
+  }, [paused, pillars])
 
-  const activePillar = PILLARS.find((p) => p.id === active)!
+  const activePillar = pillars.find((p) => p.id === active)!
 
   return (
     <section
@@ -139,7 +159,7 @@ const ServicesSection: FC = () => {
           <style>{`
             div[role="tablist"]::-webkit-scrollbar { display: none; }
           `}</style>
-          {PILLARS.map((p) => {
+          {pillars.map((p) => {
             const isActive = active === p.id
             return (
               <button

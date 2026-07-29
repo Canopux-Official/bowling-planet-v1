@@ -67,7 +67,10 @@ export const verifyOtp = async (userId: mongoose.Types.ObjectId, providedOtp: st
       expiresAt: { $gt: new Date() },
     },
     { $inc: { attempts: 1 } },
-    { returnDocument: 'after', sort: { _id: -1 } }
+    // CORRECTNESS: Sort by expiresAt desc — picks the OTP with the furthest future expiry.
+    // Sorting by _id had a bug: ObjectId timestamps have 1-second granularity,
+    // making sort order non-deterministic if two OTPs are created in the same second.
+    { returnDocument: 'after', sort: { expiresAt: -1 } }
   );
 
   if (!otpRecord) {

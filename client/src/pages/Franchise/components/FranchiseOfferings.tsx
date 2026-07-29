@@ -5,8 +5,9 @@
 import { type FC } from 'react'
 import { theme } from '../../../theme'
 import { useReveal } from '../../../hooks/useReveal'
+import type { IFranchiseOffering } from '../../../services/franchisePageApi'
 
-const MAJOR_ATTRACTIONS = [
+const HARDCODED_MAJOR_ATTRACTIONS = [
   { id: '01', label: 'Bowling Infrastructure', desc: 'Professional lanes, string pinsetters, and premium ball returns. The ultimate anchor attraction.', size: 'large', color: '#5FC1D1', image: '/franchise/f_bowling.png' },
   { id: '02', label: 'Arcade & Simulators', desc: 'Next-gen video cabinets and multiplayer racing simulators.', size: 'wide', color: '#6DBD4E', image: '/franchise/f_arcade.png' },
   { id: '03', label: 'Virtual Reality', desc: 'Immersive free-roam arenas and interactive VR pods.', size: 'tall', color: '#5FC1D1', image: '/franchise/f_vr.png' },
@@ -29,9 +30,26 @@ const OTHER_HORIZONS = [
   'Bumper Cars',
 ]
 
-const FranchiseOfferings: FC = () => {
+interface FranchiseOfferingsProps {
+  offerings?: IFranchiseOffering[];
+}
+
+const FranchiseOfferings: FC<FranchiseOfferingsProps> = ({ offerings = [] }) => {
   const headRef = useReveal()
   const gridRef = useReveal()
+
+  // Map dynamic offerings onto the hardcoded layout specs (id, size, color)
+  const displayOfferings = (offerings.length > 0 ? offerings : HARDCODED_MAJOR_ATTRACTIONS).map((p, i) => {
+    const defaultSpec = HARDCODED_MAJOR_ATTRACTIONS[i % HARDCODED_MAJOR_ATTRACTIONS.length];
+    return {
+      id: defaultSpec.id,
+      label: p.label,
+      desc: p.desc,
+      size: defaultSpec.size,
+      color: defaultSpec.color,
+      image: 'image' in p && (p.image as any)?.url ? (p.image as any).url : ('image' in p && typeof p.image === 'string' ? p.image : defaultSpec.image),
+    };
+  });
 
   return (
     <section
@@ -68,7 +86,7 @@ const FranchiseOfferings: FC = () => {
             gap: 12,
             marginBottom: 24,
           }}>
-            {MAJOR_ATTRACTIONS.map((item) => {
+            {displayOfferings.map((item) => {
               const isLarge = item.size === 'large'
               const isWide = item.size === 'wide'
               const isTall = item.size === 'tall'

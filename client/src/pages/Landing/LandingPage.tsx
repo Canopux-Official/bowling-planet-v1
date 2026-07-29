@@ -1,7 +1,8 @@
-import { type FC, useEffect, useState } from 'react'
+import { type FC } from 'react'
 import SEO from '../../components/SEO'
 import SectionProgressNav from '../../components/SectionProgressNav'
-import { homePageApi, type HomePageData } from '../../services/homePageApi'
+import { homePageApi } from '../../services/homePageApi'
+import { useQuery } from '@tanstack/react-query'
 
 // Sections
 import Hero from './components/Hero'
@@ -14,11 +15,14 @@ import CaseStudiesSection from './components/CaseStudiesSection'
 import ProductsSection from './components/ProductsSection'
 import BlogPreviewSection from './components/BlogPreviewSection'
 const LandingPage: FC = () => {
-  const [data, setData] = useState<HomePageData | null>(null);
-
-  useEffect(() => {
-    homePageApi.getHomePageData().then(setData).catch(console.error);
-  }, []);
+  const { data } = useQuery<any>({
+    queryKey: ['landing-page'],
+    queryFn: async () => {
+      const response = await homePageApi.getHomePageData();
+      return response;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <div className="landing-page">
@@ -51,7 +55,7 @@ const LandingPage: FC = () => {
       <CaseStudiesSection />
 
       {/* 8. Products (Dark/Surface) */}
-      <ProductsSection data={data?.productInventory} />
+      <ProductsSection data={data} />
 
       {/* 9. Blog Preview (Dark) */}
       <BlogPreviewSection />

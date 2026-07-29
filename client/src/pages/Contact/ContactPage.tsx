@@ -5,6 +5,7 @@ import { theme } from '../../theme'
 import { useReveal } from '../../hooks/useReveal'
 import { apiClient } from '../../services/apiClient'
 import { useLeadTracker } from '../../context/LeadTrackerContext'
+import { useGlobalSettings } from '../../context/GlobalSettingsContext'
 
 const ContactPage: FC = () => {
   const headRef = useReveal()
@@ -26,6 +27,15 @@ const ContactPage: FC = () => {
   }
 
   const { state, logCTAEvent } = useLeadTracker()
+  const { settings } = useGlobalSettings()
+  
+  const contactData = settings?.contact || {
+    email: 'sales@bowlingplanet.in',
+    phoneDisplay: '+91 98765 43210',
+    location: 'Bowling Planet India\nLevel 4, Innovator Building\nCyber City, Gurugram, 122002\nIndia'
+  }
+  
+  const whatsappNumber = settings?.socials?.whatsappNumber || '919512545959'
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,7 +139,7 @@ const ContactPage: FC = () => {
               onClick={() => {
                 logCTAEvent('Contact Page: Direct WhatsApp');
                 const customMessage = `Hi Bowling Planet,\nI'd like to get in touch to discuss a project.`;
-                window.open(`https://api.whatsapp.com/send?phone=919512545959&text=${encodeURIComponent(customMessage)}`, '_blank');
+                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(customMessage)}`, '_blank');
               }}
               style={{
                 padding: '16px 32px',
@@ -172,11 +182,8 @@ const ContactPage: FC = () => {
                 📍
               </div>
               <h3 className="font-display text-metallic" style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Headquarters</h3>
-              <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody }}>
-                Bowling Planet India<br/>
-                Level 4, Innovator Building<br/>
-                Cyber City, Gurugram, 122002<br/>
-                India
+              <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody, whiteSpace: 'pre-wrap' }}>
+                {contactData.location}
               </p>
             </div>
 
@@ -194,7 +201,7 @@ const ContactPage: FC = () => {
               <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody }}>
                 Drop us a line anytime. We aim to respond to all inquiries within 24 hours.
               </p>
-              <a href="mailto:sales@bowlingplanet.in" onClick={() => logCTAEvent('Contact Page: Email Sales')} style={{ 
+              <a href={`mailto:${contactData.email}`} onClick={() => logCTAEvent('Contact Page: Email Sales')} style={{ 
                 color: theme.colors.green, 
                 textDecoration: 'none', 
                 fontWeight: 600, 
@@ -202,7 +209,7 @@ const ContactPage: FC = () => {
                 display: 'inline-block',
                 fontFamily: theme.typography.fontDisplay,
               }}>
-                sales@bowlingplanet.in
+                {contactData.email}
               </a>
             </div>
 
@@ -220,7 +227,7 @@ const ContactPage: FC = () => {
               <p style={{ color: theme.colors.text2, fontSize: 15, lineHeight: 1.6, fontFamily: theme.typography.fontBody }}>
                 Available Monday - Friday, 9:00 AM to 6:00 PM (IST).
               </p>
-              <a href="tel:+919876543210" onClick={() => logCTAEvent('Contact Page: Call Support')} style={{ 
+              <a href={`tel:${contactData.phoneDisplay.replace(/[\s-]/g, '')}`} onClick={() => logCTAEvent('Contact Page: Call Support')} style={{ 
                 color: theme.colors.purple, 
                 textDecoration: 'none', 
                 fontWeight: 600, 
@@ -228,7 +235,7 @@ const ContactPage: FC = () => {
                 display: 'inline-block',
                 fontFamily: theme.typography.fontDisplay,
               }}>
-                +91 98765 43210
+                {contactData.phoneDisplay}
               </a>
             </div>
             

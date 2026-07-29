@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { theme } from '../../../../../theme';
 import { ArrowLeft, Plus, Eye, Edit2, Trash2, Globe, EyeOff, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ProjectModal } from './components/ProjectModal';
 import { projectService, type IProject } from './services';
@@ -10,61 +11,69 @@ import { ProjectViewModal } from './components/ProjectvViewModal';
 
 export const CmsProjectsView: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   // Data list and loading states
-  const [projects, setProjects] = useState<IProject[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
   // Pagination tracking metrics
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
   // Modal target references
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<IProject | null>(null);
 
-  const fetchProjects = async () => {
-    setLoading(true);
-    try {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['cms-projects', page, searchTerm],
+    queryFn: async () => {
       const response = await projectService.getAll({
         page,
         limit: 8,
         search: searchTerm,
       });
       if (response.success) {
-        setProjects(response.data.projects);
-        setTotalPages(response.data.pagination.totalPages);
+        return response.data;
       }
-    } catch (err) {
-      console.error('Error retrieving internal collections records:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      throw new Error('Failed to fetch projects');
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchProjects();
-  }, [page, searchTerm]);
+  const projects = data?.projects || [];
+  const totalPages = data?.pagination?.totalPages || 1;
 
-  const handleTogglePublish = async (id: string, currentStatus: boolean) => {
-    try {
-      await projectService.togglePublish(id, !currentStatus);
-      fetchProjects();
-    } catch (err) {
+  const togglePublishMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: boolean }) => {
+      return projectService.togglePublish(id, status);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-projects'] });
+    },
+    onError: () => {
       alert('Failed updating state flags visibility maps.');
     }
+  });
+
+  const handleTogglePublish = (id: string, currentStatus: boolean) => {
+    togglePublishMutation.mutate({ id, status: !currentStatus });
   };
 
-  const handleDelete = async (id: string) => {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return projectService.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-projects'] });
+    },
+    onError: (err: any) => {
+      alert(err.message || 'Error occurred handling deletion sequence.');
+    }
+  });
+
+  const handleDelete = (id: string) => {
     if (window.confirm('Are you absolute sure you want to completely erase this project details along with remote asset arrays?')) {
-      try {
-        await projectService.delete(id);
-        fetchProjects();
-      } catch (err: any) {
-        alert(err.message || 'Error occurred handling deletion sequence.');
-      }
+      deleteMutation.mutate(id);
     }
   };
 
@@ -201,12 +210,17 @@ export const CmsProjectsView: React.FC = () => {
       )}
 
       {/* Modals Injections */}
-      <ProjectModal 
-        isOpen={isFormModalOpen} 
-        project={selectedProject} 
-        onClose={() => setIsFormModalOpen(false)} 
-        onSaveSuccess={fetchProjects} 
-      />
+      {isFormModalOpen && (
+        <ProjectModal
+          isOpen={isFormModalOpen}
+          project={selectedProject}
+          onClose={() => setIsFormModalOpen(false)}
+          onSaveSuccess={() => {
+            setIsFormModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['cms-projects'] });
+          }}
+        />
+      )}
 
       <ProjectViewModal 
         isOpen={isViewModalOpen} 

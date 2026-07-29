@@ -1,4 +1,5 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { type FC, useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import SEO from '../../components/SEO'
 import { Link, useParams } from 'react-router-dom'
 import Loader from '../../components/common/Loader'
@@ -9,43 +10,25 @@ import FeaturePointsList from './components/FeaturePointsList'
 import BulletListSection from './components/BulletListSection'
 import SetupStepsTimeline from './components/SetupStepsTimeline'
 import TestimonialsCarousel from './components/TestimonialsCarousel'
-import type { IProject } from '../ProjectsPage/types'
+
 import { getProjectBySlug } from './services/projectDetailsApi'
 import { Building2, Plus, Check } from 'lucide-react'
 import { useLeadTracker } from '../../context/LeadTrackerContext'
 
 const ProjectDetailsPage: FC = () => {
   const { slug } = useParams<{ slug: string }>()
-  const [project, setProject] = useState<IProject | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [activeSection, setActiveSection] = useState('features')
   const { state, addToEnquiry } = useLeadTracker()
+  const [activeSection, setActiveSection] = useState('features')
 
-  const load = useCallback(async () => {
-    if (!slug) {
-      setError('Project not found.')
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await getProjectBySlug(slug)
-      setProject(data)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to load this project.'
-      setProject(null)
-      setError(message)
-    } finally {
-      setLoading(false)
-    }
-  }, [slug])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+  const { data: project, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['public-project-details', slug],
+    queryFn: async () => {
+      if (!slug) throw new Error('Project not found.')
+      return await getProjectBySlug(slug)
+    },
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  })
 
   const navItems = useMemo(() => {
     if (!project) return []
@@ -102,7 +85,7 @@ const ProjectDetailsPage: FC = () => {
       <div className="project-details-page flex min-h-[60vh] items-center justify-center bg-black px-5 pt-28">
         <div className="mx-auto max-w-xl text-center">
           {error ? (
-            <ErrorState message={error} onRetry={() => void load()} />
+            <ErrorState message={error instanceof Error ? error.message : 'Unable to load this project.'} onRetry={() => void refetch()} />
           ) : (
             <>
               <h1 className="font-display text-2xl font-bold text-[#F5F5F7]">Project not found</h1>

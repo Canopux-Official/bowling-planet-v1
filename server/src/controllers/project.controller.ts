@@ -337,6 +337,40 @@ const sendResponse = (
 };
 
 // ------------------------------------------------------------------
+// SECURITY: safeParse — JSON.parse with prototype-pollution protection.
+// A malicious admin could submit {"__proto__":{"isAdmin":true}} in a JSON
+// string field (media, setupSteps, etc.) and pollute Object.prototype.
+// The reviver blocks these dangerous keys before they reach the schema.
+// ------------------------------------------------------------------
+const safeParse = (str: string): any => {
+    return JSON.parse(str, (key, value) => {
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            return undefined;
+        }
+        return value;
+    });
+};
+
+// ------------------------------------------------------------------
+// SECURITY: safeProjectError — never expose raw Mongoose error details to the client.
+// Classifies the error and returns a safe, generic message.
+// ------------------------------------------------------------------
+const safeProjectError = (res: Response, error: any, defaultCode: number, defaultMsg: string) => {
+    if (error?.name === 'ValidationError') {
+        return sendResponse(res, 400, false, 'Invalid data: please check the submitted fields');
+    }
+    if (error?.code === 11000) {
+        return sendResponse(res, 409, false, 'A project with these details already exists');
+    }
+    if (error?.name === 'CastError') {
+        return sendResponse(res, 400, false, 'Invalid ID format');
+    }
+    // Log the full error internally so developers can debug without exposing details to clients
+    console.error('[ProjectController] Unhandled error:', error?.message || error);
+    return sendResponse(res, defaultCode, false, defaultMsg);
+};
+
+// ------------------------------------------------------------------
 // CREATE — POST /api/projects
 // ------------------------------------------------------------------
 export const createProject = async (req: Request, res: Response) => {
@@ -346,11 +380,11 @@ export const createProject = async (req: Request, res: Response) => {
         if (typeof projectData.tags === 'string') {
             projectData.tags = projectData.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
         }
-        if (typeof projectData.media === 'string') projectData.media = JSON.parse(projectData.media);
-        if (typeof projectData.setupSteps === 'string') projectData.setupSteps = JSON.parse(projectData.setupSteps);
-        if (typeof projectData.featurePoints === 'string') projectData.featurePoints = JSON.parse(projectData.featurePoints);
-        if (typeof projectData.bulletList === 'string') projectData.bulletList = JSON.parse(projectData.bulletList);
-        if (typeof projectData.testimonials === 'string') projectData.testimonials = JSON.parse(projectData.testimonials);
+        if (typeof projectData.media === 'string') projectData.media = safeParse(projectData.media);
+        if (typeof projectData.setupSteps === 'string') projectData.setupSteps = safeParse(projectData.setupSteps);
+        if (typeof projectData.featurePoints === 'string') projectData.featurePoints = safeParse(projectData.featurePoints);
+        if (typeof projectData.bulletList === 'string') projectData.bulletList = safeParse(projectData.bulletList);
+        if (typeof projectData.testimonials === 'string') projectData.testimonials = safeParse(projectData.testimonials);
 
         const { gallery, setupStepFiles, testimonialAvatars, testimonialCovers } = groupIncomingFiles(
             req.files as Express.Multer.File[]
@@ -398,7 +432,7 @@ export const createProject = async (req: Request, res: Response) => {
         const project = await Project.create(projectData);
         return sendResponse(res, 201, true, 'Project created successfully', project);
     } catch (error: any) {
-        return sendResponse(res, 400, false, error.message || 'Failed to create project');
+        return safeProjectError(res, error, 400, 'Failed to create project');
     }
 };
 
@@ -423,7 +457,11 @@ export const getAllProjects = async (req: Request, res: Response) => {
         }
 
         if (req.query.search) {
-            const searchRegex = new RegExp(req.query.search as string, 'i');
+            // SECURITY: Escape regex metacharacters before handing to MongoDB.
+            // An unescaped ReDoS pattern causes CPU spin on the MongoDB node.
+            const rawSearch = (req.query.search as string).slice(0, 100);
+            const escaped = rawSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const searchRegex = new RegExp(escaped, 'i');
             filter.$or = [{ title: searchRegex }, { description: searchRegex }];
         }
 
@@ -446,7 +484,7 @@ export const getAllProjects = async (req: Request, res: Response) => {
             },
         });
     } catch (error: any) {
-        return sendResponse(res, 500, false, error.message || 'Failed to fetch projects');
+        return safeProjectError(res, error, 500, 'Failed to fetch projects');
     }
 };
 
@@ -466,7 +504,7 @@ export const getProjectBySlug = async (req: Request, res: Response) => {
 
         return sendResponse(res, 200, true, 'Project fetched successfully', project);
     } catch (error: any) {
-        return sendResponse(res, 500, false, error.message || 'Failed to fetch project');
+        return safeProjectError(res, error, 500, 'Failed to fetch project');
     }
 };
 
@@ -484,11 +522,11 @@ export const updateProject = async (req: Request, res: Response) => {
         if (typeof updateData.tags === 'string') {
             updateData.tags = updateData.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
         }
-        if (typeof updateData.media === 'string') updateData.media = JSON.parse(updateData.media);
-        if (typeof updateData.setupSteps === 'string') updateData.setupSteps = JSON.parse(updateData.setupSteps);
-        if (typeof updateData.featurePoints === 'string') updateData.featurePoints = JSON.parse(updateData.featurePoints);
-        if (typeof updateData.bulletList === 'string') updateData.bulletList = JSON.parse(updateData.bulletList);
-        if (typeof updateData.testimonials === 'string') updateData.testimonials = JSON.parse(updateData.testimonials);
+        if (typeof updateData.media === 'string') updateData.media = safeParse(updateData.media);
+        if (typeof updateData.setupSteps === 'string') updateData.setupSteps = safeParse(updateData.setupSteps);
+        if (typeof updateData.featurePoints === 'string') updateData.featurePoints = safeParse(updateData.featurePoints);
+        if (typeof updateData.bulletList === 'string') updateData.bulletList = safeParse(updateData.bulletList);
+        if (typeof updateData.testimonials === 'string') updateData.testimonials = safeParse(updateData.testimonials);
 
         // Gallery asset differential cleanup
         if (updateData.media && Array.isArray(updateData.media)) {
@@ -560,7 +598,7 @@ export const updateProject = async (req: Request, res: Response) => {
 
         return sendResponse(res, 200, true, 'Project updated successfully', project);
     } catch (error: any) {
-        return sendResponse(res, 400, false, error.message || 'Failed to update project');
+        return safeProjectError(res, error, 400, 'Failed to update project');
     }
 };
 
@@ -597,7 +635,7 @@ export const deleteProject = async (req: Request, res: Response) => {
 
         return sendResponse(res, 200, true, 'Project permanently deleted and remote assets cleared');
     } catch (error: any) {
-        return sendResponse(res, 500, false, error.message || 'Failed to delete project');
+        return safeProjectError(res, error, 500, 'Failed to delete project');
     }
 };
 
@@ -623,7 +661,7 @@ export const togglePublishProject = async (req: Request, res: Response) => {
         const message = project.isPublished ? 'Project published' : 'Project unpublished';
         return sendResponse(res, 200, true, message, project);
     } catch (error: any) {
-        return sendResponse(res, 500, false, error.message || 'Failed to update publish status');
+        return safeProjectError(res, error, 500, 'Failed to update publish status');
     }
 };
 

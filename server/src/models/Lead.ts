@@ -73,13 +73,21 @@ const LeadSchema: Schema = new Schema(
 
     behavior: {
       isReturningVisitor: { type: Boolean, default: false },
-      eventLog: [
-        {
-          label: { type: String },
-          timestamp: { type: String },
-          path: { type: String },
+      // SECURITY: Enforce max length at the schema level so a direct DB update
+      // cannot bypass the Zod validator and bloat a single document.
+      eventLog: {
+        type: [
+          {
+            label:     { type: String, maxlength: 200 },
+            timestamp: { type: String, maxlength: 50 },
+            path:      { type: String, maxlength: 500 },
+          },
+        ],
+        validate: {
+          validator: function (v: any[]) { return v.length <= 150; },
+          message: 'eventLog cannot exceed 150 entries',
         },
-      ],
+      },
     },
 
     device: {
