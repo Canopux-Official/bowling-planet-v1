@@ -55,12 +55,9 @@ const Footer: FC = () => {
             {/* Brand */}
             <div style={{ maxWidth: 260 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
-                <img src="/logo.avif" alt="Bowling Planet" style={{ height: 48, width: 'auto' }}
+                <img src="/logo.png" alt="Bowling Planet" style={{ height: 56, width: 'auto' }}
                   onError={e => { const t = e.currentTarget; if (!t.dataset.fb2) { t.dataset.fb2 = '1'; t.src = '/logo.avif' } }} />
-                <div>
-                  <div style={{ fontFamily: '"Sora",sans-serif', fontWeight: 700, fontSize: 20, color: '#F5F5F7', letterSpacing: '-0.01em' }}>{companyData.name}</div>
-                  <div className="label" style={{ fontSize: 10, marginBottom: 0 }}>FEC Consulting</div>
-                </div>
+
               </div>
               <p style={{ color: '#48484A', fontSize: 13, lineHeight: 1.65, fontFamily: 'Inter,sans-serif' }}>
                 {companyData.tagline}

@@ -4,18 +4,18 @@ import { useAuth } from '../context/AuthContext'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 
 const NAV_LINKS = [
-  { label: 'Home',      path: '/'          },
-  { label: 'About',     path: '/about'     },
-  { label: 'Services',  path: '/services'  },
-  { label: 'Projects',  path: '/projects'  },
-  { label: 'Products',  path: '/products'  },
-  { label: 'Careers',   path: '/careers'   },
-  { label: 'Blog',      path: '/blog'      },
+  { label: 'Home', path: '/' },
+  { label: 'About', path: '/about' },
+  { label: 'Services', path: '/services' },
+  { label: 'Projects', path: '/projects' },
+  { label: 'Products', path: '/products' },
+  { label: 'Careers', path: '/careers' },
+  { label: 'Blog', path: '/blog' },
   { label: 'Franchise', path: '/franchise' },
 ]
 
 const Nav: FC = () => {
-  const [solid,    setSolid]    = useState(false)
+  const [solid, setSolid] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const { isAuthenticated } = useAuth()
   const { logCTAEvent } = useLeadTracker()
@@ -37,7 +37,7 @@ const Nav: FC = () => {
       document.body.style.overflow = ''
       document.body.classList.remove('nav-drawer-open')
     }
-    return () => { 
+    return () => {
       document.body.style.overflow = ''
       document.body.classList.remove('nav-drawer-open')
     }
@@ -74,7 +74,7 @@ const Nav: FC = () => {
       >
         <div style={{
           maxWidth: 1320, margin: '0 auto', padding: '0 clamp(16px, 4vw, 28px)',
-          height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           gap: 12,
         }}>
 
@@ -83,27 +83,29 @@ const Nav: FC = () => {
             to="/"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             aria-label="Bowling Planet — Home"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', minWidth: 0 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              textDecoration: 'none',
+              minWidth: 0,
+              height: '100%',
+            }}
           >
             <img
-              src="/logo.avif"
+              src="/logo.png"
               alt="Bowling Planet"
-              style={{ height: 44, width: 'auto', flexShrink: 0 }}
+              style={{
+                height: 'clamp(52px, 6.9vw, 72px)', // increased from clamp(36px, 5vw, 52px)
+                width: 'auto',
+                flexShrink: 0,
+                objectFit: 'contain',
+                display: 'block',
+              }}
               onError={e => {
                 const t = e.currentTarget
-                if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = '/logo.avif' }
+                if (!t.dataset.fb) { t.dataset.fb = '1'; t.src = '/logo.png' }
               }}
             />
-            <span
-              className="nav-wordmark"
-              style={{
-                fontFamily: '"Sora", sans-serif', fontWeight: 700,
-                fontSize: 20, letterSpacing: '-0.02em', color: '#F5F5F7',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Bowling Planet
-            </span>
           </Link>
 
           {/* Desktop links */}
@@ -147,7 +149,7 @@ const Nav: FC = () => {
             >
               {isAuthenticated ? "Admin Portal" : "Login"}
             </Link>
-            
+
             <Link
               to="/contact"
               onClick={() => logCTAEvent('Header: Get in Touch')}
@@ -183,8 +185,8 @@ const Nav: FC = () => {
                   transition: 'transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease, background 0.25s ease',
                   transform: menuOpen
                     ? i === 0 ? 'rotate(45deg) translate(5px, 5px)'
-                    : i === 2 ? 'rotate(-45deg) translate(5px,-5px)'
-                    : 'none'
+                      : i === 2 ? 'rotate(-45deg) translate(5px,-5px)'
+                        : 'none'
                     : 'none',
                   opacity: menuOpen && i === 1 ? 0 : 1,
                 }} />
