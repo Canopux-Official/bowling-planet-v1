@@ -215,7 +215,7 @@ const BaseProductDetailsPage: FC = () => {
           ) : null}
         </div>
 
-        <ProductItemsGrid items={visibleItems} />
+        <ProductItemsGrid items={visibleItems} baseSlug={slug?slug:""} />
       </div>
     </div>
   )

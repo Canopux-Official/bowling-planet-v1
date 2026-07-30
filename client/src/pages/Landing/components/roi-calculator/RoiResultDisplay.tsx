@@ -4,6 +4,8 @@ import { TrendingUp, BarChart3, Briefcase, Calendar, Users } from 'lucide-react'
 import { theme } from '../../../../theme'
 import type { RoiInputs } from '../../../../hooks/useRoiMatch'
 import { useLeadTracker } from '../../../../context/LeadTrackerContext'
+import { useGlobalSettings } from '../../../../context/GlobalSettingsContext'
+
 
 interface RoiResultsDisplayProps {
   matched: FranchiseType
@@ -12,7 +14,7 @@ interface RoiResultsDisplayProps {
 }
 
 // TODO: replace with the real business WhatsApp number (country code, no + or spaces), e.g. '919876543210'
-const WHATSAPP_NUMBER = '919876543210'
+
 
 const WhatsAppIcon: FC<{ size?: number }> = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,6 +68,9 @@ function MetricCard({ icon, label, value, subtext, color }: { icon: React.ReactN
  */
 function WhatsAppCta({ matched, tier }: { matched: FranchiseType; tier: number }) {
   const { logCTAEvent } = useLeadTracker()
+
+  const { settings } = useGlobalSettings()
+  const WHATSAPP_NUMBER = settings?.socials?.whatsappNumber || '919876543210'
 
   const message = `Hi! I just ran an ROI projection for the ${matched.name} setup in ${TIER_LABELS[tier]} and I'd like to discuss it in more detail.`
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`

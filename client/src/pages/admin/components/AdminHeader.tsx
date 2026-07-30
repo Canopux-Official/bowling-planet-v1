@@ -65,8 +65,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar, sidebar
         
         {/* View Website Button */}
         <a 
-          href="/" 
-          target="_blank" 
+          href="/"
           rel="noopener noreferrer"
           style={{
             display: 'flex', alignItems: 'center', gap: '6px',

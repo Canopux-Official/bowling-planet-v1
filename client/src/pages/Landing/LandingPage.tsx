@@ -52,7 +52,7 @@ const LandingPage: FC = () => {
       <PortfolioSection data={data?.featuredProjects} />
 
       {/* 7. Case Studies */}
-      <CaseStudiesSection />
+      <CaseStudiesSection data={data?.caseStudies}/>
 
       {/* 8. Products (Dark/Surface) */}
       <ProductsSection data={data} />
