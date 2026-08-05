@@ -118,7 +118,7 @@ const ProductsSection: FC<{ data?: any }> = ({ data }) => {
             style={{ flex: '1 1 auto', marginTop: 12 }}
           >
             <Link
-              to="/products#roi"
+              to="/franchise"
               onClick={() => logCTAEvent('Landing: View ROI Models')}
               style={{
                 display: 'inline-flex',
