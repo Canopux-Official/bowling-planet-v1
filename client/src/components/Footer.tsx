@@ -1,8 +1,7 @@
 
 import { type FC } from 'react'
 import { Link } from 'react-router-dom'
-import { FaLink } from 'react-icons/fa'
-import { SocialIcon } from 'react-social-icons'
+import { FaLink, FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaYoutube } from 'react-icons/fa'
 import { useGlobalSettings } from '../context/GlobalSettingsContext'
 import { useLeadTracker } from '../context/LeadTrackerContext'
 
@@ -55,16 +54,12 @@ const Footer: FC = () => {
   const getPlatformIcon = (platform: string) => {
     const p = platform.toLowerCase();
 
-    // Map platform names to react-social-icons network strings
-    let network = p;
-    if (p.includes('facebook')) network = 'facebook';
-    else if (p.includes('instagram')) network = 'instagram';
-    else if (p.includes('linkedin')) network = 'linkedin';
-    else if (p.includes('twitter') || p.includes('x')) network = 'x';
-    else if (p.includes('youtube')) network = 'youtube';
-    else return <FaLink size={24} color="#6B7280" />;
-
-    return <SocialIcon network={network} style={{ height: 26, width: 26 }} />;
+    if (p.includes('facebook')) return <FaFacebook size={22} />;
+    else if (p.includes('instagram')) return <FaInstagram size={22} />;
+    else if (p.includes('linkedin')) return <FaLinkedin size={22} />;
+    else if (p.includes('twitter') || p.includes('x')) return <FaTwitter size={22} />;
+    else if (p.includes('youtube')) return <FaYoutube size={22} />;
+    else return <FaLink size={22} />;
   };
 
   return (

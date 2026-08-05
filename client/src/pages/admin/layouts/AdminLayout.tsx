@@ -24,7 +24,7 @@ export const AdminLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="admin-portal" style={{ display: 'flex', minHeight: '100vh', backgroundColor: theme.colors.adminBg, fontFamily: '"Inter", sans-serif' }}>
+    <div className="admin-portal" style={{ display: 'flex', minHeight: '100vh', backgroundColor: theme.colors.adminBg, color: theme.colors.adminText, fontFamily: '"Inter", sans-serif' }}>
       {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 

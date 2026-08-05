@@ -40,6 +40,13 @@ const cmsCards = [
     tag: 'Core'
   },
   { 
+    title: 'Service Details', 
+    description: 'Manage standalone, dynamic service pages (inside pages).', 
+    icon: FolderKanban, 
+    path: '/admin/cms/service-details',
+    tag: 'Core'
+  },
+  { 
     title: 'Projects', 
     description: 'Upload project gallery photos and detail pages.', 
     icon: FolderKanban, 

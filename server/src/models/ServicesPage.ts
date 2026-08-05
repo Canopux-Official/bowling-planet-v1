@@ -9,6 +9,7 @@ export interface IServicesPage extends Document {
     accentColor: string;
     stats: { label: string; value: string }[];
     features: string[];
+    link?: string;
   }[];
   processSteps: {
     num: string;
@@ -20,6 +21,13 @@ export interface IServicesPage extends Document {
     image?: { url: string; public_id: string };
     label: string;
   }[];
+  results: {
+    raw: number;
+    suffix: string;
+    label: string;
+    sublabel: string;
+    image?: { url: string; public_id: string };
+  }[];
 }
 
 const ServicesPageSchema = new Schema<IServicesPage>(
@@ -29,6 +37,7 @@ const ServicesPageSchema = new Schema<IServicesPage>(
         tag: { type: String },
         title: { type: String },
         subtitle: { type: String },
+        link: { type: String },
         image: {
           url: { type: String },
           public_id: { type: String },
@@ -61,6 +70,18 @@ const ServicesPageSchema = new Schema<IServicesPage>(
           public_id: { type: String },
         },
         label: { type: String },
+      },
+    ],
+    results: [
+      {
+        raw: { type: Number },
+        suffix: { type: String },
+        label: { type: String },
+        sublabel: { type: String },
+        image: {
+          url: { type: String },
+          public_id: { type: String },
+        },
       },
     ],
   },

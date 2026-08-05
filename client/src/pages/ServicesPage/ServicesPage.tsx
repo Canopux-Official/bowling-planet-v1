@@ -1,4 +1,5 @@
 import { type FC, useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import SEO from '../../components/SEO'
 import { ArrowRight, Check, Plus } from 'lucide-react'
 import { useLeadTracker } from '../../context/LeadTrackerContext'
@@ -65,10 +66,11 @@ const ServicesPage: FC = () => {
   }, [])
 
   useEffect(() => {
+    if (loading || !metricsRef.current) return
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setMetricsInView(true) }, { threshold: 0.3 })
-    if (metricsRef.current) obs.observe(metricsRef.current)
+    obs.observe(metricsRef.current)
     return () => obs.disconnect()
-  }, [])
+  }, [loading])
 
   // Auto-advance process steps
   useEffect(() => {
@@ -179,10 +181,17 @@ const ServicesPage: FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between mt-4">
-                  <div className="flex items-center gap-2 font-semibold text-sm" style={{ color: svc.accentColor }}>
-                    Explore Service
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
-                  </div>
+                  {svc.link ? (
+                    <Link to={svc.link} className="flex items-center gap-2 font-semibold text-sm cursor-pointer hover:opacity-80 transition-opacity" style={{ color: svc.accentColor }}>
+                      Explore Service
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-2 font-semibold text-sm" style={{ color: svc.accentColor }}>
+                      Explore Service
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+                    </div>
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -282,13 +291,8 @@ const ServicesPage: FC = () => {
           <h2 className="font-display text-3xl font-extrabold text-white mb-12 tracking-tight">Results That Speak</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { raw: 150, suffix: '+', label: 'FECs Launched', sublabel: 'Across India', img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop' },
-              { raw: 40, suffix: '+', label: 'Cities Covered', sublabel: 'Pan-India presence', img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop' },
-              { raw: 32, suffix: '%', label: 'Avg Revenue Uplift', sublabel: 'Post-engagement', img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop' },
-              { raw: 15, suffix: '+', label: 'Years Experience', sublabel: 'Industry veterans', img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=600&auto=format&fit=crop' },
-            ].map((m, idx) => (
-              <StatCard key={idx} m={m} metricsInView={metricsInView} />
+            {(data?.results || []).map((m: any, idx: number) => (
+              <StatCard key={idx} m={{ ...m, img: m.image?.url || m.img }} metricsInView={metricsInView} />
             ))}
           </div>
         </div>

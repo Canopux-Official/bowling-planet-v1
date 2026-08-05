@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+// Triggering nodemon restart to clear in-memory cache again
 import { ServicesPage } from '../models/ServicesPage';
 import { uploadMedia, deleteMedia } from '../utils/cloudinary';
 
@@ -34,6 +35,7 @@ export const updateServicesPageData = async (req: Request, res: Response): Promi
     if (typeof updatePayload.services === 'string') updatePayload.services = JSON.parse(updatePayload.services);
     if (typeof updatePayload.processSteps === 'string') updatePayload.processSteps = JSON.parse(updatePayload.processSteps);
     if (typeof updatePayload.galleryImages === 'string') updatePayload.galleryImages = JSON.parse(updatePayload.galleryImages);
+    if (typeof updatePayload.results === 'string') updatePayload.results = JSON.parse(updatePayload.results);
 
     const existingData = await ServicesPage.findOne();
 
@@ -66,6 +68,15 @@ export const updateServicesPageData = async (req: Request, res: Response): Promi
             
             const uploaded = await uploadMedia(file.buffer, { folder: 'servicespage/gallery' });
             updatePayload.galleryImages[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
+          }
+        } else if (file.fieldname.startsWith('results_')) {
+          const idx = parseInt(file.fieldname.split('_')[1], 10);
+          if (updatePayload.results?.[idx]) {
+            const oldPublicId = existingData?.results?.[idx]?.image?.public_id;
+            if (oldPublicId) await deleteMedia(oldPublicId).catch(() => {});
+            
+            const uploaded = await uploadMedia(file.buffer, { folder: 'servicespage/results' });
+            updatePayload.results[idx].image = { url: uploaded.url, public_id: uploaded.publicId };
           }
         }
       }

@@ -10,6 +10,7 @@ export interface ServicesPageData {
     accentColor: string;
     stats: { label: string; value: string }[];
     features: string[];
+    link?: string;
   }[];
   processSteps: {
     num: string;
@@ -20,6 +21,13 @@ export interface ServicesPageData {
   galleryImages: {
     image?: { url: string; public_id: string };
     label: string;
+  }[];
+  results?: {
+    raw: number;
+    suffix: string;
+    label: string;
+    sublabel: string;
+    image?: { url: string; public_id: string };
   }[];
 }
 
@@ -41,6 +49,7 @@ export const servicesPageApi = {
       formData.append('services', JSON.stringify(data.services || []));
       formData.append('processSteps', JSON.stringify(data.processSteps || []));
       formData.append('galleryImages', JSON.stringify(data.galleryImages || []));
+      formData.append('results', JSON.stringify(data.results || []));
 
       if (files) {
         Object.keys(files).forEach(key => {

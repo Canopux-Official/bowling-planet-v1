@@ -47,8 +47,8 @@ export const theme = {
     adminTextLight: '#94A3B8',
     adminBorder: '#E2E8F0',
     adminBorderStrong: '#CBD5E1',
-    adminAccent: '#2946c8a3',         // Teal accent
-    adminAccentBg: 'rgba(81, 106, 176, 0.08)',
+    adminAccent: '#5FC1D1',         // Teal accent
+    adminAccentBg: 'rgba(95, 193, 209, 0.08)',
     adminDanger: '#EF4444',
     adminSuccess: '#10B981',
     adminWarning: '#F59E0B',

@@ -6,6 +6,8 @@ import path from 'path';
 import { GlobalSettings } from '../models/GlobalSettings';
 import { HomePage } from '../models/HomePage';
 import { FranchisePage } from '../models/FranchisePage';
+import { ServicesPage } from '../models/ServicesPage';
+import { ServiceDetail } from '../models/ServiceDetail';
 import Project from '../models/project';
 import { BaseProduct, ProductItem } from '../models/product';
 import Job from '../models/career';
@@ -35,6 +37,8 @@ const seedAll = async () => {
     await GlobalSettings.deleteMany({});
     await HomePage.deleteMany({});
     await FranchisePage.deleteMany({});
+    await ServicesPage.deleteMany({});
+    await ServiceDetail.deleteMany({});
     await Project.deleteMany({});
     await BaseProduct.deleteMany({});
     await ProductItem.deleteMany({});
@@ -229,6 +233,198 @@ const seedAll = async () => {
         { q: 'Is there a franchise fee?', a: 'No. Franchise fee is ₹0. Our model is built around consulting and delivery value, not entry barriers.' },
       ]
     });
+
+    // ==========================================
+    // 3.5 SERVICES PAGE
+    // ==========================================
+    console.log('Seeding Services Page...');
+    await ServicesPage.create({
+      services: [
+        {
+          tag: 'Operations',
+          title: 'Execute & Lead Business Operations',
+          subtitle: 'End-to-end ops management that drives revenue, efficiency, and guest delight.',
+          link: '/services/execute-lead-business-operations',
+          image: { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600&auto=format&fit=crop', public_id: 'dummy' },
+          accentColor: '#5FC1D1',
+          stats: [
+            { label: 'Revenue uplift', value: '32%' },
+            { label: 'Efficiency gain', value: '55%' },
+            { label: 'Guest satisfaction', value: '4.8★' },
+          ],
+          features: [
+            'SOP & Financial Modelling',
+            'HR & PMS Development',
+            'ROI-Centric Analytics',
+            'Industry Audits & Compliance',
+            'Gold Standard Hospitality',
+            'Real-Time P&L Reviews'
+          ]
+        },
+        {
+          tag: 'Pre-Opening',
+          title: 'Pre-Opening Set-Up & Consultation',
+          subtitle: 'From site selection to launch day — we set you up for a triumphant debut.',
+          link: '/services/pre-opening-set-up-consultation-services',
+          image: { url: 'https://images.unsplash.com/photo-1560472355-536de3962603?q=80&w=1600&auto=format&fit=crop', public_id: 'dummy' },
+          accentColor: '#A78BFA',
+          stats: [
+            { label: 'Avg. launch time', value: '90 days' },
+            { label: 'ROI projected', value: '3-5×' },
+            { label: 'Cities served', value: '40+' },
+          ],
+          features: [
+            'Location & Demographic Analysis',
+            'Manpower Hiring & Planning',
+            'ROI-Driven Game Selection',
+            'Installation & Supervision',
+            'Pricing & Promotions Design',
+            'Arcade Layout & Center Design'
+          ]
+        }
+      ],
+      processSteps: [
+        { num: '01', title: 'Discovery', desc: 'Market research, site analysis, and feasibility study.', image: { url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { num: '02', title: 'Strategy', desc: 'ROI modelling, layout design, and game selection blueprint.', image: { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { num: '03', title: 'Execution', desc: 'Setup, staff training, vendor coordination, and soft launch.', image: { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { num: '04', title: 'Growth', desc: 'Ongoing ops management, analytics, and performance tuning.', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } }
+      ],
+      galleryImages: [
+        { label: 'Arcade Zone', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { label: 'Hospitality', image: { url: 'https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { label: 'Center Design', image: { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { label: 'Operations Hub', image: { url: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { label: 'Marketing', image: { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } },
+        { label: 'Team Synergy', image: { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop', public_id: 'dummy' } }
+      ],
+      results: [
+        { raw: 150, suffix: '+', label: 'FECs Launched', sublabel: 'Across India', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+        { raw: 40, suffix: '+', label: 'Cities Covered', sublabel: 'Pan-India presence', image: { url: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+        { raw: 32, suffix: '%', label: 'Avg Revenue Uplift', sublabel: 'Post-engagement', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+        { raw: 15, suffix: '+', label: 'Years Experience', sublabel: 'Industry veterans', image: { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+      ]
+    });
+    console.log('Created Services Page.');
+
+    // ==========================================
+    // 3.8 SERVICE DETAILS
+    // ==========================================
+    console.log('Seeding Service Details (Inside Pages)...');
+    await ServiceDetail.create([
+      {
+        slug: 'pre-opening-set-up-consultation-services',
+        seo: {
+          title: "Pre-Opening Set-Up & Consultation — Bowling Planet",
+          description: "Bowling Planet's Pre-Opening Consulting. Location analytics, ROI projection, layout design, game selection, staffing guidance, and expert training."
+        },
+        header: {
+          subtitle: 'Pre-Opening',
+          title: 'Set-Up & Consultation Services',
+          accentColor: '#A78BFA',
+          leadId: 'consultation',
+          image: { url: 'https://images.unsplash.com/photo-1560472355-536de3962603?q=80&w=2070&auto=format&fit=crop', public_id: 'dummy' }
+        },
+        hero: {
+          missionText: 'From an idea to a thriving venue — in 90 days.',
+          timelineTitle: 'Launch Timeline',
+          image: { url: 'https://images.unsplash.com/photo-1560472355-536de3962603?q=80&w=1400&auto=format&fit=crop', public_id: 'dummy' }
+        },
+        timeline: [
+          { phase: 'Week 1–2', label: 'Site & Market Analysis', iconName: 'MapPin', color: '#5FC1D1' },
+          { phase: 'Week 3–4', label: 'Strategy & Blueprinting', iconName: 'ClipboardCheck', color: '#A78BFA' },
+          { phase: 'Week 5–10', label: 'Procurement & Setup', iconName: 'Wrench', color: '#34D399' },
+          { phase: 'Week 11–13', label: 'Training & Soft Launch', iconName: 'GraduationCap', color: '#FBBF24' },
+          { phase: 'Day 90+', label: 'Grand Opening & Growth', iconName: 'Rocket', color: '#F87171' }
+        ],
+        metrics: [
+          { target: 90, suffix: ' days', label: 'Average launch timeline', color: '#A78BFA', image: { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { target: 40, suffix: '+', label: 'Cities we have served', color: '#5FC1D1', image: { url: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { target: 150, suffix: '+', label: 'Successful FEC launches', color: '#34D399', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        features: [
+          { title: 'Location & Demographics', short: 'Analytics guiding optimal site decisions', iconName: 'MapPin', image: { url: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Pre-Opening Evaluation', short: 'Meticulous requirements assessment', iconName: 'ClipboardCheck', image: { url: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Launch Strategy', short: 'Impactful launch plan for day one success', iconName: 'Rocket', image: { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Pricing Strategy', short: 'Maximize profitability at every price point', iconName: 'Tag', image: { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Recharge & Promotions', short: 'Plans that build loyalty and repeat visits', iconName: 'Gift', image: { url: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Operations Training', short: 'Sales, ops & tech team readiness', iconName: 'GraduationCap', image: { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Manpower Selection', short: 'Talent recruitment across all roles', iconName: 'UserCheck', image: { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Workforce Planning', short: 'Optimal coverage & shift structure', iconName: 'Users', image: { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Inventory Procurement', short: 'Best-deal sourcing for all game assets', iconName: 'ShoppingCart', image: { url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Installation Support', short: 'Setup to testing — flawlessly executed', iconName: 'Wrench', image: { url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'ROI-Driven Games', short: 'ROI, quality & demographics alignment', iconName: 'Gamepad2', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Arcade Layout Design', short: 'Ambiance, ergonomics & efficiency', iconName: 'LayoutDashboard', image: { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        gallery: [
+          { title: 'Arcade experience that keeps guests coming back', tag: 'Games Zone', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Premium center design', tag: '', image: { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Expert team training', tag: '', image: { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Cohesive teams executing from day one', tag: 'Operations', image: { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1200&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        crossLink: {
+          text: 'Explore our other core service offering',
+          buttonText: 'Operations Consulting',
+          buttonLink: '/services/execute-lead-business-operations'
+        }
+      },
+      {
+        slug: 'execute-lead-business-operations',
+        seo: {
+          title: "Execute & Lead Business Operations — Bowling Planet",
+          description: "Bowling Planet's Operations Management Service. SOP design, ROI-driven strategies, HR, finances, marketing, safety & more."
+        },
+        header: {
+          subtitle: 'Operations',
+          title: 'Execute & Lead Business Operations',
+          accentColor: '#5FC1D1',
+          leadId: 'operations',
+          image: { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop', public_id: 'dummy' }
+        },
+        hero: {
+          missionText: 'Operational excellence at every level — from frontline staff to P&L.',
+          timelineTitle: 'Engagement Lifecycle',
+          image: { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1400&auto=format&fit=crop', public_id: 'dummy' }
+        },
+        timeline: [
+          { phase: 'Phase 1', label: 'Operational Assessment', iconName: 'Settings', color: '#5FC1D1' },
+          { phase: 'Phase 2', label: 'SOP & System Design', iconName: 'FileText', color: '#34D399' },
+          { phase: 'Phase 3', label: 'Team Training & HR', iconName: 'Users', color: '#FBBF24' },
+          { phase: 'Phase 4', label: 'Launch & Monitoring', iconName: 'TrendingUp', color: '#F87171' },
+          { phase: 'Ongoing', label: 'Audits & Optimisation', iconName: 'ShieldCheck', color: '#A78BFA' }
+        ],
+        metrics: [
+          { target: 32, suffix: '%', label: 'Average revenue uplift post-engagement', color: '#5FC1D1', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { target: 55, suffix: '%', label: 'Operational efficiency gained', color: '#34D399', image: { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { target: 150, suffix: '+', label: 'FECs managed across India', color: '#FBBF24', image: { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        features: [
+          { title: 'Robust Protocols', short: 'SOPs, checklists & operational registers', iconName: 'Settings', image: { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Streamlined Day-to-Day', short: 'Guest relations, loss prevention, inventory', iconName: 'Layers', image: { url: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Budget Planning', short: 'Optimal resource allocation & forecasting', iconName: 'PieChart', image: { url: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'SOP & Reporting', short: 'Frameworks, financial models & registers', iconName: 'FileText', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Marketing Strategy', short: 'Sales uplift & audience targeting', iconName: 'Target', image: { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Gold Standard Hospitality', short: 'Industry-leading guest experience', iconName: 'Award', image: { url: 'https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Training & Development', short: 'Skills programs aligned to industry trends', iconName: 'BookOpen', image: { url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'HR & PMS', short: 'Recruitment to appraisal — end-to-end', iconName: 'Users', image: { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'ROI-Centric Approach', short: 'Data-driven growth & innovation', iconName: 'TrendingUp', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Industry Audits', short: 'Mystery audits, quality & machine uptime', iconName: 'ShieldCheck', image: { url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'P&L Reviews', short: 'Comprehensive profit & loss analysis', iconName: 'Activity', image: { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Data-Driven Pricing', short: 'Pricing, recharge plans & offers', iconName: 'BarChart', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        gallery: [
+          { title: 'Empowered teams deliver extraordinary results', tag: 'HR & People', image: { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Sales strategies that convert', tag: '', image: { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Gold standard guest experience', tag: '', image: { url: 'https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=600&auto=format&fit=crop', public_id: 'dummy' } },
+          { title: 'Data-driven decisions power every outcome', tag: 'Analytics', image: { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop', public_id: 'dummy' } }
+        ],
+        crossLink: {
+          text: 'Explore our other core service offering',
+          buttonText: 'Pre-Opening Consulting',
+          buttonLink: '/services/pre-opening-set-up-consultation-services'
+        }
+      }
+    ]);
+    console.log('Created Service Details.');
 
     // ==========================================
     // 4. PROJECTS

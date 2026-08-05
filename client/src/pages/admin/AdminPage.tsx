@@ -20,6 +20,7 @@ import { CmsResourceView } from './views/cms/resources/CmsResourceView';
 import { BlogEditorPage } from './views/cms/blog/components/BlogEditorPage';
 import { MediaManagement } from './views/media/MediaManagement';
 import { CmsServicesView } from './views/cms/services/CmsServicesView';
+import CmsServiceDetailsView from './views/cms/services/CmsServiceDetailsView';
 
 export default function AdminPage() {
   return (
@@ -58,6 +59,7 @@ export default function AdminPage() {
         <Route path="cms/settings" element={<CmsSettingsView />} />
         <Route path="cms/team" element={<CmsTeamView />} />
         <Route path="cms/services" element={<CmsServicesView />} />
+        <Route path="cms/service-details" element={<CmsServiceDetailsView />} />
 
         {/* Placeholders for future views */}
         <Route path="media" element={<MediaManagement/>} />

@@ -36,8 +36,7 @@ const ContactPage = lazy(() => import('./pages/Contact/ContactPage'))
 const InsightsPage = lazy(() => import('./pages/InsightsPage/InsightsPage'))
 const BlogDetailsPage = lazy(() => import('./pages/BlogDetailsPage/BlogDetailsPage'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage/ServicesPage'))
-const ServiceOperationsPage = lazy(() => import('./pages/ServicesPage/ServiceOperationsPage'))
-const ServiceConsultationPage = lazy(() => import('./pages/ServicesPage/ServiceConsultationPage'))
+const DynamicServicePage = lazy(() => import('./pages/ServicesPage/DynamicServicePage'))
 const LoginPage = lazy(() => import('./pages/Auth/LoginPage'))
 const SignupPage = lazy(() => import('./pages/Auth/SignupPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/Auth/ForgotPasswordPage'))
@@ -86,8 +85,7 @@ export default function App() {
                     <Route path="products/:slug" element={<BaseProductDetailsPage />} />
                     <Route path="/franchise" element={<FranchisePage />} />
                     <Route path="/services" element={<ServicesPage />} />
-                    <Route path="/services/execute-lead-business-operations" element={<ServiceOperationsPage />} />
-                    <Route path="/services/pre-opening-set-up-consultation-services" element={<ServiceConsultationPage />} />
+                    <Route path="/services/:slug" element={<DynamicServicePage />} />
                     <Route path="/careers" element={<JobsPage />} />
                     <Route path="careers/:slug" element={<JobDetailsPage />} />
                     <Route path="contact" element={<ContactPage />} />
