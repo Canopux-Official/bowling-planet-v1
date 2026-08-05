@@ -95,7 +95,7 @@ const AboutPage: React.FC = () => {
       <div className="mx-auto max-w-[1200px] space-y-16 px-5 pb-16 pt-24 sm:space-y-24 sm:px-7 sm:pt-28">
         {/* Standard Intro */}
         <header className="mb-16 text-center max-w-3xl mx-auto pt-8 flex flex-col items-center">
-          <img src="/logo.png" alt="Bowling Planet" className="h-44 w-auto mb-6 sm:h-36" />
+          <img src="/logo.png" alt="Bowling Planet" className="h-auto max-h-32 sm:max-h-36 w-auto max-w-[85vw] mb-6 object-contain" />
           <h1 className="font-display text-[clamp(2rem,4vw,3rem)] font-extrabold tracking-tight text-[#F5F5F7]">
             About Bowling Planet
           </h1>
